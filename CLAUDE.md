@@ -113,7 +113,10 @@ models.js`) се градат од примитиви во рамка од OBB �
 ## Git тек
 
 - `develop` — интеграциска гранка (ќе стане default); feature гранките се спојуваат таму.
-- `main` — објавува на GitHub Pages. **Push на `main` само по изречна дозвола од сопственикот.**
+- `main` — објавува на GitHub Pages (`.github/workflows/deploy.yml`, извор „GitHub Actions“):
+  https://aleksandar-transformian.github.io/bitola-map/ — **push на `main` само по изречна
+  дозвола од сопственикот** (дадена за објавата во фаза 4; секоја следна објава — прашај).
+- Лиценца: MIT за кодот (`LICENSE`); податоците ODbL, фонтовите OFL.
 - Спецификации и план: `docs/specs/`; одлуки, бројки и проблеми: `docs/NOTES.md`.
 
 ## Мрежни ограничувања во cloud сесии
