@@ -8,12 +8,13 @@ import { createTime, TIMES } from './app/time.js';
 import { createWeather, WEATHERS } from './app/weather.js';
 import { readPref, hashPref, writePref } from './app/prefs.js';
 import { createStyleManager } from './styles/manager.js';
-import { STYLES, getStyle, initialStyleId, rememberStyle, styleFromHash } from './styles/index.js';
+import { STYLES, getStyle, initialStyleId, rememberStyle, styleFromHash, migrateLegacyStyle } from './styles/index.js';
 import { VIEWS, CHECK_VIEWS } from './config/views.js';
 import { PLACE_RANK, PLACE_SKIP, EXTRA_PLACES } from './config/labels.js';
 import { createOverlay } from './ui/overlay.js';
 import { createStylePicker } from './ui/style-picker.js';
 import { createMenu } from './ui/menu.js';
+import { createSnapshot } from './app/snapshot.js';
 import { createLabels, collectLabels } from './ui/labels.js';
 import { detectProfile } from './profile.js';
 import { createPerf } from './perf/perf.js';
@@ -24,6 +25,7 @@ const T0 = performance.now();
 const QS = new URLSearchParams(location.search);
 const BENCH = QS.has('bench');
 const profile = detectProfile();
+migrateLegacyStyle();
 const firstStyle = getStyle(initialStyleId());
 const validTime = (id) => TIMES.some((t) => t.id === id);
 const validWeather = (id) => WEATHERS.some((w) => w.id === id);
@@ -48,7 +50,7 @@ async function start() {
     time: { value: 0 },
     flicker: { value: 1 },
     broken: { value: 0 },
-    streetGain: { value: 1 }, // сјаењето на улиците по растојание (го менува стилот, на пр. „Ноќна Битола“)
+    streetGain: { value: 1 }, // сјаењето на улиците по растојание (го менува менаџерот на стилови)
     snow: { value: 0 }, // снег 0–1 (временски услови, app/weather.js)
     snowColor: { value: new THREE.Color('#f3f6fa') },
   };
@@ -127,6 +129,15 @@ async function start() {
     onTime: (id) => setTime(id),
     onWeather: (id) => setWeather(id),
     onLife: (on) => setLife(on),
+    onSnapshot: () => snapshot.save(),
+  });
+  const snapshot = createSnapshot({
+    pipeline,
+    renderFrame: () => pipeline.render(0),
+    container,
+    profile,
+    attribution: data.meta.attribution || ['© соработниците на OpenStreetMap'],
+    state: () => ({ style: styles.current?.id, time: time.mode }),
   });
   // „Живот на мапата“ (сообраќај и пешаци): вклучен, освен при ?bench и „намалено движење“
   let life = !BENCH && !still?.matches;
@@ -185,12 +196,10 @@ async function start() {
     syncTime();
     if (animate) writePref('time', id);
   }
-  /** Копчињата за време и data-time; стил со фиксно време ги заклучува копчињата. */
+  /** Копчињата за време и data-time. */
   function syncTime() {
-    const fixed = styles.current?.fixedTime || null;
-    menu.lockTime(fixed);
-    menu.setTime(fixed || time.mode);
-    document.documentElement.dataset.time = fixed || time.mode;
+    menu.setTime(time.mode);
+    document.documentElement.dataset.time = time.mode;
   }
   function setWeather(id) {
     if (!validWeather(id) || id === weather.mode) return;
@@ -209,6 +218,7 @@ async function start() {
   }
   controls.addEventListener('start', () => menu.setPlace(null));
   window.addEventListener('hashchange', () => {
+    migrateLegacyStyle();
     const s = styleFromHash();
     if (s) setStyle(s);
     const t = hashPref('time', validTime);
@@ -300,6 +310,7 @@ async function start() {
 
   Object.assign(stats, { buildings: data.meta.stats.buildings.count });
   const app = {
+    snapshot,
     scene,
     camera,
     controls,
