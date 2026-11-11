@@ -97,10 +97,15 @@ export default {
     facade5: '#f8f7f3',
     paving: '#eeeae2',
     bronze: '#b8976a',
+    eave: '#c2a983',
+    copper: '#b39a74',
+    ochre: '#efe3c6',
+    plinth: '#d8c6a3',
+    tin: '#d6bc94',
+    amber: '#dcc49c',
     // зградите на Магнолија (world/landmarks/magnolija.js)
     plaster: '#f8f7f3',
     peach: '#f1e8dc',
-    ochre: '#eadfc8',
     wood: '#c9ae82',
   },
   trees: {

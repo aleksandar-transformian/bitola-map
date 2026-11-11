@@ -105,10 +105,16 @@ export default {
     facade5: '#97a6b0',
     paving: '#bfae93',
     bronze: '#5f6a5a',
+    // Дом на културата, Горна гимназија (world/landmarks/civic.js)
+    eave: '#6f4c3a',
+    copper: '#4f3a2e',
+    ochre: '#d8b26c',
+    plinth: '#9a8670',
+    tin: '#9a5a4c',
+    amber: '#d08a52',
     // зградите на Магнолија (world/landmarks/magnolija.js)
     plaster: '#ebe2d2',
     peach: '#ddb89d',
-    ochre: '#d8b26c',
     wood: '#7b3f2a',
   },
   trees: {
