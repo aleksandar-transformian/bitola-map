@@ -59,6 +59,7 @@ const material = () =>
 export class InkPass extends Pass {
   constructor(camera, { color = '#2a2420', strength = 0.9, threshold = 0.012, width = 1 } = {}) {
     super();
+    this.perfName = 'ink';
     this.camera = camera;
     this.material = material();
     const u = this.material.uniforms;

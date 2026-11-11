@@ -8,17 +8,20 @@ import { createTime, TIMES } from './app/time.js';
 import { readPref, hashPref, writePref } from './app/prefs.js';
 import { createStyleManager } from './styles/manager.js';
 import { STYLES, getStyle, initialStyleId, rememberStyle, styleFromHash } from './styles/index.js';
-import { VIEWS } from './config/views.js';
+import { VIEWS, CHECK_VIEWS } from './config/views.js';
 import { PLACE_RANK, PLACE_SKIP, EXTRA_PLACES } from './config/labels.js';
 import { createOverlay } from './ui/overlay.js';
 import { createStylePicker } from './ui/style-picker.js';
 import { createMenu } from './ui/menu.js';
 import { createLabels, collectLabels } from './ui/labels.js';
 import { detectProfile } from './profile.js';
+import { createPerf } from './perf/perf.js';
 import './ui/fonts.js';
 import './ui/ui.css';
 
 const T0 = performance.now();
+const QS = new URLSearchParams(location.search);
+const BENCH = QS.has('bench');
 const profile = detectProfile();
 const firstStyle = getStyle(initialStyleId());
 const validTime = (id) => TIMES.some((t) => t.id === id);
@@ -65,6 +68,9 @@ async function start() {
   const view = createCamera(pipeline.renderer.domElement, world);
   const { camera, controls } = view;
   pipeline.init(scene, camera);
+  // мерење (само со ?debug или ?bench): CPU по фаза, GPU по пас
+  const perf = createPerf(pipeline.renderer, { enabled: BENCH || QS.has('debug') });
+  pipeline.instrument(perf.gpu);
 
   const styles = createStyleManager({
     world,
@@ -94,6 +100,7 @@ async function start() {
     if (!l.group || places.has(l.id)) continue; // брзиот поглед со истото име има предност
     places.set(l.id, { target: { x: l.center[0], z: l.center[1] }, bearing: 200, polar: 58, distance: SIZE[l.model] || 170, ...(l.view || {}) });
   }
+  for (const v of CHECK_VIEWS) if (!places.has(v.id)) places.set(v.id, v); // само преку #view= (проверки, мерења)
   validView = (id) => places.has(id);
   const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id) });
   menu.setTime(time.mode);
@@ -104,7 +111,7 @@ async function start() {
   picker.setActive(firstStyle.id);
   // упатството се покажува сам само при првата посета
   try {
-    if (!localStorage.getItem('bitola.helpSeen')) {
+    if (!BENCH && !localStorage.getItem('bitola.helpSeen')) {
       menu.showHelp(true);
       localStorage.setItem('bitola.helpSeen', '1');
     }
@@ -112,21 +119,23 @@ async function start() {
     // без складирање — без автоматско упатство
   }
 
-  function setStyle(id) {
+  function setStyle(id, { animate = true, remember = true } = {}) {
     const s = getStyle(id);
     if (!s || s.id === styles.current?.id) return;
-    stats.lastSwitchMs = styles.apply(s);
+    stats.lastSwitchMs = styles.apply(s, { animate });
     picker.setActive(s.id);
-    rememberStyle(s.id);
+    if (remember) rememberStyle(s.id);
     // фонтовите на натписите зависат од стилот
     requestAnimationFrame(() => labels.measure());
+    return stats.lastSwitchMs;
   }
-  function setTime(id) {
+  function setTime(id, animate = true) {
     if (!validTime(id) || id === time.mode) return;
-    time.set(id);
+    time.set(id, animate);
+    if (!animate) styles.relight();
     menu.setTime(id);
     document.documentElement.dataset.time = id;
-    writePref('time', id);
+    if (animate) writePref('time', id);
   }
   function goTo(id, animate = true) {
     const v = places.get(id);
@@ -180,13 +189,17 @@ async function start() {
     const now = performance.now();
     const dt = (now - last) / 1000;
     last = now;
+    perf.begin(now);
     view.updateFlight();
     controls.update();
     const d = view.updateClipping(sky);
     updateSun(d);
     styles.update();
+    perf.mark('update');
     pipeline.render(dt);
+    perf.mark('render');
     labels.update(camera, container.clientWidth, container.clientHeight, d);
+    perf.end('labels');
     frames++;
     if (first) {
       first = false;
@@ -203,12 +216,46 @@ async function start() {
       lastFpsT = now;
       stats.style = styles.current?.id;
       stats.time = time.mode;
-      overlay.debug(stats, pipeline.renderer.info);
+      overlay.debug(stats, pipeline.renderer.info, perf.live(), pipeline.size);
     }
   });
 
   Object.assign(stats, { buildings: data.meta.stats.buildings.count });
-  window.__bitolaApp = { scene, camera, controls, pipeline, setView: view.setView, getView: view.getView, goTo, setStyle, setTime, world, data };
+  const app = {
+    scene,
+    camera,
+    controls,
+    pipeline,
+    renderer: pipeline.renderer,
+    perf,
+    profile,
+    stats,
+    sun,
+    places,
+    uiRoot: ui,
+    setView: view.setView,
+    getView: view.getView,
+    flyTo: view.flyTo,
+    goTo,
+    setStyle,
+    setTime,
+    get style() {
+      return styles.current?.id;
+    },
+    get time() {
+      return time.mode;
+    },
+    world,
+    data,
+  };
+  window.__bitolaApp = app;
+
+  // ?bench — мерење на изведбата (посебен модул, се вчитува само тогаш)
+  if (BENCH) {
+    await new Promise((r) => setTimeout(r, 500)); // првите кадри (шејдери, текстури) да поминат
+    const { startBench } = await import('./perf/bench.js');
+    await startBench(app);
+  }
 }
 
 start().catch((err) => {

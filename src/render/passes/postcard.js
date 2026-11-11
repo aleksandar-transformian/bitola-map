@@ -122,6 +122,7 @@ function srgb(hex) {
  */
 export function createPostcardPass(o) {
   const pass = new ShaderPass({ ...shader, defines: { OCTAVES: o.low ? 3 : 5 } });
+  pass.perfName = 'postcard';
   const u = pass.uniforms;
   u.paper.value.copy(srgb(o.paper));
   for (const k of ['wobble', 'bleed', 'edge', 'grain', 'vignette', 'warmth']) if (o[k] !== undefined) u[k].value = o[k];

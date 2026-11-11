@@ -12,7 +12,7 @@
 
 import { createRequire } from 'node:module';
 import { mkdir } from 'node:fs/promises';
-import { VIEWS as APP_VIEWS } from '../../src/config/views.js';
+import { VIEWS as APP_VIEWS, CHECK_VIEWS } from '../../src/config/views.js';
 import { readFileSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
@@ -34,15 +34,7 @@ const views = opt('views', 'home').split(',');
 // Погледи за проверка: брзите погледи од апликацијата (config/views.js) + неколку дополнителни.
 const VIEWS = {
   home: null,
-  ...Object.fromEntries(APP_VIEWS.map((v) => [v.id, v])),
-  center: { target: { x: 0, z: 0 }, bearing: 200, polar: 55, distance: 900 },
-  close: { target: { x: 30, z: -60 }, bearing: 160, polar: 62, distance: 350 },
-  west: { target: { x: -2500, z: 800 }, bearing: 70, polar: 65, distance: 4500 },
-  top: { target: { x: -500, z: 400 }, bearing: 0, polar: 1, distance: 11000 },
-  // крупни планови на знаменитостите
-  saat: { target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
-  dimitrija: { target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
-  filip: { target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
+  ...Object.fromEntries([...APP_VIEWS, ...CHECK_VIEWS].map((v) => [v.id, v])),
 };
 
 // lm-<id> = поглед кон знаменитост од public/data/landmarks.json (растојание по големина)
