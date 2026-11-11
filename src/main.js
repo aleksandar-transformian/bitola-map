@@ -40,7 +40,7 @@ async function start() {
   stats.dataMs = Math.round(performance.now() - T0);
 
   // Заеднички uniforms за ноќта (прозорци, улици, светилки).
-  const env = { night: { value: 0 }, lamp: { value: new THREE.Color('#ffc27a') } };
+  const env = { night: { value: 0 }, lamp: { value: new THREE.Color('#ffc27a') }, streetGain: { value: 1 } };
   const time = createTime(readPref('time', validTime) || 'day');
   document.documentElement.dataset.time = time.mode;
 
@@ -103,7 +103,7 @@ async function start() {
   for (const v of CHECK_VIEWS) if (!places.has(v.id)) places.set(v.id, v); // само преку #view= (проверки, мерења)
   validView = (id) => places.has(id);
   const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id) });
-  menu.setTime(time.mode);
+  syncTime();
   const dock = document.createElement('div');
   dock.className = 'dock';
   ui.appendChild(dock);
@@ -124,6 +124,7 @@ async function start() {
     if (!s || s.id === styles.current?.id) return;
     stats.lastSwitchMs = styles.apply(s, { animate });
     picker.setActive(s.id);
+    syncTime();
     if (remember) rememberStyle(s.id);
     // фонтовите на натписите зависат од стилот
     requestAnimationFrame(() => labels.measure());
@@ -133,9 +134,15 @@ async function start() {
     if (!validTime(id) || id === time.mode) return;
     time.set(id, animate);
     if (!animate) styles.relight();
-    menu.setTime(id);
-    document.documentElement.dataset.time = id;
+    syncTime();
     if (animate) writePref('time', id);
+  }
+  /** Копчињата за време и data-time; стил со фиксно време ги заклучува копчињата. */
+  function syncTime() {
+    const fixed = styles.current?.fixedTime || null;
+    menu.lockTime(fixed);
+    menu.setTime(fixed || time.mode);
+    document.documentElement.dataset.time = fixed || time.mode;
   }
   function goTo(id, animate = true) {
     const v = places.get(id);

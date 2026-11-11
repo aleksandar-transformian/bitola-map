@@ -225,11 +225,12 @@ export function withStreetGlow(material, env, strength = [0.4, 0.38, 0.36, 0.32,
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
     shader.uniforms.uStrength = { value: strength };
+    shader.uniforms.uStreetGain = env.streetGain || { value: 1 };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nattribute float cls;\nuniform float uStrength[10];\nvarying float vStreet;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvStreet = uStrength[int(cls + 0.5)];');
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform float uNight;\nuniform vec3 uLamp;\nvarying float vStreet;')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vStreet * uNight;');
+      .replace('#include <common>', '#include <common>\nuniform float uNight, uStreetGain;\nuniform vec3 uLamp;\nvarying float vStreet;')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vStreet * uNight * uStreetGain;');
   });
 }
