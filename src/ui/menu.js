@@ -98,7 +98,12 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
   });
   weatherNav.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-id]');
-    if (b) onWeather(b.dataset.id);
+    if (!b) return;
+    // клик на избраното копче = следната состојба (на телефон се гледа само тоа копче)
+    if (b.getAttribute('aria-checked') === 'true') {
+      const all = [...weatherNav.querySelectorAll('button[data-id]')];
+      onWeather(all[(all.indexOf(b) + 1) % all.length].dataset.id);
+    } else onWeather(b.dataset.id);
   });
   const lifeBtn = el.querySelector('.life-btn');
   lifeBtn.addEventListener('click', () => onLife?.(lifeBtn.getAttribute('aria-pressed') !== 'true'));

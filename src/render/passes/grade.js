@@ -46,6 +46,7 @@ export function createGradePass({ shadows = '#1d3a4a', highlights = '#ffb46a', s
         gl_FragColor = vec4(clamp(toned, 0.0, 1.0), c.a);
       }`,
   });
+  pass.perfName = 'grade';
   const setSize = pass.setSize.bind(pass);
   pass.setSize = (w, h) => {
     setSize(w, h);

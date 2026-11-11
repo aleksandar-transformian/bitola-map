@@ -173,6 +173,7 @@ export class BokehPass extends Pass {
    */
   constructor(camera, { samples = 32, maxRadius = 12, band = 0.1, lights = null, gain = 1, lamp = '#ffb15e' } = {}) {
     super();
+    this.perfName = 'bokeh';
     this.camera = camera;
     this.maxRadius = maxRadius;
     this.dof = dofMaterial(samples);

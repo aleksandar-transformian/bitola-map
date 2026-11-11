@@ -179,6 +179,7 @@ export default {
     if (!mobile) {
       const { width, height } = ctx.size;
       bloom = new UnrealBloomPass(new THREE.Vector2(width, height), 0.55, 0.6, 0.85);
+      bloom.perfName = 'bloom';
       before.push(bloom);
     }
     const grade = createGradePass({ shadows: '#1b3a4c', highlights: '#ffb46a', split: 0.1, vignette: 0.4, grain: 0.035 });

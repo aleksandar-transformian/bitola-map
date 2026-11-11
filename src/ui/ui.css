@@ -751,6 +751,13 @@ html[data-style='nokna'] .label span {
 
 /* тесен екран: сите стилови се мостри, името се гледа само кај избраниот */
 @media (max-width: 600px) {
+  /* снегот е едно копче (тековната состојба; допир = следната) — место за „Оди до…“ */
+  .weather-toggle button[aria-checked='false'] {
+    display: none;
+  }
+  .weather-toggle button[aria-checked='true'] {
+    background: transparent;
+  }
   .style-picker button {
     padding: 7px;
     gap: 6px;
