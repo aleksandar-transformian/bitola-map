@@ -24,12 +24,16 @@ node scripts/dev/check-styles.mjs                     # проверка на и
 ```
 
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, charshija,
-gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija.
+gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip + `lm-<id>`
+за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa&time=day|sunset|night&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
-Home = преглед, 1–9 = стил.
+Home = преглед, 1–9 = стил, ? = упатство.
+
+Важно: слојот со натписите е преку цел екран и мора да има `pointer-events: none`, инаку ги
+„голта“ глувчето/допирот и мапата не може да се движи (`check-styles.mjs` го проверува ова).
 
 ## Архитектура
 
@@ -37,7 +41,8 @@ Home = преглед, 1–9 = стил.
 src/config/region.js     ← ЕДИНСТВЕНОТО место за опфатот (bbox), почетна точка, зум на релјефот
 src/config/classes.js    ← enum класи (улици, површини, згради) — дел од форматот на податоците
 src/config/zones.js      ← зони за проценка на висини (чаршија, Широк Сокак, центар)
-src/config/landmarks.js  ← знаменитости: OSM основа + модел (Саат Кула, џамии, Безистен, …)
+src/config/landmarks.js  ← знаменитости (30): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
+                           group (мени „Оди до…“), view, rank, label
 src/config/views.js      ← брзи погледи
 src/config/labels.js     ← кои населби добиваат натпис + рачни места (Јени Маале, …)
 src/lib/pack.js          ← бинарен контејнер .bin (encode во Node, decode во прелистувач)
@@ -46,7 +51,8 @@ src/world/*.js           ← градење геометрија од подат
 src/world/world.js       ← сите слоеви на светот (еднаш); setBuildingRoofs() = варијанта на геометрија
 src/world/buildings.js   ← згради: рамни или двоводни покриви, атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
-src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js (моделите)
+src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
+                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, …)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
@@ -59,8 +65,8 @@ src/app/camera.js        ← камера, MapControls, погледи, лет �
 src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
 src/app/prefs.js         ← поставки во URL hash + localStorage
 src/data/loader.js       ← вчитување на public/data/*
-src/ui/                  ← интерфејс: наслов, атрибуција, избирач на стил, погледи и време (controls.js),
-                           натписи (labels.js — проекција + одбегнување преклоп), фонтови
+src/ui/                  ← интерфејс: наслов, атрибуција, мени горе десно (menu.js: „Оди до…“, време,
+                           упатство „?“), избирач на стил долу, натписи (labels.js), фонтови
 src/main.js              ← поврзување на сè погоре, јамка
 scripts/data/            ← Node скрипти: fetch-osm, fetch-overture, fetch-terrain, build (+ lib/)
 scripts/dev/             ← screenshot.mjs (слики, време, FPS), check-styles.mjs (тест на стиловите)
