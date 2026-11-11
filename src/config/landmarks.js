@@ -57,11 +57,13 @@ export const LANDMARKS = [
   { id: 'nov-manastir', group: 'Цркви и џамии', name: 'Нов Битолски Манастир', osm: 'w1331445406', model: 'monastery', rank: 1 },
 
   // ── јавни згради ──
-  { id: 'dom-na-kultura', group: 'Јавни згради', name: 'Дом на култура', osm: 'w38065297', model: 'publicBuilding', rank: 1, opts: { height: 15, roof: 'flat', part: 'wall', floors: 3, band: true } },
+  // Дом на културата (Смилевски и Мушич, 1976–1980): бакарни покриви, скалести волумени;
+  // главната фасада гледа кон паркот на исток (front = насока во светот, x = исток, z = југ)
+  { id: 'dom-na-kultura', group: 'Јавни згради', name: 'Дом на култура', osm: 'w38065297', model: 'culturalCenter', rank: 1, opts: { front: [1, 0] } },
   { id: 'opshtina', group: 'Јавни згради', name: 'Општина Битола', osm: 'w789965987', model: 'publicBuilding', rank: 1, opts: { height: 17, roof: 'flat', part: 'wall', floors: 5, flag: true } },
   // „Горна гимназија“ — СОУ „Јосип Броз Тито“: главната зграда во дворот на училиштето
   // главната зграда е до главната улица (точка од сопственикот); најголемата во дворот е спортската сала
-  { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, at: { lat: 41.0321394, lon: 21.3284611 }, model: 'publicBuilding', rank: 1, opts: { height: 14, roof: 'hip', part: 'wall2', floors: 3 } },
+  { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, at: { lat: 41.0321394, lon: 21.3284611 }, model: 'gymnasium', rank: 1, opts: { front: [0, 1] } }, // фасадата кон Драгор (на југ од зградата)
   { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'publicBuilding', rank: 1, opts: { height: 10, roof: 'tiles', part: 'wall2', floors: 2 } },
   { id: 'zandan-kule', group: 'Историја и спомен-места', name: 'Зандан Куле', osm: 'w992188624', model: 'stoneTower', rank: 1 },
   { id: 'stanica', group: 'Јавни згради', name: 'Железничка станица', osm: 'w333585687', model: 'station', rank: 1 },

@@ -4,8 +4,9 @@ import * as THREE from 'three';
 import { Kit, PARTS } from './kit.js';
 import { MODELS } from './models.js';
 import { EXTRA_MODELS } from './extra.js';
+import { CIVIC_MODELS } from './civic.js';
 
-const ALL = { ...MODELS, ...EXTRA_MODELS };
+const ALL = { ...MODELS, ...EXTRA_MODELS, ...CIVIC_MODELS };
 
 /**
  * @param {object[]} items  landmarks.json

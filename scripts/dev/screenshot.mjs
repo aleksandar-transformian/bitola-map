@@ -43,6 +43,10 @@ const VIEWS = {
   saat: { target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
   dimitrija: { target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
   filip: { target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
+  dom: { target: { x: -8, z: 292 }, bearing: 115, polar: 58, distance: 160 }, // како воздушната фотографија од паркот
+  'dom-front': { target: { x: 10, z: 285 }, bearing: 68, polar: 76, distance: 120 }, // фронтално од паркот
+  gimnazija: { target: { x: -542, z: -162 }, bearing: 182, polar: 72, distance: 80 }, // од кејот на Драгор
+  'gimnazija-agol': { target: { x: -540, z: -163 }, bearing: 140, polar: 72, distance: 65 },
 };
 
 // lm-<id> = поглед кон знаменитост од public/data/landmarks.json (растојание по големина)
