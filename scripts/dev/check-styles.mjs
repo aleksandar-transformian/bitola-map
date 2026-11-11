@@ -200,7 +200,8 @@ check('непознат #style= се игнорира', (await p3.evaluate(() =>
 await p3.waitForTimeout(300);
 const fk1 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
 await p3.emulateMedia({ reducedMotion: 'reduce' });
-await p3.waitForTimeout(500);
+// вредноста се менува во следниот кадар — во SwiftShader кадарот може да трае и неколку секунди
+await p3.waitForFunction(() => window.__bitolaApp.env.flicker.value === 0, null, { timeout: 60000, polling: 300 }).catch(() => {});
 const fk2 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
 check('треперење: вклучено / исклучено при reduced-motion', fk1.f > 0 && fk2.f === 0 && fk2.t > fk1.t, `${fk1.f} → ${fk2.f}`);
 
