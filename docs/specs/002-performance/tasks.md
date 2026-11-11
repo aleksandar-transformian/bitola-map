@@ -11,7 +11,7 @@
 - [x] `src/perf/bench.js` — `?bench=quick|standard|ablation`, аблација, панел (копирај / сними JSON)
 - [x] `src/config/perf.js` — буџети за референтниот уред; `src/perf/report.js` — ✓/✗, табела, споредба
 - [x] `scripts/dev/bench.mjs` (`npm run bench`) — SwiftShader / `--gpu` / `--uncapped`, `--compare`, `--check`
-- [x] Основа во SwiftShader: `docs/perf/baseline-swiftshader.json` (структура на кадарот)
+- [x] Основа во SwiftShader: `docs/perf/baseline-swiftshader.json` (десктоп, standard) и `baseline-swiftshader-mobile.json` (телефон, quick)
 - [x] Анализа: `analysis.md` — каде оди времето (хипотези + бројки од структурата)
 - (?) **Прво мерење на MacBook-от** (`?bench`, протокол во `plan.md`) → `docs/perf/results/`
 - [ ] По мерењето: потврди/смени го редоследот во фаза Б; затегни ги буџетите
