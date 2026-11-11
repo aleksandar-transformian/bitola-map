@@ -22,6 +22,7 @@
 //                 flicker?: { amount?: 0–1 (стандардно 1), broken?: true } } — ноќни светла;
 //               flicker = благо треперење (styles/shared/flicker.js), broken = понекоја „расипана“ светилка
 //   times?      { sunset?, night? } — делумно пребришување на стандардното зајдисонце/ноќ (app/time.js)
+//   fixedTime?  'night' | 'sunset' | 'day' — стилот е секогаш во тоа време (копчињата се заклучуваат)
 //   ui          { paper } — бои за интерфејсот (CSS: html[data-style=<id>])
 //   materials(ctx)        → { terrain, skirt, walls, roofs, roads, rail, water } — нови материјали
 //   post(ctx)?            → { before: Pass[], after: Pass[], ... } — пост-процесирање
@@ -33,9 +34,10 @@ import razglednica from './razglednica.js';
 import maketa from './maketa.js';
 import crtan from './crtan.js';
 import lowpoly from './lowpoly.js';
+import nokna from './nokna.js';
 import { readPref, hashPref, writePref } from '../app/prefs.js';
 
-export const STYLES = [razglednica, maketa, crtan, lowpoly];
+export const STYLES = [razglednica, maketa, crtan, lowpoly, nokna];
 export const DEFAULT_STYLE = 'razglednica';
 
 export function getStyle(id) {

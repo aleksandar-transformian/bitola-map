@@ -92,6 +92,20 @@ const s3 = await page.evaluate(() => {
 });
 check('тастер 3 → Цртан филм (без сенки)', s3.style === 'crtan' && !s3.shadows, JSON.stringify(s3));
 
+// Тастер 5 → „Ноќна Битола“: секогаш ноќ, копчињата за време се заклучени.
+await page.keyboard.press('5');
+await page.waitForFunction(() => document.documentElement.dataset.style === 'nokna', null, { timeout: 60000 }).catch(() => {});
+const s5 = await page.evaluate(() => ({
+  time: document.documentElement.dataset.time,
+  locked: [...document.querySelectorAll('.time-toggle button')].every((b) => b.disabled),
+  night: window.__bitolaApp.scene.getObjectByName('lamps')?.visible,
+}));
+check('тастер 5 → Ноќна Битола (ноќ, заклучено време)', s5.time === 'night' && s5.locked && s5.night, JSON.stringify(s5));
+await page.keyboard.press('1');
+await page.waitForFunction(() => document.documentElement.dataset.style === 'razglednica', null, { timeout: 60000 }).catch(() => {});
+const s6 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, unlocked: [...document.querySelectorAll('.time-toggle button')].every((b) => !b.disabled) }));
+check('назад на Разгледница → времето отклучено', s6.time === 'day' && s6.unlocked, JSON.stringify(s6));
+
 // Смена преку hashchange.
 await page.evaluate(() => (location.hash = 'style=maketa'));
 await page.waitForTimeout(1500);

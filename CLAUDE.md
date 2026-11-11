@@ -40,7 +40,7 @@ gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, fili
 за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa|crtan|lowpoly&time=day|sunset|night&view=<id>`.
+`#style=razglednica|maketa|crtan|lowpoly|nokna&time=day|sunset|night&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
 Home = преглед, 1–9 = стил, ? = упатство.
 
@@ -70,7 +70,7 @@ src/world/landmarks/     ← kit.js (примитиви → една геоме�
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
-src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js)
+src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js, nokna.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
 src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ);
                            flicker.js — „живи“ светла ноќе (треперење, прозорци што се палат, телевизори)

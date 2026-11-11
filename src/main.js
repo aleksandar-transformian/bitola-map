@@ -46,6 +46,7 @@ async function start() {
     time: { value: 0 },
     flicker: { value: 1 },
     broken: { value: 0 },
+    streetGain: { value: 1 }, // сјаењето на улиците по растојание (го менува стилот, на пр. „Ноќна Битола“)
   };
   // „Намалено движење“ во системот → мирни светла (и детерминистички screenshot-ови).
   const still = window.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -111,7 +112,7 @@ async function start() {
   for (const v of CHECK_VIEWS) if (!places.has(v.id)) places.set(v.id, v); // само преку #view= (проверки, мерења)
   validView = (id) => places.has(id);
   const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id) });
-  menu.setTime(time.mode);
+  syncTime();
   const dock = document.createElement('div');
   dock.className = 'dock';
   ui.appendChild(dock);
@@ -132,6 +133,7 @@ async function start() {
     if (!s || s.id === styles.current?.id) return;
     stats.lastSwitchMs = styles.apply(s, { animate });
     picker.setActive(s.id);
+    syncTime();
     if (remember) rememberStyle(s.id);
     // фонтовите на натписите зависат од стилот
     requestAnimationFrame(() => labels.measure());
@@ -141,9 +143,15 @@ async function start() {
     if (!validTime(id) || id === time.mode) return;
     time.set(id, animate);
     if (!animate) styles.relight();
-    menu.setTime(id);
-    document.documentElement.dataset.time = id;
+    syncTime();
     if (animate) writePref('time', id);
+  }
+  /** Копчињата за време и data-time; стил со фиксно време ги заклучува копчињата. */
+  function syncTime() {
+    const fixed = styles.current?.fixedTime || null;
+    menu.lockTime(fixed);
+    menu.setTime(fixed || time.mode);
+    document.documentElement.dataset.time = fixed || time.mode;
   }
   function goTo(id, animate = true) {
     const v = places.get(id);
