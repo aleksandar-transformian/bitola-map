@@ -54,9 +54,11 @@ for (const lm of LMS) {
 
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+// мирни светла (без треперење) за сликите да се исти при секое пуштање; --motion = со треперење
+const reducedMotion = has('motion') ? 'no-preference' : 'reduce';
 const context = mobile
-  ? await browser.newContext({ ...devices['iPhone 13'] })
-  : await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: scale });
+  ? await browser.newContext({ ...devices['iPhone 13'], reducedMotion })
+  : await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: scale, reducedMotion });
 // упатството при првата посета не е потребно на сликите
 await context.addInitScript(() => {
   try {

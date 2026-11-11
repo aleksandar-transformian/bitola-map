@@ -18,7 +18,9 @@
 //                 shadow: јачина 0–1, shadows?: false (без сенки), toneMapping: 'neutral' | 'aces' | 'none', exposure }
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
-//   night       { lamp, windows?: { ratio }, streets?: [јачина по класа на улица] } — ноќни светла
+//   night       { lamp, windows?: { ratio }, streets?: [јачина по класа на улица],
+//                 flicker?: { amount?: 0–1 (стандардно 1), broken?: true } } — ноќни светла;
+//               flicker = благо треперење (styles/shared/flicker.js), broken = понекоја „расипана“ светилка
 //   times?      { sunset?, night? } — делумно пребришување на стандардното зајдисонце/ноќ (app/time.js)
 //   ui          { paper } — бои за интерфејсот (CSS: html[data-style=<id>])
 //   materials(ctx)        → { terrain, skirt, walls, roofs, roads, rail, water } — нови материјали
