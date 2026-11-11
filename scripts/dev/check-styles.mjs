@@ -122,19 +122,23 @@ const off = await page.evaluate(() => ({ on: window.__bitolaApp.world.traffic.en
 check('копчето „Живот на мапата“ ги исклучува', !off.on && !off.visible, JSON.stringify(off));
 await tap(page, '.life-btn');
 
-// Тастер 5 → „Ноќна Битола“: секогаш ноќ, копчињата за време се заклучени.
-await page.keyboard.press('5');
-await page.waitForFunction(() => document.documentElement.dataset.style === 'nokna', null, { timeout: 60000 }).catch(() => {});
+// Стар линк #style=nokna („Ноќна Битола“ е споена во ноќта) → Разгледница ноќе, со сјај.
+await page.evaluate(() => (location.hash = 'style=nokna'));
+await page
+  .waitForFunction(() => document.documentElement.dataset.style === 'razglednica' && document.documentElement.dataset.time === 'night', null, { timeout: 60000 })
+  .catch(() => {});
+await page.waitForFunction(() => window.__bitolaApp.pipeline.stylePasses.some((p) => p.perfName === 'bloom' && p.enabled), null, { timeout: 60000, polling: 500 }).catch(() => {});
 const s5 = await page.evaluate(() => ({
+  style: document.documentElement.dataset.style,
   time: document.documentElement.dataset.time,
-  locked: [...document.querySelectorAll('.time-toggle button')].every((b) => b.disabled),
-  night: window.__bitolaApp.scene.getObjectByName('lamps')?.visible,
+  hash: location.hash,
+  bloom: window.__bitolaApp.pipeline.stylePasses.some((p) => p.perfName === 'bloom' && p.enabled),
 }));
-check('тастер 5 → Ноќна Битола (ноќ, заклучено време)', s5.time === 'night' && s5.locked && s5.night, JSON.stringify(s5));
-await page.keyboard.press('1');
-await page.waitForFunction(() => document.documentElement.dataset.style === 'razglednica', null, { timeout: 60000 }).catch(() => {});
-const s6 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, unlocked: [...document.querySelectorAll('.time-toggle button')].every((b) => !b.disabled) }));
-check('назад на Разгледница → времето отклучено', s6.time === 'day' && s6.unlocked, JSON.stringify(s6));
+check('#style=nokna → Разгледница ноќе, со сјај', s5.style === 'razglednica' && s5.time === 'night' && s5.bloom, JSON.stringify(s5));
+await tap(page, '.time-toggle button[data-id="day"]');
+await page.waitForFunction(() => !window.__bitolaApp.pipeline.stylePasses.some((p) => p.perfName === 'bloom' && p.enabled), null, { timeout: 60000, polling: 500 }).catch(() => {});
+const s6 = await page.evaluate(() => window.__bitolaApp.pipeline.stylePasses.some((p) => p.perfName === 'bloom' && p.enabled));
+check('дење сјајот е исклучен', !s6);
 
 // Смена преку hashchange.
 await page.evaluate(() => (location.hash = 'style=maketa'));
@@ -186,6 +190,14 @@ await page
   .catch(() => {});
 const vf = await page.evaluate(() => window.__bitolaApp.getView());
 check('Оди до → Битолскиот филџан', Math.hypot(vf.target.x + 1584, vf.target.z + 263) < 5, `цел ${vf.target.x.toFixed(0)}, ${vf.target.z.toFixed(0)}`);
+
+// „Зачувај слика“: PNG во двојна резолуција, со атрибуцијата.
+const snap = await page.evaluate(async () => {
+  const s = await window.__bitolaApp.snapshot.capture();
+  const head = new Uint8Array(await s.blob.slice(0, 8).arrayBuffer());
+  return { name: s.name, w: s.width, h: s.height, png: head[1] === 0x50 && head[2] === 0x4e && head[3] === 0x47, cssW: innerWidth };
+});
+check('Зачувај слика → PNG 2×', snap.png && snap.w === snap.cssW * 2 && /^bitola-[a-z]+-(day|sunset|night)\.png$/.test(snap.name), `${snap.name} ${snap.w}×${snap.h}`);
 
 // „Превчитување“ без hash → од localStorage (нова страница во истиот контекст;
 // старата се затвора за софтверското рендерирање да не ја блокира навигацијата).

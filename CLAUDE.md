@@ -41,9 +41,9 @@ gimnazija, gimnazija-agol + `lm-<id>`
 за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa|crtan|lowpoly|nokna&time=day|sunset|night&view=<id>`.
+`#style=razglednica|maketa|crtan|lowpoly&time=day|sunset|night&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
-Home = преглед, 1–9 = стил, ? = упатство.
+Home = преглед, 1–4 = стил, ? = упатство.
 
 Важно: слојот со натписите е преку цел екран и мора да има `pointer-events: none`, инаку ги
 „голта“ глувчето/допирот и мапата не може да се движи (`check-styles.mjs` го проверува ова).
@@ -73,7 +73,7 @@ src/world/trees.js       ← инстанцирани дрвја (облик п�
 src/world/traffic.js     ← „Живот на мапата“: автомобили и пешаци (инстанцирани, CPU), фарови ноќе
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
-src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js, nokna.js)
+src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
 src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ);
                            flicker.js — „живи“ светла ноќе (треперење, прозорци што се палат, телевизори)
@@ -86,6 +86,7 @@ src/render/passes/       ← сопствени пост-пасови (postcard.
 src/app/camera.js        ← камера, MapControls, погледи, лет до поглед, тастатура, динамички near/far
 src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
 src/app/prefs.js         ← поставки во URL hash + localStorage
+src/app/snapshot.js      ← „Зачувај слика“: кадар 2×, натписи + наслов + атрибуција во PNG
 src/data/loader.js       ← вчитување на public/data/*
 src/ui/                  ← интерфејс: наслов, атрибуција, мени горе десно (menu.js: „Оди до…“, време,
                            упатство „?“), избирач на стил долу, натписи (labels.js), фонтови
@@ -113,7 +114,9 @@ scripts/dev/             ← screenshot.mjs (слики, време, FPS), check
 Време од денот: денот го дава стилот (`light`, `sky`, `fog`); зајдисонцето и ноќта се стандардни
 поставки во `app/time.js` што стилот може делумно да ги пребрише (`style.times`). Заедничкиот
 uniform `env.night` (0–1) ги пали прозорците (`withWindows`), улиците (`withStreetGlow`),
-светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки. Светлата благо
+светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки.
+Ноќе на десктоп менаџерот додава сјај (`UnrealBloomPass`) на секој стил; улиците светат
+посилно од далеку (`env.streetGain`). „Ноќна Битола“ не е посебен стил (`#style=nokna` → ноќ). Светлата благо
 треперат (`env.time`, `env.flicker`; атрибут `aSeed` = семе по светло); при
 `prefers-reduced-motion` се мирни. Големи површини (улиците) не треперат.
 
