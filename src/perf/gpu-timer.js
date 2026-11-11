@@ -61,8 +61,9 @@ export function createGpuTimer(gl) {
           }
           free.push(q);
         }
-        // при „disjoint“ (смена на фреквенција, друг процес) мерењата не се веродостојни
-        if (!disjoint) cb(f.tag, laps, total);
+        // при „disjoint“ (смена на фреквенција, друг процес) мерењата не се веродостојни;
+        // некои драјвери (SwiftShader) враќаат и бесмислени вредности → отфрли ги
+        if (!disjoint && Number.isFinite(total) && total >= 0 && total < 10000) cb(f.tag, laps, total);
       }
     },
   };
