@@ -38,7 +38,7 @@ check('почеток со #style=razglednica', (await page.evaluate(() => docum
 check('упатството при првата посета', await page.isVisible('.help'));
 await tap(page, '.help-close');
 check('упатството се затвора', !(await page.isVisible('.help')));
-await tap(page, '.help-btn:not(.life-btn)');
+await tap(page, '.help-btn[aria-controls="help"]');
 check('копче ? го отвора упатството', await page.isVisible('.help'));
 await page.keyboard.press('Escape');
 
