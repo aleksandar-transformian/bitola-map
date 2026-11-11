@@ -23,6 +23,34 @@ export function lambertSet(ctx, { skirt = '#8b7d66' } = {}) {
   };
 }
 
+/** Градиент за toon сенчење: n тонови (на пр. [0.45, 0.75, 1]) — n пиксели, без филтрирање. */
+export function toonGradient(levels = [0.45, 0.75, 1]) {
+  const data = new Uint8Array(levels.map((v) => Math.round(v * 255)));
+  const tex = new THREE.DataTexture(data, levels.length, 1, THREE.RedFormat);
+  tex.minFilter = THREE.NearestFilter;
+  tex.magFilter = THREE.NearestFilter;
+  tex.generateMipmaps = false;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/** Комплет toon материјали (цртан изглед): сенчење во неколку тонови наместо меко. */
+export function toonSet(ctx, { skirt = '#8b7d66', levels } = {}) {
+  const gradientMap = toonGradient(levels);
+  const toon = (o) => new THREE.MeshToonMaterial({ gradientMap, ...o });
+  return {
+    terrain: toon({ map: ctx.ground.texture }),
+    skirt: toon({ color: skirt, side: THREE.DoubleSide }),
+    walls: toon({ vertexColors: true }),
+    roofs: toon({ vertexColors: true }),
+    roads: toon({ vertexColors: true }),
+    rail: toon({ vertexColors: true }),
+    water: toon({ vertexColors: true }),
+    landmarks: toon({ vertexColors: true, side: THREE.DoubleSide }),
+    trees: toon({ vertexColors: true }),
+  };
+}
+
 /** Додај светска висина како varying (vWorldY) во vertex шејдерот. */
 function injectWorldY(shader) {
   shader.vertexShader = shader.vertexShader
