@@ -5,7 +5,7 @@
 //  - разлевање: мешање со замаглена верзија
 //  - пигмент на рабовите: потемнување каде што бојата нагло се менува (меко, без контури)
 //  - хартија: зрнеста текстура (шум во пиксели — хартијата не се движи со камерата)
-//  - винета кон бојата на хартијата
+//  - винета: потемнети рабови во топол сепија тон
 
 import * as THREE from 'three';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
@@ -97,12 +97,13 @@ const shader = {
       // пигментот поблед таму каде што хартијата е „испакната“
       c = mix(c, paper, grain * 0.18 * smoothstep(0.55, 0.85, fine));
 
-      // 5) топлина и винета кон хартијата
+      // 5) топлина и винета
       c *= vec3(1.0 + warmth, 1.0, 1.0 - warmth);
       vec2 q = vUv - 0.5;
       q.x *= resolution.x / resolution.y;
       float v = smoothstep(0.45, 1.05, length(q) * 1.35 + (clouds - 0.5) * 0.25);
-      c = mix(c, paper, v * vignette);
+      // винетата ги затемнува рабовите (топол сепија тон, како стара разгледница)
+      c = mix(c, c * vec3(0.62, 0.54, 0.46), v * vignette);
 
       gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0);
     }`,
@@ -121,6 +122,7 @@ function srgb(hex) {
  */
 export function createPostcardPass(o) {
   const pass = new ShaderPass({ ...shader, defines: { OCTAVES: o.low ? 3 : 5 } });
+  pass.perfName = 'postcard';
   const u = pass.uniforms;
   u.paper.value.copy(srgb(o.paper));
   for (const k of ['wobble', 'bleed', 'edge', 'grain', 'vignette', 'warmth']) if (o[k] !== undefined) u[k].value = o[k];
