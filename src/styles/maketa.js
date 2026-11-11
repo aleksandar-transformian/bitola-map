@@ -96,6 +96,7 @@ export default {
     facade4: '#eeede8',
     facade5: '#f8f7f3',
     paving: '#eeeae2',
+    bronze: '#b8976a',
   },
   trees: {
     crowns: ['#dfe4d6', '#e7eadf', '#d6dccb'],

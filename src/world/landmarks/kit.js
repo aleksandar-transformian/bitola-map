@@ -27,6 +27,7 @@ export const PARTS = [
   'facade4', //  18
   'facade5', //  19
   'paving', //   20 калдрма
+  'bronze', //   21 бронза (споменици)
 ];
 export const PART_ID = Object.fromEntries(PARTS.map((p, i) => [p, i]));
 
@@ -79,6 +80,12 @@ export class Kit {
   static at(u, y, v, rotY = 0, sx = 1, sy = 1, sz = 1) {
     q.setFromAxisAngle(UPV, rotY);
     return m4b.compose(new THREE.Vector3(u, y, v), q, new THREE.Vector3(sx, sy, sz)).clone();
+  }
+
+  /** Локална матрица со ротации околу x, y, z (Ојлер XYZ, радијани). */
+  static atE(u, y, v, rx = 0, ry = 0, rz = 0, sx = 1, sy = 1, sz = 1) {
+    q.setFromEuler(new THREE.Euler(rx, ry, rz));
+    return new THREE.Matrix4().compose(new THREE.Vector3(u, y, v), q, new THREE.Vector3(sx, sy, sz));
   }
 
   /** Кутија: центар на основата во (u, y, v); w по u, d по v, h по y. */
