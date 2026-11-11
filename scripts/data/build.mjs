@@ -501,16 +501,17 @@ function roofShape(t) {
       raw.push({ el, t, rings, area, c, isPart });
     }
   }
-  // Дополнителни основи (опционално): data/raw/extra-buildings.json.gz — згради што ги
-  // нема во OSM (на пр. Microsoft ML Buildings преку Overture). Се додаваат само ако
-  // не се преклопуваат со OSM зграда.
+  // Дополнителни основи: data/raw/overture-buildings.json.gz (fetch-overture.mjs) — згради
+  // што ги нема во OSM (Microsoft ML Buildings преку Overture Maps, ODbL). Се додаваат само
+  // ако не се преклопуваат со OSM зграда (OSM е поново и има предност).
   const osmIdx = new G.GridIndex(100);
   for (const b of raw) osmIdx.insert(b, G.ringBounds(b.rings[0]));
   let extraAdded = 0;
   let extraSkipped = 0;
   let extraSource = null;
+  const extraBySource = {};
   try {
-    const extra = JSON.parse(gunzipSync(await readFile('data/raw/extra-buildings.json.gz')));
+    const extra = JSON.parse(gunzipSync(await readFile('data/raw/overture-buildings.json.gz')));
     extraSource = extra.source;
     for (const e of extra.buildings) {
       const rings = orient(e.rings.map((r) => G.cleanRing(r.map((ll) => proj.toXZ(ll[0], ll[1])))).filter((r) => r.length >= 3));
@@ -530,6 +531,7 @@ function roofShape(t) {
       if (e.h) t.height = String(e.h);
       if (e.f) t['building:levels'] = String(e.f);
       raw.push({ el: { type: 'extra', id: Math.abs(id) }, t, rings, area, c, isPart: false, extra: true });
+      extraBySource[e.src] = (extraBySource[e.src] || 0) + 1;
       extraAdded++;
     }
   } catch (err) {
@@ -595,7 +597,7 @@ function roofShape(t) {
       },
     }),
   );
-  stats.buildings = { count: w.count, heightFromOsm: bySource[0], levelsFromOsm: bySource[1], estimated: bySource[2], outlinesReplacedByParts: skippedOutlines, extra: extraAdded, extraOverlappingOsm: extraSkipped, extraSource };
+  stats.buildings = { count: w.count, heightFromOsm: bySource[0], levelsFromOsm: bySource[1], estimated: bySource[2], outlinesReplacedByParts: skippedOutlines, extra: extraAdded, extraBySource, extraOverlappingOsm: extraSkipped, extraSource };
 }
 
 // ─────────────── Дрвја ───────────────
@@ -671,7 +673,11 @@ const meta = {
   osmTimestamp: raw.osm3s?.timestamp_osm_base || raw.fetchedAt,
   generatedAt: new Date().toISOString(),
   stats,
-  attribution: ['© соработниците на OpenStreetMap (ODbL)', 'Релјеф: Terrain Tiles (Mapzen, AWS Open Data)'],
+  attribution: [
+    '© соработниците на OpenStreetMap (ODbL)',
+    ...(stats.buildings.extra ? ['Згради: Overture Maps Foundation, Microsoft (ODbL)'] : []),
+    'Релјеф: Terrain Tiles (Mapzen, AWS Open Data)',
+  ],
 };
 await writeFile(`${OUT}/meta.json`, JSON.stringify(meta, null, 1));
 

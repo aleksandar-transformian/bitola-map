@@ -23,8 +23,8 @@
   "minZ": -3829.390483288387,
   "maxZ": 4519.5713262066565
  },
- "osmTimestamp": "2026-11-11T09:31:59Z",
- "generatedAt": "2026-11-11T09:47:41.884Z",
+ "osmTimestamp": "2026-11-11T09:52:05Z",
+ "generatedAt": "2026-11-11T10:36:48.032Z",
  "stats": {
   "terrain": {
    "cols": 757,
@@ -38,20 +38,24 @@
   "rail": 31,
   "waterways": 80,
   "buildings": {
-   "count": 4543,
+   "count": 20507,
    "heightFromOsm": 3,
    "levelsFromOsm": 57,
-   "estimated": 4483,
+   "estimated": 20447,
    "outlinesReplacedByParts": 0,
-   "extra": 0,
-   "extraOverlappingOsm": 0,
-   "extraSource": null
+   "extra": 15964,
+   "extraBySource": {
+    "Microsoft ML Buildings": 15964
+   },
+   "extraOverlappingOsm": 38,
+   "extraSource": "Overture Maps 2026-10-21.0 (buildings), без извор OpenStreetMap"
   },
   "trees": 412,
   "pois": 87
  },
  "attribution": [
   "© соработниците на OpenStreetMap (ODbL)",
+  "Згради: Overture Maps Foundation, Microsoft (ODbL)",
   "Релјеф: Terrain Tiles (Mapzen, AWS Open Data)"
  ]
 }

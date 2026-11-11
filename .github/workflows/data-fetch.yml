@@ -1,6 +1,7 @@
-# Ги симнува сировите OSM податоци преку Overpass и ги комитува во data/raw/
-# на истата гранка. Се пушта рачно или кога ќе се смени опфатот / скриптата.
-name: Податоци — OSM
+# Ги симнува сировите податоци (OSM преку Overpass, згради од Overture Maps) и ги
+# комитува во data/raw/ на истата гранка. Се пушта рачно или кога ќе се смени
+# опфатот / скриптите за симнување.
+name: Податоци — OSM и Overture
 
 on:
   workflow_dispatch:
@@ -9,6 +10,7 @@ on:
     paths:
       - src/config/region.js
       - scripts/data/fetch-osm.mjs
+      - scripts/data/fetch-overture.mjs
       - .github/workflows/data-fetch.yml
 
 permissions:
@@ -27,17 +29,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Зависности
+        run: npm ci
       - name: Симни OSM (Overpass)
         run: node scripts/data/fetch-osm.mjs
+      - name: Симни згради од Overture
+        run: node scripts/data/fetch-overture.mjs
       - name: Комитувај ги сировите податоци
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/raw/osm.json.gz data/raw/places-wide.json
+          git add data/raw/osm.json.gz data/raw/places-wide.json data/raw/overture-buildings.json.gz
           if git diff --cached --quiet; then
             echo "Нема промени."
           else
-            git commit -m "data: освежени OSM податоци ($(date -u +%Y-%m-%d))"
+            git commit -m "data: освежени OSM и Overture податоци ($(date -u +%Y-%m-%d))"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
