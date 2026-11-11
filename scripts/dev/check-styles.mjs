@@ -22,6 +22,9 @@ page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 const ready = () => page.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 const result = {};
+// клик директно во страницата: софтверското рендерирање е бавно, па Playwright-овото чекање
+// „елементот е стабилен два кадра“ знае да истече иако копчето е таму
+const tap = (p, sel) => p.$eval(sel, (el) => el.click());
 const check = (name, ok, detail = '') => {
   result[name] = ok;
   console.log(`${ok ? '✓' : '✗'} ${name}${detail ? ' — ' + detail : ''}`);
@@ -33,9 +36,9 @@ check('почеток со #style=razglednica', (await page.evaluate(() => docum
 
 // Упатство: само при првата посета, се затвора со копче.
 check('упатството при првата посета', await page.isVisible('.help'));
-await page.click('.help-close');
+await tap(page, '.help-close');
 check('упатството се затвора', !(await page.isVisible('.help')));
-await page.click('.help-btn');
+await tap(page, '.help-btn');
 check('копче ? го отвора упатството', await page.isVisible('.help'));
 await page.keyboard.press('Escape');
 
@@ -64,7 +67,7 @@ check(
 );
 
 // Смена преку копчето (со анимација) — снимка среде премин.
-await page.click('.style-picker button[data-id="maketa"]');
+await tap(page, '.style-picker button[data-id="maketa"]');
 await page.waitForTimeout(250);
 await page.screenshot({ path: `${out}/switch-mid.png`, timeout: 300000 });
 await page.waitForTimeout(2000);
@@ -95,7 +98,7 @@ await page.waitForTimeout(1500);
 check('hashchange → Макета', (await page.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
 
 // Време од денот: копче, URL, localStorage.
-await page.click('.time-toggle button[data-id="night"]');
+await tap(page, '.time-toggle button[data-id="night"]');
 await page.waitForTimeout(2500);
 const t1 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, hash: location.hash }));
 check('копче Ноќ', t1.time === 'night' && t1.hash.includes('time=night'), t1.hash);

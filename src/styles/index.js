@@ -6,7 +6,7 @@
 //   name        име во интерфејсот (македонски)
 //   tagline     краток опис
 //   swatch      CSS позадина за копчето во избирачот
-//   geometry    { roofs: 'flat' | 'gabled', trees } — барања за геометрија; ако се разликуваат од
+//   geometry    { roofs: 'flat' | 'gabled' | 'hip', trees } — барања за геометрија; ако се разликуваат од
 //               тековните, менаџерот ги пресоздава само засегнатите слоеви (со анимација)
 //   ground      { painter: 'flat' | 'watercolor', base, edge, washes?, outline?, areas: {класа: боја} }
 //   roads       { класа: боја }   (класи: config/classes.js → ROAD)
@@ -30,9 +30,10 @@
 import razglednica from './razglednica.js';
 import maketa from './maketa.js';
 import crtan from './crtan.js';
+import lowpoly from './lowpoly.js';
 import { readPref, hashPref, writePref } from '../app/prefs.js';
 
-export const STYLES = [razglednica, maketa, crtan];
+export const STYLES = [razglednica, maketa, crtan, lowpoly];
 export const DEFAULT_STYLE = 'razglednica';
 
 export function getStyle(id) {
