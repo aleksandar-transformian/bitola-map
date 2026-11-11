@@ -296,25 +296,6 @@ body {
     font-size: 13px;
     padding: 7px 12px 7px 7px;
   }
-  /* шест стила не собираат во еден ред на телефон — два реда по три */
-  .style-picker {
-    flex-wrap: wrap;
-    justify-content: center;
-    width: min(400px, calc(100vw - 24px));
-    box-sizing: border-box;
-    gap: 2px;
-  }
-  .style-picker button {
-    flex: 1 1 30%;
-    min-width: 0;
-    font-size: 12px;
-    gap: 5px;
-    padding: 6px 6px 6px 5px;
-  }
-  .style-picker .swatch {
-    width: 18px;
-    height: 18px;
-  }
   .title {
     padding: 8px 14px 9px;
   }

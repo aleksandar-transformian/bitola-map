@@ -24,6 +24,7 @@ export const CHECK_VIEWS = [
   { id: 'dimitrija', target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
   { id: 'filip', target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
   // зградите на Магнолија од споменикот (како на фотографиите на сопственикот)
-  { id: 'mag-red', target: { x: -17, z: 63 }, bearing: 42, polar: 77, distance: 42 },
+  // камерата е на плоштадот источно од споменикот (не во ресторанот „Грне“)
+  { id: 'mag-red', target: { x: -25, z: 73 }, bearing: 43, polar: 77, distance: 41 },
   { id: 'mag-plostad', target: { x: 10, z: 58 }, bearing: 300, polar: 68, distance: 90 },
 ];
