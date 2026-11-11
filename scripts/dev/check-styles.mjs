@@ -38,7 +38,7 @@ check('почеток со #style=razglednica', (await page.evaluate(() => docum
 check('упатството при првата посета', await page.isVisible('.help'));
 await tap(page, '.help-close');
 check('упатството се затвора', !(await page.isVisible('.help')));
-await tap(page, '.help-btn');
+await tap(page, '.help-btn:not(.life-btn)');
 check('копче ? го отвора упатството', await page.isVisible('.help'));
 await page.keyboard.press('Escape');
 
@@ -91,6 +91,24 @@ const s3 = await page.evaluate(() => {
   return { style: document.documentElement.dataset.style, shadows: sun.castShadow };
 });
 check('тастер 3 → Цртан филм (без сенки)', s3.style === 'crtan' && !s3.shadows, JSON.stringify(s3));
+
+// „Живот на мапата“: автомобили и пешаци се движат; копчето ги исклучува.
+const life0 = await page.evaluate(() => {
+  const t = window.__bitolaApp.world.traffic;
+  const cars = window.__bitolaApp.scene.getObjectByName('cars');
+  const m = new (cars.instanceMatrix.array.constructor)(cars.instanceMatrix.array.slice(0, 16));
+  return { on: t.enabled, counts: t.counts, first: Array.from(m) };
+});
+await page.waitForTimeout(2500);
+const moved = await page.evaluate((first) => {
+  const a = window.__bitolaApp.scene.getObjectByName('cars').instanceMatrix.array;
+  return Math.hypot(a[12] - first[12], a[14] - first[14]);
+}, life0.first);
+check('автомобилите се движат', life0.on && life0.counts.cars > 0 && moved > 0.5, `${JSON.stringify(life0.counts)}, поместување ${moved.toFixed(1)} m`);
+await tap(page, '.life-btn');
+const off = await page.evaluate(() => ({ on: window.__bitolaApp.world.traffic.enabled, visible: window.__bitolaApp.scene.getObjectByName('traffic').visible }));
+check('копчето „Живот на мапата“ ги исклучува', !off.on && !off.visible, JSON.stringify(off));
+await tap(page, '.life-btn');
 
 // Тастер 5 → „Ноќна Битола“: секогаш ноќ, копчињата за време се заклучени.
 await page.keyboard.press('5');

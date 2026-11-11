@@ -25,4 +25,6 @@ export const CHECK_VIEWS = [
   { id: 'dom-front', target: { x: 10, z: 285 }, bearing: 68, polar: 76, distance: 120 }, // фронтално од паркот
   { id: 'gimnazija', target: { x: -542, z: -162 }, bearing: 182, polar: 72, distance: 80 }, // од кејот на Драгор
   { id: 'gimnazija-agol', target: { x: -540, z: -163 }, bearing: 140, polar: 72, distance: 65 },
+  // сообраќај и пешаци: Широк Сокак и булеварот до Магнолија одблиску
+  { id: 'traffic', target: { x: 60, z: 200 }, bearing: 150, polar: 62, distance: 240 },
 ];

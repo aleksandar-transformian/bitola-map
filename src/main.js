@@ -111,7 +111,28 @@ async function start() {
   }
   for (const v of CHECK_VIEWS) if (!places.has(v.id)) places.set(v.id, v); // само преку #view= (проверки, мерења)
   validView = (id) => places.has(id);
-  const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id) });
+  const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id), onLife: (on) => setLife(on) });
+  // „Живот на мапата“ (сообраќај и пешаци): вклучен, освен при ?bench и „намалено движење“
+  let life = !BENCH && !still?.matches;
+  try {
+    const saved = localStorage.getItem('bitola.life');
+    if (saved && !BENCH) life = saved === 'on';
+  } catch {
+    // без складирање
+  }
+  function setLife(on, remember = true) {
+    life = on;
+    world.traffic.setEnabled(on);
+    menu.setLife(on);
+    if (remember) {
+      try {
+        localStorage.setItem('bitola.life', on ? 'on' : 'off');
+      } catch {
+        // без складирање
+      }
+    }
+  }
+  setLife(life, false);
   syncTime();
   const dock = document.createElement('div');
   dock.className = 'dock';
@@ -211,6 +232,7 @@ async function start() {
     const d = view.updateClipping(sky);
     updateSun(d);
     styles.update();
+    world.traffic.update(dt, d);
     const fl = styles.current?.night?.flicker;
     env.time.value = (now / 1000) % 3600;
     env.flicker.value = still?.matches ? 0 : (fl?.amount ?? 1);

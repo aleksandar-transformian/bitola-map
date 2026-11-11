@@ -87,6 +87,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     colorBuildings(world.buildings.geometry, style.buildings);
     colorLandmarks(world.landmarks.geometry, style.landmarks);
     colorTrees(world.trees, style.trees);
+    world.traffic?.restyle(style);
     colorRibbons(world.roads.geometry, ROAD.map((k) => style.roads[k]));
     colorRibbons(world.rail.geometry, style.rail);
     colorRibbons(world.water.geometry, [style.water]);
