@@ -26,6 +26,15 @@
   (дозволен од сопственикот): build ✓, но `configure-pages` падна — **Pages уште не е вклучен**
   (Settings → Pages → Source: GitHub Actions). По вклучувањето — нов run.
 - Предупредување во Actions: Node 20 акциите се извршуваат на Node 24 (не е грешка).
+- Pages бара јавно репо на бесплатниот план → сопственикот го направи репото јавно (претходно
+  проверена историјата: без тајни, без е-пошта, без спомен на други проекти).
+- Вториот run (push на `main`): build ✓, `deploy` одбиен за 2 s без лог — околината
+  `github-pages` при вклучувањето дозволува објава само од default гранката (`develop`).
+  Рачен run од `develop` на **истиот комит** (`5e11e61`) → успешно:
+  **https://aleksandar-transformian.github.io/bitola-map/** (2026-11-11).
+- За објава од `main`: Settings → Environments → `github-pages` → Deployment branches and tags →
+  додади `main`. Дотогаш: `workflow_dispatch` на `deploy.yml` од `develop` (само кога `main` и
+  `develop` се на ист комит).
 
 ## Фаза 3+ — уште 21 знаменитост, ново мени, поправка на глувчето (2026-11-12)
 

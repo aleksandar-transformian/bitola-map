@@ -117,6 +117,8 @@ models.js`) се градат од примитиви во рамка од OBB �
 - `main` — објавува на GitHub Pages (`.github/workflows/deploy.yml`, извор „GitHub Actions“):
   https://aleksandar-transformian.github.io/bitola-map/ — **push на `main` само по изречна
   дозвола од сопственикот** (дадена за објавата во фаза 4; секоја следна објава — прашај).
+  Околината `github-pages` мора да ја дозволува гранката `main` (Settings → Environments);
+  инаку `deploy` се одбива за 2 s без лог.
 - Лиценца: MIT за кодот (`LICENSE`); податоците ODbL, фонтовите OFL.
 - Спецификации и план: `docs/specs/`; одлуки, бројки и проблеми: `docs/NOTES.md`.
 
