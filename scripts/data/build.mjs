@@ -15,6 +15,7 @@ import { gunzipSync } from 'node:zlib';
 import { PNG } from 'pngjs';
 import { REGION, makeProjection, bboxMeters } from '../../src/config/region.js';
 import { ZONES } from '../../src/config/zones.js';
+import { LANDMARKS } from '../../src/config/landmarks.js';
 import { ROAD_ID, ROAD_FLAG, RAIL_ID, WATERWAY_ID, AREA_ID, BUILDING_ID, ROOF_ID } from '../../src/config/classes.js';
 import { encodePack } from '../../src/lib/pack.js';
 import { Heightfield } from '../../src/world/heightfield.js';
@@ -421,6 +422,9 @@ const shirokLines = [];
 
 // ─────────────── Згради ───────────────
 
+// Индекс на основите на зградите (за дрвјата да не паѓаат во згради).
+const buildingIdx = new G.GridIndex(60);
+
 const zoneBazaar = { c: proj.toXZ(ZONES.oldBazaar.lat, ZONES.oldBazaar.lon), r: ZONES.oldBazaar.radius };
 const zoneCenter = { c: proj.toXZ(ZONES.center.lat, ZONES.center.lon), r: ZONES.center.radius };
 const near = (p, z) => Math.hypot(p[0] - z.c[0], p[1] - z.c[1]) < z.r;
@@ -569,6 +573,7 @@ function roofShape(t) {
       gsum += g;
     }
     const gmean = gsum / b.rings[0].length;
+    buildingIdx.insert(b.rings, G.ringBounds(b.rings[0]));
     w.add(b.rings.map((r) => G.simplifyRing(r, 0.15)));
     A.height.push(Math.round(Math.max(height, minH + 1) * 10));
     A.minHeight.push(Math.round(minH * 10));
@@ -601,13 +606,20 @@ function roofShape(t) {
 }
 
 // ─────────────── Дрвја ───────────────
+// kind: 0 = поединечно/дрворед од OSM, 1 = парк/гробишта, 2 = шума, 3 = овоштарник/грмушки.
+// Површините се полнат со растресена мрежа (детерминистички), без дрвја во згради.
 
 {
   const pts = [];
+  const kinds = [];
+  const push = (p, k) => {
+    pts.push(p);
+    kinds.push(k);
+  };
   for (const n of osm.nodes.values()) {
     if (n.tags?.natural !== 'tree') continue;
     const p = proj.toXZ(n.lat, n.lon);
-    if (inRect(p)) pts.push(p);
+    if (inRect(p)) push(p, 0);
   }
   for (const way of osm.ways.values()) {
     if (way.tags?.natural !== 'tree_row') continue;
@@ -620,7 +632,35 @@ function roofShape(t) {
       const n = Math.max(1, Math.round(len / 8));
       for (let k = 0; k < n; k++) {
         const p = [ax + ((bx - ax) * k) / n, az + ((bz - az) * k) / n];
-        if (inRect(p)) pts.push(p);
+        if (inRect(p)) push(p, 0);
+      }
+    }
+  }
+  const singles = pts.length;
+  // m² по дрво; шумите подалеку од центарот се поретки
+  const DENSITY = { park: [1, 110], cemetery: [1, 160], grass: [1, 900], forest: [2, 220], orchard: [3, 70], scrub: [3, 500] };
+  const inBuilding = (p) => buildingIdx.query(p).some((rings) => G.pointInPolygon(p, rings));
+  const MAX = 40000;
+  const sorted = [...areas].filter((a) => DENSITY[a.cls]).sort((a, b) => {
+    const da = Math.hypot(...G.centroid(a.rings[0]));
+    const db = Math.hypot(...G.centroid(b.rings[0]));
+    return da - db; // поблиските прво (ако се стигне границата)
+  });
+  let seed = 1;
+  for (const a of sorted) {
+    const [kind, per] = DENSITY[a.cls];
+    const c = G.centroid(a.rings[0]);
+    const far = Math.hypot(c[0], c[1]) > 2500 && a.cls === 'forest';
+    const step = Math.sqrt(far ? per * 3.5 : per);
+    const bb = G.ringBounds(a.rings[0]);
+    for (let x = bb.minX + step / 2; x < bb.maxX; x += step) {
+      for (let z = bb.minZ + step / 2; z < bb.maxZ; z += step) {
+        const jx = (G.hash01(seed++) - 0.5) * step * 0.85;
+        const jz = (G.hash01(seed++) - 0.5) * step * 0.85;
+        const p = [x + jx, z + jz];
+        if (!inRect(p) || !G.pointInPolygon(p, a.rings) || inBuilding(p)) continue;
+        if (pts.length >= MAX) break;
+        push(p, kind);
       }
     }
   }
@@ -629,8 +669,66 @@ function roofShape(t) {
     coords[i * 2] = quant(x);
     coords[i * 2 + 1] = quant(z);
   });
-  await writeFile(`${OUT}/trees.bin`, encodePack({ meta: { q: Q, count: pts.length }, arrays: { coords } }));
-  stats.trees = pts.length;
+  await writeFile(`${OUT}/trees.bin`, encodePack({ meta: { q: Q, count: pts.length }, arrays: { coords, kind: Uint8Array.from(kinds) } }));
+  stats.trees = { total: pts.length, osm: singles, sampled: pts.length - singles };
+}
+
+// ─────────────── Знаменитости ───────────────
+// Основи (локални метри, ориентирани) и подлога за моделите во src/world/landmarks/.
+
+{
+  const out = [];
+  const ringsOf = (ref) => {
+    const el = ref[0] === 'w' ? osm.ways.get(+ref.slice(1)) : osm.relations.get(+ref.slice(1));
+    if (!el) throw new Error(`Знаменитост: не најдов ${ref} во OSM`);
+    return { el, polys: polygonsOf(el).map(orient) };
+  };
+  const groundOf = (ring) => {
+    let min = Infinity;
+    let max = -Infinity;
+    let sum = 0;
+    for (const [x, z] of ring) {
+      const g = hf.sample(x, z);
+      min = Math.min(min, g);
+      max = Math.max(max, g);
+      sum += g;
+    }
+    return { min: +min.toFixed(2), max: +max.toFixed(2), mean: +(sum / ring.length).toFixed(2) };
+  };
+  const r1 = (ring) => ring.map(([x, z]) => [+x.toFixed(2), +z.toFixed(2)]);
+  for (const L of LANDMARKS) {
+    const item = { id: L.id, name: L.name, model: L.model, opts: L.opts || {} };
+    if (L.osm) {
+      const { el, polys } = ringsOf(L.osm);
+      // најголемиот полигон е основата
+      polys.sort((a, b) => Math.abs(G.signedArea(b[0])) - Math.abs(G.signedArea(a[0])));
+      item.osm = L.osm;
+      item.osmId = el.type === 'relation' ? -el.id : el.id;
+      item.polys = polys.map((p) => p.map(r1));
+      item.center = G.centroid(polys[0][0]).map((v) => +v.toFixed(2));
+      item.ground = groundOf(polys[0][0]);
+    }
+    if (L.street) {
+      item.lines = [];
+      for (const way of osm.ways.values()) {
+        const t = way.tags;
+        if (t?.name !== L.street || !['pedestrian', 'footway'].includes(t.highway) || t.footway === 'crossing') continue;
+        const line = wayXZ(way);
+        if (line && line.length >= 2) item.lines.push(r1(line));
+      }
+      item.buffer = L.buffer;
+      const all = item.lines.flat();
+      item.center = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length].map((v) => +v.toFixed(2));
+    }
+    for (const [k, ref] of Object.entries(L.parts || {})) {
+      const { polys } = ringsOf(ref);
+      item.parts = item.parts || {};
+      item.parts[k] = { polys: polys.map((p) => p.map(r1)), center: G.centroid(polys[0][0]).map((v) => +v.toFixed(2)) };
+    }
+    out.push(item);
+  }
+  await writeFile(`${OUT}/landmarks.json`, JSON.stringify(out));
+  stats.landmarks = out.length;
 }
 
 // ─────────────── Именувани точки ───────────────
