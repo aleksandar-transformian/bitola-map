@@ -257,7 +257,8 @@ export async function startBench(app) {
       scenarios.push(base);
       continue;
     }
-    const key = (s) => (s.gpu ? s.gpu.total.mean : s.cpu.total.mean);
+    // цена: GPU време ако го има, инаку интервалот меѓу кадри (тоа што го гледа корисникот)
+    const key = (s) => (s.gpu ? s.gpu.total.mean : s.interval.mean);
     ablation.push({ base: id, variant: 'основа', ms: key(base), delta: null, deltaPct: null, triangles: base.triangles, calls: base.calls, interval: base.interval.p50, cpu: base.cpu.total.mean });
     for (const [name, apply] of variants()) {
       step(`${id} — ${name}`);

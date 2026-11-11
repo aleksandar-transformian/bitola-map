@@ -17,6 +17,7 @@
 import { createRequire } from 'node:module';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { formatReport, compareReports } from '../../src/perf/report.js';
 
 const args = process.argv.slice(2);
@@ -94,6 +95,13 @@ try {
 }
 const report = await page.evaluate(() => window.__bitolaBench.report);
 await browser.close();
+// commit од работната копија (Vite го чита само при старт на dev серверот, а тој служи тековни фајлови)
+try {
+  const git = (c) => execSync(c, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+  report.commit = git('git rev-parse --short HEAD') + (git('git status --porcelain -- src') ? '-dirty' : '');
+} catch {
+  // без git — останува тоа што го дал прелистувачот
+}
 
 console.log('\n' + formatReport(report));
 console.log(`\n(вкупно ${Math.round((Date.now() - t0) / 1000)} s)`);

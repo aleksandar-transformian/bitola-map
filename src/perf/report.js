@@ -59,11 +59,12 @@ export function formatReport(r) {
   }
   if (r.ablation?.length) {
     L.push('');
-    L.push(`Цена на деловите (аблација; ${r.gpuTimer ? 'GPU' : 'CPU'} средно ms; Δ = колку чини делот):`);
+    const soft = r.env.software;
+    L.push(`Цена на деловите (аблација; ${soft ? 'SwiftShader — само структура' : r.gpuTimer ? 'GPU средно ms' : 'интервал меѓу кадри, средно ms'}; Δ = колку чини делот):`);
     L.push(`${pad('основа / варијанта', 52)}${lpad('ms', 8)}${lpad('Δ ms', 8)}${lpad('Δ %', 7)}${lpad('кадар', 8)}${lpad('повици', 8)}${lpad('триаг.', 9)}`);
     for (const a of r.ablation) {
       L.push(
-        `${pad(`${a.base} / ${a.variant}`, 52)}${lpad(f1(a.ms), 8)}${lpad(a.delta == null ? '' : f1(a.delta), 8)}${lpad(a.deltaPct == null ? '' : f1(a.deltaPct), 7)}${lpad(f1(a.interval), 8)}${lpad(a.calls ?? '', 8)}${lpad(mtri(a.triangles), 9)}`,
+        `${pad(`${a.base} / ${a.variant}`, 52)}${lpad(soft ? '—' : f1(a.ms), 8)}${lpad(a.delta == null || soft ? '' : f1(a.delta), 8)}${lpad(a.deltaPct == null || soft ? '' : f1(a.deltaPct), 7)}${lpad(soft ? '—' : f1(a.interval), 8)}${lpad(a.calls ?? '', 8)}${lpad(mtri(a.triangles), 9)}`,
       );
     }
   }
