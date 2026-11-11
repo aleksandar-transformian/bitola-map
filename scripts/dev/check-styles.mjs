@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Проверка на интерфејсот: смена на стил и време од денот во живо, #style= / #time= во URL,
-// памтење во localStorage, брзи погледи, глувче, тастатура и натписи.
+// Проверка на интерфејсот: смена на стил, време од денот и снег во живо, #style= / #time= /
+// #weather= во URL, памтење во localStorage, брзи погледи, глувче, тастатура и натписи.
 //   node scripts/dev/check-styles.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
 
 import { createRequire } from 'node:module';
@@ -140,6 +140,26 @@ await page.waitForFunction(() => !window.__bitolaApp.pipeline.stylePasses.some((
 const s6 = await page.evaluate(() => window.__bitolaApp.pipeline.stylePasses.some((p) => p.perfName === 'bloom' && p.enabled));
 check('дење сјајот е исклучен', !s6);
 
+// Тастер 5 → „Бајка“ (боке-пас со точки на светлата).
+await page.keyboard.press('5');
+await page.waitForFunction(() => document.documentElement.dataset.style === 'bajka', null, { timeout: 60000 }).catch(() => {});
+check('тастер 5 → Бајка', (await page.evaluate(() => document.documentElement.dataset.style)) === 'bajka');
+
+// Снег: копче „Снежи“ → снегулки, URL; тастер S → следниот (без снег).
+await tap(page, '.weather-toggle button[data-id="snowfall"]');
+// снегулките се појавуваат постепено (по кадар) — софтверското рендерирање е бавно
+await page.waitForFunction(() => window.__bitolaApp.world.snowfall.visible, null, { timeout: 60000, polling: 300 }).catch(() => {});
+const w1 = await page.evaluate(() => ({ w: document.documentElement.dataset.weather, hash: location.hash, flakes: window.__bitolaApp.world.snowfall.visible }));
+check('копче Снежи', w1.w === 'snowfall' && w1.hash.includes('weather=snowfall') && w1.flakes, JSON.stringify(w1));
+await page.evaluate(() => document.activeElement?.blur());
+await page.keyboard.press('s');
+await page.waitForFunction(() => !window.__bitolaApp.world.snowfall.visible, null, { timeout: 60000, polling: 300 }).catch(() => {});
+const w2 = await page.evaluate(() => ({ w: document.documentElement.dataset.weather, flakes: window.__bitolaApp.world.snowfall.visible }));
+check('тастер S → без снег (снегулките исчезнуваат)', w2.w === 'clear' && !w2.flakes, JSON.stringify(w2));
+await page.evaluate(() => (location.hash = 'style=bajka&weather=snow'));
+await page.waitForTimeout(1500);
+check('hashchange → снег', (await page.evaluate(() => document.documentElement.dataset.weather)) === 'snow');
+
 // Смена преку hashchange.
 await page.evaluate(() => (location.hash = 'style=maketa'));
 await page.waitForTimeout(1500);
@@ -208,6 +228,7 @@ await p2.goto(url);
 await p2.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 check('localStorage по превчитување', (await p2.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
 check('времето запаметено', (await p2.evaluate(() => document.documentElement.dataset.time)) === 'sunset');
+check('снегот запаметен', (await p2.evaluate(() => document.documentElement.dataset.weather)) === 'snow');
 await p2.close();
 
 // Непознат стил во URL → запаметениот, без грешка.
@@ -221,7 +242,8 @@ check('непознат #style= се игнорира', (await p3.evaluate(() =>
 await p3.waitForTimeout(300);
 const fk1 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
 await p3.emulateMedia({ reducedMotion: 'reduce' });
-await p3.waitForTimeout(500);
+// вредноста се менува во следниот кадар — во SwiftShader кадарот може да трае и неколку секунди
+await p3.waitForFunction(() => window.__bitolaApp.env.flicker.value === 0, null, { timeout: 60000, polling: 300 }).catch(() => {});
 const fk2 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
 check('треперење: вклучено / исклучено при reduced-motion', fk1.f > 0 && fk2.f === 0 && fk2.t > fk1.t, `${fk1.f} → ${fk2.f}`);
 

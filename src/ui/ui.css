@@ -34,6 +34,14 @@ html[data-style='maketa'] {
   --shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
 }
 
+html[data-style='bajka'] {
+  --ink: #2e2722;
+  --ink-soft: #6e6155;
+  --paper: rgba(244, 236, 222, 0.9);
+  --paper-solid: #efe6d6;
+  --accent: #a8602c;
+}
+
 html,
 body {
   margin: 0;
@@ -407,6 +415,12 @@ html[data-time='night'] {
   gap: 2px;
 }
 
+/* снегот е одделен од времето од денот со тенка линија */
+.weather-toggle {
+  padding-left: 4px;
+  border-left: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
 .sr {
   position: absolute;
   width: 1px;
@@ -679,6 +693,13 @@ html[data-time='night'][data-style]:not([data-style='crtan']) {
 
 /* тесен екран: сите стилови се мостри, името се гледа само кај избраниот */
 @media (max-width: 600px) {
+  /* снегот е едно копче (тековната состојба; допир = следната) — место за „Оди до…“ */
+  .weather-toggle button[aria-checked='false'] {
+    display: none;
+  }
+  .weather-toggle button[aria-checked='true'] {
+    background: transparent;
+  }
   .style-picker button {
     padding: 7px;
     gap: 6px;

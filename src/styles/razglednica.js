@@ -106,6 +106,10 @@ export default {
     plinth: '#b39c84',
     tin: '#b8675c',
     amber: '#c98a5e',
+    // зградите на Магнолија (world/landmarks/magnolija.js)
+    plaster: '#f8f1e4',
+    peach: '#f0cfb6',
+    wood: '#8e4a33',
   },
   trees: {
     crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],

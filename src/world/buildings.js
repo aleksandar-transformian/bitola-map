@@ -311,13 +311,15 @@ const tmp2 = new THREE.Color();
 
 /**
  * Пресметај бои по теме од палетата на стилот.
- * palette.buildings: { <класа>: [ѕид, рамен покрив], variation, ao, roofAlt? (бои за косите покриви) }
+ * palette.buildings: { <класа>: [ѕид, рамен покрив], variation, ao, roofAlt? (бои за косите покриви),
+ *                      wallAlt? (бои за ѕидовите на куќите со кос покрив) }
  */
 export function colorBuildings(geo, P) {
   const info = geo.userData.info;
   const col = geo.attributes.color.array;
   const pal = BUILDING.map((k) => [new THREE.Color(P[k][0]), new THREE.Color(P[k][1])]);
   const roofAlt = P.roofAlt ? P.roofAlt.map((c) => new THREE.Color(c)) : null;
+  const wallAlt = P.wallAlt ? P.wallAlt.map((c) => new THREE.Color(c)) : null;
   for (let i = 0; i < info.bid.length; i++) {
     const b = info.bid[i];
     const isWall = i < info.wallCount;
@@ -325,6 +327,9 @@ export function colorBuildings(geo, P) {
     if (!isWall && roofAlt && info.pitched[b]) {
       // коси покриви: ќерамиди со разновидност
       tmp.copy(roofAlt[Math.floor(seed * 997) % roofAlt.length]);
+    } else if (isWall && wallAlt && info.pitched[b]) {
+      // ѕидови на куќите со кос покрив: разновидни бои (стилот „Бајка“)
+      tmp.copy(wallAlt[Math.floor(seed * 7919) % wallAlt.length]);
     } else {
       tmp.copy(pal[info.kind[b]][isWall ? 0 : 1]);
     }

@@ -162,9 +162,10 @@ function chain(material, key, fn) {
   return material;
 }
 
-/** Делови што светат ноќе (атрибут aGlow: прозорци, светилки на знаменитостите); трепери како фенер. */
-export function withGlow(material, env) {
-  return chain(material, 'glow', (shader) => {
+/** Делови што светат ноќе (атрибут aGlow: прозорци, светилки на знаменитостите); трепери како фенер.
+ *  fill = топол одблесок од светилките врз фасадите на знаменитостите (ноќе не се сосема црни). */
+export function withGlow(material, env, { fill = 0 } = {}) {
+  return chain(material, `glow${fill}`, (shader) => {
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
     flickerUniforms(shader, env);
@@ -176,7 +177,13 @@ export function withGlow(material, env) {
       );
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', '#include <common>\nuniform float uNight;\nuniform vec3 uLamp;\nvarying float vGlow;')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vGlow * uNight * 1.6;');
+      .replace(
+        '#include <emissivemap_fragment>',
+        // fill = топол одблесок од светилките врз фасадите (ноќе не се сосема црни)
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance += uLamp * vGlow * uNight * 1.6;
+        ${fill ? `totalEmissiveRadiance += diffuseColor.rgb * uLamp * uNight * (1.0 - min(vGlow, 1.0)) * ${fill.toFixed(3)};` : ''}`,
+      );
   });
 }
 
@@ -184,8 +191,8 @@ export function withGlow(material, env) {
  * Осветлени прозорци на ѕидовите ноќе: процедурална мрежа (3.2 × 3.1 m) во рамнината на
  * секој ѕид, случајно светнати ќелии. Потребен е атрибутот aBase (подлога на зградата).
  */
-export function withWindows(material, env, { ratio = 0.42 } = {}) {
-  return chain(material, 'windows', (shader) => {
+export function withWindows(material, env, { ratio = 0.42, cross = 0, halo = 0, fill = 0 } = {}) {
+  return chain(material, `windows${cross}-${halo}-${fill}`, (shader) => {
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
     shader.uniforms.uRatio = { value: ratio };
@@ -231,7 +238,30 @@ export function withWindows(material, env, { ratio = 0.42 } = {}) {
           float tv = step(0.98, fract(h * 29.7)) * step(0.001, uFlicker);
           warm = mix(warm, vec3(0.55, 0.7, 1.0), tv * 0.8);
           k *= 1.0 + tv * uFlicker * (fkNoise(uTime * 2.5 + h * 50.0) - 0.5) * 0.7;
-          totalEmissiveRadiance += warm * inWin * lit * smoothstep(0.3, 0.95, uNight) * k;
+          float on = lit * smoothstep(0.3, 0.95, uNight) * k;
+          ${
+            cross
+              ? `// крстеста рамка (пречки) во прозорецот
+          vec2 wl = (f - vec2(0.28, 0.22)) / vec2(0.44, 0.56);
+          float bar = max(1.0 - smoothstep(0.035, 0.06, abs(wl.x - 0.5)), 1.0 - smoothstep(0.03, 0.055, abs(wl.y - 0.58)));
+          bar *= 1.0 - smoothstep(0.025, 0.07, fwidth(u / 3.2));
+          inWin *= 1.0 - bar * ${cross.toFixed(2)};`
+              : ''
+          }
+          totalEmissiveRadiance += warm * inWin * on;
+          ${
+            fill
+              ? `// топол одблесок од уличните светилки на долниот дел од ѕидовите
+          totalEmissiveRadiance += diffuseColor.rgb * uLamp * (1.0 - smoothstep(0.0, 14.0, v + 1.5)) * smoothstep(0.2, 0.9, uNight) * ${fill.toFixed(3)};`
+              : ''
+          }
+          ${
+            halo
+              ? `// топол одблесок на ѕидот околу светнатиот прозорец
+          vec2 dd = max(abs(f - vec2(0.5)) - vec2(0.22, 0.28), 0.0) * vec2(3.2, 3.1);
+          totalEmissiveRadiance += warm * on * exp(-length(dd) * 3.2) * (1.0 - inWin) * step(0.0, v) * ${halo.toFixed(3)};`
+              : ''
+          }
         }`,
       );
   });
@@ -250,5 +280,106 @@ export function withStreetGlow(material, env, strength = [0.4, 0.38, 0.36, 0.32,
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', '#include <common>\nuniform float uNight, uStreetGain;\nuniform vec3 uLamp;\nvarying float vStreet;')
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vStreet * uNight * uStreetGain;');
+  });
+}
+
+// ───────────────────────── Снег ─────────────────────────
+// env.snow = { value: 0..1 } — заеднички uniform (временски услови, app/weather.js).
+// Снегот ги бели површините свртени нагоре (покриви, земја, круни), со шум за наноси.
+
+/** Светска позиција и нормала (со инстанци) како varyings — заедничко за снегот и текстурите. */
+function injectWorld(shader) {
+  if (shader.vertexShader.includes('vWorldP_')) return;
+  shader.vertexShader = shader.vertexShader
+    .replace('#include <common>', '#include <common>\nvarying vec3 vWorldP_;\nvarying vec3 vWorldN_;')
+    .replace(
+      '#include <project_vertex>',
+      `#include <project_vertex>
+      {
+        vec4 wp_ = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          wp_ = instanceMatrix * wp_;
+        #endif
+        vWorldP_ = (modelMatrix * wp_).xyz;
+        // нормалата во поглед → светски координати (viewMatrix е ротација + поместување)
+        vWorldN_ = normalize((vec4(transformedNormal, 0.0) * viewMatrix).xyz);
+      }`,
+    );
+  shader.fragmentShader = shader.fragmentShader.replace(
+    '#include <common>',
+    `#include <common>
+    varying vec3 vWorldP_;
+    varying vec3 vWorldN_;
+    float n2Hash_(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+    float vNoise_(vec2 p) {
+      vec2 i = floor(p), f = fract(p);
+      f = f * f * (3.0 - 2.0 * f);
+      return mix(mix(n2Hash_(i), n2Hash_(i + vec2(1.0, 0.0)), f.x), mix(n2Hash_(i + vec2(0.0, 1.0)), n2Hash_(i + 1.0), f.x), f.y);
+    }`,
+  );
+}
+
+/**
+ * Снег врз материјалот. lo/hi = праг на нормалата (y) — над hi сè е бело;
+ * amount = најмногу снег (на пр. улиците се погазени); patch = колку шумот прави дамки.
+ */
+export function withSnow(material, env, { lo = 0.45, hi = 0.75, amount = 1, patch = 0.35, scale = 0.05, color = null } = {}) {
+  return chain(material, `snow${lo}-${hi}-${amount}-${patch}`, (shader) => {
+    injectWorld(shader);
+    shader.uniforms.uSnow = env.snow;
+    shader.uniforms.uSnowNight = env.night;
+    shader.uniforms.uSnowColor = color ? { value: new THREE.Color(color) } : env.snowColor;
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform float uSnow, uSnowNight;\nuniform vec3 uSnowColor;\nfloat snowCover_ = 0.0;')
+      // ноќе снегот благо „свети“ (месечина, одблесок од градот) — инаку е сосема темен
+      .replace(
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uSnowColor * vec3(0.62, 0.72, 0.88) * snowCover_ * uSnowNight * 0.11;',
+      )
+      // по бојата и „рачните“ текстури (alphamap доаѓа веднаш по color_fragment)
+      .replace(
+        '#include <alphamap_fragment>',
+        `if (uSnow > 0.001) {
+          vec2 sp_ = vWorldP_.xz * ${scale.toFixed(4)};
+          float sn_ = vNoise_(sp_) * 0.65 + vNoise_(sp_ * 4.3) * 0.35;
+          float up_ = vWorldN_.y + (sn_ - 0.5) * ${patch.toFixed(3)};
+          // снегот се натрупува постепено: прво на најрамните места и во наносите
+          float th_ = 1.0 - uSnow * 1.35;
+          float cover_ = smoothstep(${lo.toFixed(3)}, ${hi.toFixed(3)}, up_) * smoothstep(th_, th_ + 0.3, (sn_ + max(vWorldN_.y, 0.0)) * 0.5);
+          vec3 snowC_ = uSnowColor * (0.92 + 0.08 * vNoise_(vWorldP_.xz * 1.7));
+          snowCover_ = cover_ * ${amount.toFixed(3)};
+          diffuseColor.rgb = mix(diffuseColor.rgb, snowC_, snowCover_);
+        }
+        #include <alphamap_fragment>`,
+      );
+  });
+}
+
+/**
+ * „Рачна изработка“: шум како глина/филц и линии (штици на ѕидовите, редови ќерамиди на
+ * покривите) што исчезнуваат кога се погусти од пиксел.
+ */
+export function withCraft(material, { mottle = 0.12, lines = 0, lineStep = 0.45, lineDark = 0.18, vertical = false } = {}) {
+  return chain(material, `craft${mottle}-${lines}-${lineStep}-${vertical}`, (shader) => {
+    injectWorld(shader);
+    shader.fragmentShader = shader.fragmentShader.replace(
+      '#include <color_fragment>',
+      `#include <color_fragment>
+      {
+        vec3 P_ = vWorldP_;
+        vec2 q_ = ${vertical ? 'vec2(dot(P_.xz, normalize(vec2(-vWorldN_.z, vWorldN_.x) + 1e-4)), P_.y)' : 'P_.xz'};
+        float m_ = vNoise_(q_ * 0.9) * 0.5 + vNoise_(q_ * 3.1) * 0.3 + vNoise_(P_.xz * 0.11 + P_.y * 0.07) * 0.2;
+        diffuseColor.rgb *= 1.0 + (m_ - 0.5) * ${(mottle * 2).toFixed(3)};
+        ${
+          lines
+            ? `float l_ = P_.y / ${lineStep.toFixed(3)};
+        float lw_ = fwidth(l_);
+        float ln_ = 1.0 - smoothstep(0.0, max(lw_ * 1.2, 0.08), fract(l_));
+        ln_ *= 1.0 - smoothstep(0.25, 0.6, lw_);
+        diffuseColor.rgb *= 1.0 - ln_ * ${lineDark.toFixed(3)} * ${lines.toFixed(3)};`
+            : ''
+        }
+      }`,
+    );
   });
 }

@@ -5,6 +5,7 @@ import { createSky } from './world/sky.js';
 import { createPipeline } from './render/pipeline.js';
 import { createCamera } from './app/camera.js';
 import { createTime, TIMES } from './app/time.js';
+import { createWeather, WEATHERS } from './app/weather.js';
 import { readPref, hashPref, writePref } from './app/prefs.js';
 import { createStyleManager } from './styles/manager.js';
 import { STYLES, getStyle, initialStyleId, rememberStyle, styleFromHash, migrateLegacyStyle } from './styles/index.js';
@@ -27,6 +28,7 @@ const profile = detectProfile();
 migrateLegacyStyle();
 const firstStyle = getStyle(initialStyleId());
 const validTime = (id) => TIMES.some((t) => t.id === id);
+const validWeather = (id) => WEATHERS.some((w) => w.id === id);
 let validView = (id) => VIEWS.some((v) => v.id === id);
 document.documentElement.dataset.style = firstStyle.id;
 const overlay = createOverlay();
@@ -41,7 +43,7 @@ async function start() {
   const data = await loadData((f) => overlay.progress(f * 0.8));
   stats.dataMs = Math.round(performance.now() - T0);
 
-  // Заеднички uniforms за ноќта (прозорци, улици, светилки) и треперењето на светлата.
+  // Заеднички uniforms за ноќта (прозорци, улици, светилки), треперењето на светлата и снегот.
   const env = {
     night: { value: 0 },
     lamp: { value: new THREE.Color('#ffc27a') },
@@ -49,11 +51,16 @@ async function start() {
     flicker: { value: 1 },
     broken: { value: 0 },
     streetGain: { value: 1 }, // сјаењето на улиците по растојание (го менува менаџерот на стилови)
+    snow: { value: 0 }, // снег 0–1 (временски услови, app/weather.js)
+    snowColor: { value: new THREE.Color('#f3f6fa') },
   };
   // „Намалено движење“ во системот → мирни светла (и детерминистички screenshot-ови).
   const still = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   const time = createTime(readPref('time', validTime) || 'day');
   document.documentElement.dataset.time = time.mode;
+  const weather = createWeather(readPref('weather', validWeather) || 'clear');
+  env.snow.value = weather.snow;
+  document.documentElement.dataset.weather = weather.mode;
 
   const t1 = performance.now();
   const world = createWorld(data, profile, env);
@@ -113,7 +120,17 @@ async function start() {
   }
   for (const v of CHECK_VIEWS) if (!places.has(v.id)) places.set(v.id, v); // само преку #view= (проверки, мерења)
   validView = (id) => places.has(id);
-  const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id), onLife: (on) => setLife(on), onSnapshot: () => snapshot.save() });
+  const menu = createMenu(ui, {
+    views: VIEWS,
+    landmarks: data.landmarks,
+    times: TIMES,
+    weathers: WEATHERS,
+    onGo: (id) => goTo(id),
+    onTime: (id) => setTime(id),
+    onWeather: (id) => setWeather(id),
+    onLife: (on) => setLife(on),
+    onSnapshot: () => snapshot.save(),
+  });
   const snapshot = createSnapshot({
     pipeline,
     renderFrame: () => pipeline.render(0),
@@ -144,6 +161,8 @@ async function start() {
   }
   setLife(life, false);
   syncTime();
+  menu.setWeather(weather.mode);
+  world.snowfall.userData.set(weather.falling);
   const dock = document.createElement('div');
   dock.className = 'dock';
   ui.appendChild(dock);
@@ -182,6 +201,14 @@ async function start() {
     menu.setTime(time.mode);
     document.documentElement.dataset.time = time.mode;
   }
+  function setWeather(id) {
+    if (!validWeather(id) || id === weather.mode) return;
+    weather.set(id);
+    world.snowfall.userData.set(weather.falling);
+    menu.setWeather(id);
+    document.documentElement.dataset.weather = id;
+    writePref('weather', id);
+  }
   function goTo(id, animate = true) {
     const v = places.get(id);
     if (!v) return;
@@ -196,11 +223,18 @@ async function start() {
     if (s) setStyle(s);
     const t = hashPref('time', validTime);
     if (t) setTime(t);
+    const w = hashPref('weather', validWeather);
+    if (w) setWeather(w);
     const v = hashPref('view', validView);
     if (v) goTo(v);
   });
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Home') goTo('pregled');
+    // S = снег: без снег → снег → снежи → без снег
+    if (['s', 'S', 'с', 'С'].includes(e.key) && !e.target.closest?.('select, input, textarea') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const i = WEATHERS.findIndex((w) => w.id === weather.mode);
+      setWeather(WEATHERS[(i + 1) % WEATHERS.length].id);
+    }
   });
 
   goTo(hashPref('view', validView) || 'pregled', false);
@@ -240,6 +274,8 @@ async function start() {
     controls.update();
     const d = view.updateClipping(sky);
     updateSun(d);
+    if (weather.update()) env.snow.value = weather.snow;
+    world.snowfall.userData.update(dt, camera, d, { height: container.clientHeight, dpr: pipeline.size.dpr }, env.night.value);
     styles.update();
     world.traffic.update(dt, d);
     const fl = styles.current?.night?.flicker;
@@ -267,6 +303,7 @@ async function start() {
       lastFpsT = now;
       stats.style = styles.current?.id;
       stats.time = time.mode;
+      stats.weather = weather.mode;
       overlay.debug(stats, pipeline.renderer.info, perf.live(), pipeline.size);
     }
   });
@@ -292,11 +329,15 @@ async function start() {
     goTo,
     setStyle,
     setTime,
+    setWeather,
     get style() {
       return styles.current?.id;
     },
     get time() {
       return time.mode;
+    },
+    get weather() {
+      return weather.mode;
     },
     world,
     data,

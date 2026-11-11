@@ -12,31 +12,34 @@
 //   roads       { класа: боја }   (класи: config/classes.js → ROAD)
 //   rail        [активна, напуштена]
 //   water       боја на водотеците
-//   buildings   { класа: [ѕид, покрив], roofAlt?, variation, ao }
+//   buildings   { класа: [ѕид, покрив], roofAlt?, wallAlt?, variation, ao }
 //   sky, fog    небо (градиент) и магла (метри)
 //   light       { sun: {color, intensity, azimuth, elevation}, hemi: {sky, ground, intensity},
 //                 shadow: јачина 0–1, shadows?: false (без сенки), toneMapping: 'neutral' | 'aces' | 'none', exposure }
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
 //   traffic?    { cars: [бои], people: [бои], flat? } — „Живот на мапата“ (world/traffic.js)
-//   night       { lamp, windows?: { ratio }, streets?: [јачина по класа на улица],
-//                 flicker?: { amount?: 0–1 (стандардно 1), broken?: true } } — ноќни светла;
-//               flicker = благо треперење (styles/shared/flicker.js), broken = понекоја „расипана“ светилка
+//   night       { lamp, windows?: { ratio, cross?, halo?, fill? }, streets?: [јачина по класа на улица],
+//                 landmarkFill?, flicker?: { amount?: 0–1 (стандардно 1), broken?: true } } — ноќни светла;
+//               fill = топол одблесок врз ѕидовите; flicker = благо треперење (styles/shared/flicker.js),
+//               broken = понекоја „расипана“ светилка
+//   snow?       { color } — боја на снегот (временски услови „Снег“/„Снежи“, app/weather.js)
 //   times?      { sunset?, night? } — делумно пребришување на стандардното зајдисонце/ноќ (app/time.js)
 //   ui          { paper } — бои за интерфејсот (CSS: html[data-style=<id>])
 //   materials(ctx)        → { terrain, skirt, walls, roofs, roads, rail, water } — нови материјали
 //   post(ctx)?            → { before: Pass[], after: Pass[], ... } — пост-процесирање
 //   update(ctx, post)?    по кадар (на пр. фокус за длабочина на поле)
 //
-// ctx = { scene, camera, controls, renderer, profile, size, ground }
+// ctx = { scene, camera, controls, renderer, profile, size, ground, world, env }
 
 import razglednica from './razglednica.js';
 import maketa from './maketa.js';
 import crtan from './crtan.js';
 import lowpoly from './lowpoly.js';
+import bajka from './bajka.js';
 import { readPref, hashPref, writePref } from '../app/prefs.js';
 
-export const STYLES = [razglednica, maketa, crtan, lowpoly];
+export const STYLES = [razglednica, maketa, crtan, lowpoly, bajka];
 export const DEFAULT_STYLE = 'razglednica';
 
 export function getStyle(id) {
