@@ -9,13 +9,15 @@ const ICONS = {
 
 const LIFE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11.5 6.6 7.3A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.3L19 11.5V17h-2.2v-1.6H7.2V17H5zM7.4 10.6h9.2l-1-2.7H8.4z"/><circle cx="8" cy="13.3" r="1.1" fill="#fff"/><circle cx="16" cy="13.3" r="1.1" fill="#fff"/></svg>';
 
+const PHOTO_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.5 9.9 4h4.2l1.3 1.5H19a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5a2 2 0 0 1 2-2zM12 16.3a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-1.8a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z"/></svg>';
+
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 /**
  * @param {HTMLElement} root
  * @param {{ views: object[], landmarks: object[], times: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onLife?: (on:boolean)=>void }} o
  */
-export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife }) {
+export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife, onSnapshot }) {
   const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места'];
   const viewIds = new Set(views.map((v) => v.id));
   const groups = new Map(GROUP_ORDER.map((g) => [g, []]));
@@ -44,6 +46,7 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife
       ${times.map((t) => `<button type="button" role="radio" aria-checked="false" data-id="${t.id}" title="${t.name}" aria-label="${t.name}">${ICONS[t.id] || ''}</button>`).join('')}
     </nav>
     <button type="button" class="help-btn life-btn" aria-pressed="true" title="Живот на мапата: сообраќај и пешаци" aria-label="Живот на мапата: сообраќај и пешаци">${LIFE_ICON}</button>
+    <button type="button" class="help-btn photo-btn" title="Зачувај слика (PNG)" aria-label="Зачувај слика">${PHOTO_ICON}</button>
     <button type="button" class="help-btn" aria-expanded="false" aria-controls="help" title="Како се движи низ мапата">?</button>
   `;
   root.appendChild(el);
@@ -65,7 +68,9 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife
       <dt>Тастатура</dt>
       <dd><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> поместување · <kbd>Q</kbd> <kbd>E</kbd> ротација</dd>
       <dd><kbd>+</kbd> <kbd>−</kbd> зум · <kbd>PgUp</kbd> <kbd>PgDn</kbd> наклон · <kbd>Home</kbd> преглед</dd>
-      <dd><kbd>1</kbd>–<kbd>5</kbd> стил</dd>
+      <dd><kbd>1</kbd>–<kbd>4</kbd> стил</dd>
+      <dt>Слика</dt>
+      <dd>Копчето со фотоапарат го зачувува погледот како PNG (со натписите и атрибуцијата).</dd>
       <dt>Живот на мапата</dt>
       <dd>Копчето со автомобил ги вклучува/исклучува сообраќајот и пешаците.</dd>
     </dl>
@@ -85,7 +90,19 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife
   });
   const lifeBtn = el.querySelector('.life-btn');
   lifeBtn.addEventListener('click', () => onLife?.(lifeBtn.getAttribute('aria-pressed') !== 'true'));
-  const btn = el.querySelector('.help-btn:not(.life-btn)');
+  const photoBtn = el.querySelector('.photo-btn');
+  photoBtn.addEventListener('click', async () => {
+    if (photoBtn.disabled) return;
+    photoBtn.disabled = true;
+    photoBtn.classList.add('busy');
+    try {
+      await onSnapshot?.();
+    } finally {
+      photoBtn.disabled = false;
+      photoBtn.classList.remove('busy');
+    }
+  });
+  const btn = el.querySelector('.help-btn:not(.life-btn):not(.photo-btn)');
   const toggleHelp = (show = help.hidden) => {
     help.hidden = !show;
     btn.setAttribute('aria-expanded', String(show));
@@ -100,15 +117,6 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife
   return {
     setPlace(id) {
       select.value = id && [...select.options].some((o) => o.value === id) ? id : '';
-    },
-    /** Заклучи ги копчињата за време (стилот има фиксно време) или отклучи со null. */
-    lockTime(fixed) {
-      const nav = el.querySelector('.time-toggle');
-      nav.classList.toggle('locked', !!fixed);
-      for (const b of nav.querySelectorAll('button')) {
-        b.disabled = !!fixed;
-        b.title = fixed ? 'Овој стил е секогаш ноќ' : b.getAttribute('aria-label');
-      }
     },
     setLife(on) {
       lifeBtn.setAttribute('aria-pressed', String(on));

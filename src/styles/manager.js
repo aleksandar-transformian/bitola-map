@@ -9,6 +9,7 @@
 //  Целата смена е покриена со кратко претопување (снимка од претходниот кадар).
 
 import * as THREE from 'three';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { ROAD } from '../config/classes.js';
 import { colorBuildings } from '../world/buildings.js';
 import { colorRibbons } from '../world/ribbons.js';
@@ -30,6 +31,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
   let current = null;
   let post = null;
+  let bloom = null;
   let growStart = -1;
   let lit = null;
   const ctx = {
@@ -100,8 +102,17 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     // некои стилови (цртан филм) се без сенки — поевтино и поедноставно
     lights.sun.castShadow = profile.shadows > 0 && style.light.shadows !== false;
 
-    if (env.streetGain) env.streetGain.value = 1; // стилот може да го менува по кадар (update)
     post = style.post?.(ctx) || { before: [], after: [] };
+    // Ноќен сјај околу светлата (десктоп, сите стилови): во линеарен HDR пред OutputPass,
+    // вклучен само ноќе — дење не чини ништо.
+    bloom = null;
+    if (profile.name !== 'mobile' && style.night?.bloom !== false) {
+      const { width, height, dpr } = pipeline.size;
+      bloom = new UnrealBloomPass(new THREE.Vector2(width * dpr, height * dpr), 0, 0.4, 0.88);
+      bloom.perfName = 'bloom';
+      bloom.enabled = false;
+      post.before = [...post.before, bloom];
+    }
     pipeline.setPasses(post.before, post.after);
 
     document.documentElement.dataset.style = style.id;
@@ -111,9 +122,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
   /** Осветлување, небо и магла за стилот и тековното време од денот. */
   function applyLighting() {
-    // стил со фиксно време (на пр. „Ноќна Битола“) го игнорира изборот на корисникот
-    const w = current.fixedTime ? { day: 0, sunset: 0, night: 0, [current.fixedTime]: 1 } : time.weights;
-    lit = resolveLighting(current, w, lit || undefined);
+    lit = resolveLighting(current, time.weights, lit || undefined);
     const L = lit;
     scene.fog.color.copy(L.fog.color);
     scene.fog.near = current.fog.near;
@@ -178,6 +187,15 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
         if (t >= 1) growStart = -1;
       }
       if (time.update() && current) applyLighting();
+      // ноќе: улиците светат целосно од далеку (тенки линии), поприглушено одблиску
+      const d = camera.position.distanceTo(controls.target);
+      const k = Math.min(1, Math.max(0, (d - 150) / 2450));
+      env.streetGain.value = 0.5 + 0.5 * k * k * (3 - 2 * k);
+      if (bloom) {
+        const n = env.night.value;
+        bloom.enabled = n > 0.05;
+        bloom.strength = 0.45 * n * (current.night?.bloom ?? 1);
+      }
       current?.update?.(ctx, post);
     },
   };
