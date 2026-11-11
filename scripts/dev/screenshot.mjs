@@ -12,7 +12,7 @@
 
 import { createRequire } from 'node:module';
 import { mkdir } from 'node:fs/promises';
-import { VIEWS as APP_VIEWS } from '../../src/config/views.js';
+import { VIEWS as APP_VIEWS, CHECK_VIEWS } from '../../src/config/views.js';
 import { readFileSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
@@ -34,33 +34,23 @@ const views = opt('views', 'home').split(',');
 // Погледи за проверка: брзите погледи од апликацијата (config/views.js) + неколку дополнителни.
 const VIEWS = {
   home: null,
-  ...Object.fromEntries(APP_VIEWS.map((v) => [v.id, v])),
-  center: { target: { x: 0, z: 0 }, bearing: 200, polar: 55, distance: 900 },
-  close: { target: { x: 30, z: -60 }, bearing: 160, polar: 62, distance: 350 },
-  west: { target: { x: -2500, z: 800 }, bearing: 70, polar: 65, distance: 4500 },
-  top: { target: { x: -500, z: 400 }, bearing: 0, polar: 1, distance: 11000 },
-  // крупни планови на знаменитостите
-  saat: { target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
-  dimitrija: { target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
-  filip: { target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
-  dom: { target: { x: -8, z: 292 }, bearing: 115, polar: 58, distance: 160 }, // како воздушната фотографија од паркот
-  'dom-front': { target: { x: 10, z: 285 }, bearing: 68, polar: 76, distance: 120 }, // фронтално од паркот
-  gimnazija: { target: { x: -542, z: -162 }, bearing: 182, polar: 72, distance: 80 }, // од кејот на Драгор
-  'gimnazija-agol': { target: { x: -540, z: -163 }, bearing: 140, polar: 72, distance: 65 },
+  ...Object.fromEntries([...APP_VIEWS, ...CHECK_VIEWS].map((v) => [v.id, v])),
 };
 
-// lm-<id> = поглед кон знаменитост од public/data/landmarks.json (растојание по големина)
+// lm-<id> = поглед кон знаменитост од public/data/landmarks.json (свој `view` или растојание по големина)
 const LMS = JSON.parse(readFileSync('public/data/landmarks.json', 'utf8'));
 for (const lm of LMS) {
   const big = { stadium: 420, warCemetery: 380, fortress: 300, monastery: 300, totenburg: 200, heraclea: 380, promenade: 420 }[lm.model] || 150;
-  VIEWS[`lm-${lm.id}`] = { target: { x: lm.center[0], z: lm.center[1] }, bearing: 200, polar: 58, distance: big };
+  VIEWS[`lm-${lm.id}`] = { target: { x: lm.center[0], z: lm.center[1] }, bearing: 200, polar: 58, distance: big, ...(lm.view || {}) };
 }
 
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+// мирни светла (без треперење) за сликите да се исти при секое пуштање; --motion = со треперење
+const reducedMotion = has('motion') ? 'no-preference' : 'reduce';
 const context = mobile
-  ? await browser.newContext({ ...devices['iPhone 13'] })
-  : await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: scale });
+  ? await browser.newContext({ ...devices['iPhone 13'], reducedMotion })
+  : await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: scale, reducedMotion });
 // упатството при првата посета не е потребно на сликите
 await context.addInitScript(() => {
   try {

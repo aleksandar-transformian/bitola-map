@@ -138,6 +138,7 @@ export default {
     if (ctx.profile.name === 'mobile') return { before: [], after: tilt.passes, tilt };
     const { width, height, dpr } = ctx.size;
     const ao = new GTAOPass(ctx.scene, ctx.camera, width * dpr, height * dpr);
+    ao.perfName = 'gtao';
     ao.output = GTAOPass.OUTPUT.Default;
     ao.blendIntensity = 0.9;
     ao.updateGtaoMaterial({ radius: 8, distanceExponent: 1.5, thickness: 2, scale: 1.2, samples: 12 });

@@ -139,7 +139,7 @@ export default {
           bleed: 0.3,
           edge: 0.14,
           grain: 0.55,
-          vignette: 0.55,
+          vignette: 0.6,
           warmth: 0.02,
         }),
       ],

@@ -531,6 +531,73 @@ html[data-time='night'] {
   }
 }
 
+/* Мерење на изведбата (?bench) */
+.bench {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: min(980px, calc(100vw - 24px));
+  max-height: calc(100vh - 140px);
+  overflow: auto;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(20, 20, 22, 0.86);
+  color: #f2f2f2;
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+}
+.bench h2 {
+  margin: 0 0 6px;
+  font: 600 14px/1.3 system-ui, sans-serif;
+}
+.bench p {
+  margin: 4px 0;
+}
+.bench .bar {
+  height: 4px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.bench .bar span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: #f0b35b;
+  transition: width 0.3s ease;
+}
+.bench-note {
+  opacity: 0.7;
+}
+.bench-out {
+  margin: 8px 0;
+  white-space: pre;
+  overflow-x: auto;
+  font: inherit;
+}
+.bench-actions {
+  display: flex;
+  gap: 8px;
+}
+.bench-actions button {
+  font: 600 12px/1 system-ui, sans-serif;
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+}
+.bench-actions button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+/* аблација во бенчмаркот: без замаглување зад панелите */
+.perf-no-blur #ui * {
+  backdrop-filter: none !important;
+}
+
 /* ── „Цртан филм“ ── */
 html[data-style='crtan'] {
   --ink: #2b2521;
@@ -579,4 +646,108 @@ html[data-style='crtan'] .label-mountain span {
 
 html[data-style='crtan'][data-time='night'] .label span {
   color: #2b2521;
+}
+
+/* ── „Low-poly“ ── */
+html[data-style='lowpoly'] {
+  --ink: #33302c;
+  --ink-soft: #6d665e;
+  --paper: rgba(246, 244, 239, 0.92);
+  --paper-solid: #f4f2ed;
+  --accent: #c9785a;
+  --title-font: 'IBM Plex Sans', system-ui, sans-serif;
+  --title-weight: 500;
+  --title-spacing: 0.06em;
+  --radius: 6px;
+  --shadow: 0 2px 10px rgba(50, 45, 40, 0.12);
+  --label-ink: #33302c;
+  --label-halo: rgba(246, 244, 239, 0.95);
+}
+
+html[data-style='lowpoly'] .label span {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+/* ноќе натписите се светли во секој стил (освен балончињата на цртаниот) — поголема специфичност
+   од темите на стиловите, за да не ја пребришат */
+html[data-time='night'][data-style]:not([data-style='crtan']) {
+  --label-ink: #f3ead8;
+  --label-halo: rgba(10, 14, 28, 0.85);
+}
+
+/* заклучени копчиња за време (стил со фиксно време) */
+.time-toggle.locked button {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.time-toggle.locked button[aria-checked='true'] {
+  opacity: 1;
+}
+
+/* ── „Ноќна Битола“: темен интерфејс ── */
+html[data-style='nokna'] {
+  --ink: #f1e6d2;
+  --ink-soft: #a9a294;
+  --paper: rgba(16, 20, 34, 0.86);
+  --paper-solid: #0b0e18;
+  --accent: #ffb257;
+  --title-font: 'Lora', Georgia, serif;
+  --title-weight: 600;
+  --title-spacing: 0.06em;
+  --radius: 12px;
+  --shadow: 0 2px 18px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 178, 87, 0.15);
+}
+
+html[data-style='nokna'] .panel select {
+  color: var(--ink);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-style='nokna'] .panel select option,
+html[data-style='nokna'] .panel select optgroup {
+  color: #1d1d1d;
+}
+
+html[data-style='nokna'] .style-picker button:hover,
+html[data-style='nokna'] .time-toggle button:hover,
+html[data-style='nokna'] .help-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+html[data-style='nokna'] .style-picker button[aria-checked='true'],
+html[data-style='nokna'] .time-toggle button[aria-checked='true'],
+html[data-style='nokna'] .help-btn[aria-expanded='true'] {
+  background: rgba(255, 178, 87, 0.18);
+}
+
+html[data-style='nokna'] .help kbd {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+html[data-style='nokna'] .help-close {
+  color: #1b1408;
+}
+
+html[data-style='nokna'] .label span {
+  color: #ffe6bf;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 0 10px rgba(255, 170, 80, 0.35);
+}
+
+/* тесен екран: сите стилови се мостри, името се гледа само кај избраниот */
+@media (max-width: 600px) {
+  .style-picker button {
+    padding: 7px;
+    gap: 6px;
+  }
+  .style-picker button .name {
+    display: none;
+  }
+  .style-picker button[aria-checked='true'] {
+    padding-right: 12px;
+  }
+  .style-picker button[aria-checked='true'] .name {
+    display: inline;
+  }
 }

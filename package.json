@@ -14,7 +14,8 @@
     "data:fetch": "npm run data:fetch:osm && npm run data:fetch:overture && npm run data:fetch:terrain",
     "data:build": "node scripts/data/build.mjs",
     "data": "npm run data:fetch && npm run data:build",
-    "shot": "node scripts/dev/screenshot.mjs"
+    "shot": "node scripts/dev/screenshot.mjs",
+    "bench": "node scripts/dev/bench.mjs"
   },
   "engines": {
     "node": ">=20"

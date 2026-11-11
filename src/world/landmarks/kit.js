@@ -3,6 +3,7 @@
 // геометрија. Секое теме носи „дел“ (part → боја од палетата на стилот) и сјај ноќе (aGlow).
 
 import * as THREE from 'three';
+import { seedOf } from '../../styles/shared/flicker.js';
 
 /** Делови на моделите; бојата ја дава style.landmarks[part]. Додавај само на крај. */
 export const PARTS = [
@@ -49,6 +50,8 @@ export class Kit {
     this.nor = [];
     this.part = [];
     this.glow = [];
+    this.seed = []; // семе по примитив: секоја светилка/прозорец трепери посебно
+    this.nAdd = 0;
     this.frame = new THREE.Matrix4();
   }
 
@@ -69,6 +72,7 @@ export class Kit {
     const n = g.attributes.normal.array;
     const pid = PART_ID[part];
     const gl = glow ?? GLOW[part] ?? 0;
+    const sd = seedOf(this.nAdd++);
     for (let i = 0; i < p.length; i++) {
       this.pos.push(p[i]);
       this.nor.push(n[i]);
@@ -76,6 +80,7 @@ export class Kit {
     for (let i = 0; i < p.length / 3; i++) {
       this.part.push(pid);
       this.glow.push(gl);
+      this.seed.push(sd);
     }
     if (g !== geo) g.dispose();
     geo.dispose();
@@ -165,6 +170,7 @@ export class Kit {
   raw(pos, nor, part, glow) {
     const pid = PART_ID[part];
     const gl = glow ?? GLOW[part] ?? 0;
+    const sd = seedOf(this.nAdd++);
     for (let i = 0; i < pos.length; i++) {
       this.pos.push(pos[i]);
       this.nor.push(nor[i]);
@@ -172,6 +178,7 @@ export class Kit {
     for (let i = 0; i < pos.length / 3; i++) {
       this.part.push(pid);
       this.glow.push(gl);
+      this.seed.push(sd);
     }
     return this;
   }
@@ -220,6 +227,7 @@ export class Kit {
     geo.setAttribute('normal', new THREE.Float32BufferAttribute(this.nor, 3));
     geo.setAttribute('part', new THREE.Float32BufferAttribute(this.part, 1));
     geo.setAttribute('aGlow', new THREE.Float32BufferAttribute(this.glow, 1));
+    geo.setAttribute('aSeed', new THREE.Float32BufferAttribute(this.seed, 1));
     geo.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(this.pos.length), 3));
     geo.computeBoundingSphere();
     return geo;

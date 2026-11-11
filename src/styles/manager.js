@@ -52,7 +52,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
     // 1) геометрија
     const roofs = style.geometry?.roofs || 'flat';
-    if (world.setBuildingRoofs(roofs) && current) {
+    if (world.setBuildingRoofs(roofs) && current && animate) {
       grow.value = 0;
       growStart = performance.now();
     }
@@ -99,6 +99,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     // некои стилови (цртан филм) се без сенки — поевтино и поедноставно
     lights.sun.castShadow = profile.shadows > 0 && style.light.shadows !== false;
 
+    if (env.streetGain) env.streetGain.value = 1; // стилот може да го менува по кадар (update)
     post = style.post?.(ctx) || { before: [], after: [] };
     pipeline.setPasses(post.before, post.after);
 
@@ -109,7 +110,9 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
   /** Осветлување, небо и магла за стилот и тековното време од денот. */
   function applyLighting() {
-    lit = resolveLighting(current, time.weights, lit || undefined);
+    // стил со фиксно време (на пр. „Ноќна Битола“) го игнорира изборот на корисникот
+    const w = current.fixedTime ? { day: 0, sunset: 0, night: 0, [current.fixedTime]: 1 } : time.weights;
+    lit = resolveLighting(current, w, lit || undefined);
     const L = lit;
     scene.fog.color.copy(L.fog.color);
     scene.fog.near = current.fog.near;
@@ -158,6 +161,10 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
   return {
     apply,
+    /** Ново осветлување веднаш (смена на времето без премин). */
+    relight() {
+      if (current) applyLighting();
+    },
     get current() {
       return current;
     },

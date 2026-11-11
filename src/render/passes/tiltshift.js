@@ -49,6 +49,7 @@ const shader = (dir) => ({
 export function createTiltShift({ focus = 0.55, band = 0.16, maxBlur = 7 } = {}) {
   const passes = ['x', 'y'].map((d) => {
     const p = new ShaderPass(shader(d));
+    p.perfName = 'tiltshift';
     p.uniforms.focus.value = focus;
     p.uniforms.band.value = band;
     p.uniforms.maxBlur.value = maxBlur;

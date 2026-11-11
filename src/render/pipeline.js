@@ -9,7 +9,8 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 export function createPipeline(container, profile) {
   const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
-  const dpr = Math.min(window.devicePixelRatio, profile.maxPixelRatio);
+  let dpr = Math.min(window.devicePixelRatio, profile.maxPixelRatio);
+  let msaa = profile.msaa;
   renderer.setPixelRatio(dpr);
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -21,7 +22,7 @@ export function createPipeline(container, profile) {
   // текстура за длабочина: ја користат пасовите што бараат рабови (на пр. „мастило“ кај цртаниот стил)
   const target = new THREE.WebGLRenderTarget(1, 1, {
     type: THREE.HalfFloatType,
-    samples: profile.msaa,
+    samples: msaa,
     depthTexture: new THREE.DepthTexture(1, 1, THREE.UnsignedIntType),
   });
   const composer = new EffectComposer(renderer, target);
@@ -30,7 +31,21 @@ export function createPipeline(container, profile) {
 
   let renderPass = null;
   const outputPass = new OutputPass();
+  outputPass.perfName = 'output';
   let extra = [];
+  let timer = null;
+
+  /** GPU круг за секој пас (името е perfName на пасот). */
+  function wrap(pass) {
+    if (!timer || pass._perfWrapped) return;
+    const render = pass.render;
+    const name = pass.perfName || 'pass';
+    pass.render = function (...args) {
+      timer.lap(name);
+      return render.apply(this, args);
+    };
+    pass._perfWrapped = true;
+  }
 
   return {
     renderer,
@@ -38,6 +53,7 @@ export function createPipeline(container, profile) {
     /** Сцена и камера се поставуваат еднаш. */
     init(scene, camera) {
       renderPass = new RenderPass(scene, camera);
+      renderPass.perfName = 'scene';
       this.setPasses([], []);
     },
     /** Замени ги пасовите на стилот (старите се ослободуваат). */
@@ -49,14 +65,56 @@ export function createPipeline(container, profile) {
       for (const p of before) composer.addPass(p);
       composer.addPass(outputPass);
       for (const p of after) composer.addPass(p);
+      for (const p of composer.passes) wrap(p);
+    },
+    /** Пасовите на тековниот стил (без RenderPass и OutputPass). */
+    get stylePasses() {
+      return extra;
+    },
+    /**
+     * Мерење на GPU време по пас (perf/gpu-timer.js). Сенките се посебен круг:
+     * WebGLShadowMap.render се повикува од RenderPass, па кругот потоа се враќа на 'scene'.
+     */
+    instrument(gpuTimer) {
+      if (!gpuTimer || timer) return;
+      timer = gpuTimer;
+      for (const p of composer.passes) wrap(p);
+      const sm = renderer.shadowMap;
+      const render = sm.render;
+      sm.render = function (...args) {
+        timer.lap('shadow');
+        const r = render.apply(this, args);
+        timer.lap('scene');
+        return r;
+      };
     },
     render(dt) {
       renderer.info.reset();
+      timer?.begin();
       composer.render(dt);
+      timer?.end();
     },
     setSize(w, h) {
       renderer.setSize(w, h);
       composer.setSize(w, h);
+    },
+    /** Густина на пиксели во живо (мерења; подоцна адаптивна резолуција). */
+    setPixelRatio(r) {
+      dpr = r;
+      renderer.setPixelRatio(r);
+      composer.setPixelRatio(r);
+      this.setSize(container.clientWidth, container.clientHeight);
+    },
+    /** Број на MSAA примероци во живо (целите се пресоздаваат при следното цртање). */
+    setMsaa(samples) {
+      msaa = samples;
+      for (const rt of [composer.renderTarget1, composer.renderTarget2]) {
+        rt.samples = samples;
+        rt.dispose();
+      }
+    },
+    get msaa() {
+      return msaa;
     },
     get size() {
       return { width: container.clientWidth, height: container.clientHeight, dpr };
