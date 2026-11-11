@@ -1,4 +1,4 @@
-// Камера и контроли (глувче, допир, тастатура), погледи и ограничувања.
+// Камера и контроли (глувче, допир, тастатура), погледи, лет до поглед и ограничувања.
 
 import * as THREE from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
@@ -64,10 +64,91 @@ export function createCamera(dom, world) {
     return d;
   }
 
+  /** Тековниот поглед во истите параметри како setView. */
+  function getView() {
+    const off = camera.position.clone().sub(controls.target);
+    const d = off.length();
+    return {
+      target: { x: controls.target.x, z: controls.target.z },
+      bearing: (Math.atan2(off.x, -off.z) / DEG + 360) % 360,
+      polar: Math.acos(Math.min(1, Math.max(-1, off.y / d))) / DEG,
+      distance: d,
+    };
+  }
+
+  // Лет до поглед: мазно движење на целта, азимутот, наклонот и растојанието;
+  // при подалечни скокови камерата малку се крева. Секое корисничко движење го прекинува.
+  let flight = null;
+  function flyTo(v, ms = 1800) {
+    const a = getView();
+    let db = ((v.bearing - a.bearing + 540) % 360) - 180;
+    const travel = Math.hypot(v.target.x - a.target.x, v.target.z - a.target.z);
+    flight = { a, b: v, db, t0: performance.now(), ms, hump: Math.min(0.9, travel / Math.max(a.distance, v.distance)) * 0.6 };
+  }
+  controls.addEventListener('start', () => (flight = null));
+
+  function updateFlight() {
+    if (!flight) return false;
+    const { a, b, db, t0, ms, hump } = flight;
+    const k = Math.min(1, (performance.now() - t0) / ms);
+    const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+    const lerp = (x, y) => x + (y - x) * e;
+    const dist = Math.exp(lerp(Math.log(a.distance), Math.log(b.distance))) * (1 + hump * Math.sin(Math.PI * k));
+    setView({
+      target: { x: lerp(a.target.x, b.target.x), z: lerp(a.target.z, b.target.z) },
+      bearing: a.bearing + db * e,
+      polar: lerp(a.polar, b.polar),
+      distance: dist,
+    });
+    if (k >= 1) flight = null;
+    return true;
+  }
+
+  // Тастатура: Q/E ротација, +/− зум, PageUp/PageDown наклон (стрелките ги има MapControls).
+  window.addEventListener('keydown', (e) => {
+    if (e.target.closest?.('input, textarea') || e.altKey || e.ctrlKey || e.metaKey) return;
+    const v = getView();
+    let changed = true;
+    switch (e.key) {
+      case 'q':
+      case 'Q':
+      case 'љ':
+      case 'Љ':
+        v.bearing -= 12;
+        break;
+      case 'e':
+      case 'E':
+      case 'е':
+      case 'Е':
+        v.bearing += 12;
+        break;
+      case '+':
+      case '=':
+        v.distance = Math.max(controls.minDistance, v.distance / 1.25);
+        break;
+      case '-':
+      case '_':
+        v.distance = Math.min(controls.maxDistance, v.distance * 1.25);
+        break;
+      case 'PageUp':
+        v.polar = Math.max(5, v.polar - 6);
+        break;
+      case 'PageDown':
+        v.polar = Math.min(controls.maxPolarAngle / DEG, v.polar + 6);
+        break;
+      default:
+        changed = false;
+    }
+    if (changed) {
+      e.preventDefault();
+      flyTo(v, 260);
+    }
+  });
+
   function resize(w, h) {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   }
 
-  return { camera, controls, setView, updateClipping, resize };
+  return { camera, controls, setView, getView, flyTo, updateFlight, updateClipping, resize };
 }

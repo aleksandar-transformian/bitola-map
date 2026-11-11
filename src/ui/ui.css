@@ -177,8 +177,8 @@ body {
 
 .debug {
   position: absolute;
-  right: 8px;
-  top: max(8px, env(safe-area-inset-top));
+  left: 8px;
+  bottom: max(110px, calc(env(safe-area-inset-bottom) + 110px));
   margin: 0;
   font: 11px/1.4 ui-monospace, monospace;
   background: rgba(0, 0, 0, 0.6);
@@ -187,12 +187,23 @@ body {
   border-radius: 6px;
 }
 
-/* ── Избирач на стил ── */
-.style-picker {
+/* ── Долен панел: стил + време ── */
+.dock {
   position: absolute;
   left: 50%;
   bottom: max(34px, calc(env(safe-area-inset-bottom) + 30px));
   transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: calc(100vw - 24px);
+}
+
+.style-picker,
+.time-toggle,
+.view-bar {
   display: flex;
   gap: 4px;
   padding: 4px;
@@ -200,12 +211,13 @@ body {
   backdrop-filter: blur(6px);
   border-radius: calc(var(--radius) + 4px);
   box-shadow: var(--shadow);
-  max-width: calc(100vw - 24px);
   overflow-x: auto;
   scrollbar-width: none;
 }
 
-.style-picker button {
+.style-picker button,
+.view-bar button,
+.time-toggle button {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -220,17 +232,38 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 
-.style-picker button:hover {
+.view-bar button {
+  padding: 8px 12px;
+}
+
+.time-toggle button {
+  padding: 7px;
+}
+
+.time-toggle svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.style-picker button:hover,
+.view-bar button:hover,
+.time-toggle button:hover {
   color: var(--ink);
   background: rgba(0, 0, 0, 0.04);
 }
 
-.style-picker button[aria-checked='true'] {
+.style-picker button[aria-checked='true'],
+.time-toggle button[aria-checked='true'],
+.view-bar button.active {
   color: var(--ink);
   background: rgba(0, 0, 0, 0.07);
 }
 
-.style-picker button:focus-visible {
+.style-picker button:focus-visible,
+.view-bar button:focus-visible,
+.time-toggle button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
@@ -245,8 +278,9 @@ body {
 
 @media (max-width: 600px) {
   /* атрибуцијата на тесен екран е во два реда */
-  .style-picker {
+  .dock {
     bottom: max(58px, calc(env(safe-area-inset-bottom) + 54px));
+    gap: 6px;
   }
   .style-picker button {
     font-size: 13px;
@@ -263,5 +297,111 @@ body {
   }
   .attribution {
     font-size: 10px;
+  }
+}
+
+/* ── Брзи погледи ── */
+.view-bar {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  max-width: calc(100vw - 260px);
+}
+
+/* ── Натписи ── */
+.labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  will-change: transform;
+}
+
+.label.on {
+  opacity: 1;
+}
+
+.label span {
+  display: block;
+  transform: translate(-50%, -100%);
+  color: var(--label-ink, var(--ink));
+  font: 500 15px/1.1 var(--label-font, var(--font));
+  letter-spacing: var(--label-spacing, 0.01em);
+  text-transform: var(--label-case, none);
+  text-shadow: 0 0 3px var(--label-halo, rgba(255, 255, 255, 0.9)), 0 0 8px var(--label-halo, rgba(255, 255, 255, 0.9));
+  padding-bottom: 4px;
+}
+
+.label-village span {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.label-mountain span {
+  font-size: 19px;
+  letter-spacing: 0.3em;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.label-landmark span {
+  font-size: 13px;
+  font-weight: 500;
+  padding-bottom: 10px;
+  background: linear-gradient(var(--label-ink, var(--ink)), var(--label-ink, var(--ink))) center bottom / 1px 8px no-repeat;
+}
+
+html[data-style='razglednica'] {
+  --label-font: 'Neucha', 'Lora', cursive;
+  --label-ink: #4a3626;
+  --label-halo: rgba(246, 236, 216, 0.95);
+}
+
+html[data-style='razglednica'] .label span {
+  font-size: 18px;
+}
+
+html[data-style='razglednica'] .label-landmark span {
+  font-size: 16px;
+}
+
+html[data-style='maketa'] {
+  --label-ink: #2a2c2e;
+  --label-halo: rgba(255, 255, 255, 0.95);
+  --label-case: uppercase;
+  --label-spacing: 0.16em;
+}
+
+html[data-style='maketa'] .label span {
+  font-size: 11px;
+}
+
+/* ноќе натписите се светли */
+html[data-time='night'] {
+  --label-ink: #f3ead8;
+  --label-halo: rgba(10, 14, 28, 0.85);
+}
+
+@media (max-width: 760px) {
+  /* погледите под насловот, низ целата ширина (со лизгање) */
+  .view-bar {
+    left: 12px;
+    right: 12px;
+    max-width: none;
+    top: max(84px, calc(env(safe-area-inset-top) + 80px));
+  }
+  .view-bar button {
+    font-size: 13px;
+    padding: 7px 10px;
+    white-space: nowrap;
   }
 }
