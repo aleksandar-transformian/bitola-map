@@ -5,4 +5,5 @@
 
 Во изработка — види `CLAUDE.md` и `docs/`.
 
-Податоци: © соработниците на OpenStreetMap (ODbL). Релјеф: Terrain Tiles (Mapzen / AWS Open Data).
+Податоци: © соработниците на OpenStreetMap (ODbL). Дополнителни згради: Overture Maps Foundation,
+Microsoft ML Buildings (ODbL). Релјеф: Terrain Tiles (Mapzen / AWS Open Data).

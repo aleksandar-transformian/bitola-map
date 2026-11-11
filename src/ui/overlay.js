@@ -15,6 +15,8 @@ export function createOverlay() {
     <footer class="attribution">
       <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© соработниците на OpenStreetMap</a>
       <span class="sep">·</span>
+      <a href="https://overturemaps.org/" target="_blank" rel="noopener" title="Згради: Overture Maps Foundation и Microsoft ML Buildings (ODbL)">Overture Maps, Microsoft</a>
+      <span class="sep">·</span>
       <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">Релјеф: Terrain Tiles</a>
     </footer>
     <pre class="debug" hidden></pre>

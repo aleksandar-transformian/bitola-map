@@ -148,9 +148,10 @@ export function colorRibbons(geo, palette) {
 // Редослед на исцртување: поважните улици малку повисоко (без z-fighting на раскрсници).
 const ROAD_LIFT = [0.55, 0.52, 0.5, 0.48, 0.46, 0.42, 0.38, 0.4, 0.34, 0.3];
 
-export function buildRoads(pack, hf, style) {
+/** Улици: атрибутот „cls“ е индекс во ROAD (config/classes.js). */
+export function buildRoadGeometry(pack, hf) {
   const { arrays, meta } = pack;
-  const geo = buildRibbons(
+  return buildRibbons(
     {
       linePt: arrays.linePt,
       coords: arrays.coords,
@@ -163,41 +164,28 @@ export function buildRoads(pack, hf, style) {
     },
     hf,
   );
-  const palette = () => ROAD.map((k) => style.roads[k]);
-  colorRibbons(geo, palette());
-  const mat = new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.name = 'roads';
-  mesh.receiveShadow = true;
-  mesh.userData.recolor = (s) => colorRibbons(geo, ROAD.map((k) => s.roads[k]));
-  return mesh;
 }
 
-export function buildRail(pack, hf, style) {
+/** Железница: cls 0 = активна, 1 = напуштена. */
+export function buildRailGeometry(pack, hf) {
   const { arrays, meta } = pack;
-  const geo = buildRibbons(
+  return buildRibbons(
     {
       linePt: arrays.railLinePt,
       coords: arrays.railCoords,
       q: meta.q,
       width: (l) => (arrays.railCls[l] === 1 ? 2.2 : 3.2),
       lift: () => 0.5,
-      group: () => 0,
+      group: (l) => (arrays.railCls[l] === 1 ? 1 : 0),
     },
     hf,
   );
-  colorRibbons(geo, [style.rail.color]);
-  const mat = new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.name = 'rail';
-  mesh.receiveShadow = true;
-  mesh.userData.recolor = (s) => colorRibbons(geo, [s.rail.color]);
-  return mesh;
 }
 
-export function buildWaterways(pack, hf, style) {
+/** Водотеци (без канали под земја и ровови). */
+export function buildWaterGeometry(pack, hf) {
   const { arrays, meta } = pack;
-  const geo = buildRibbons(
+  return buildRibbons(
     {
       linePt: arrays.waterLinePt,
       coords: arrays.waterCoords,
@@ -209,10 +197,6 @@ export function buildWaterways(pack, hf, style) {
     },
     hf,
   );
-  colorRibbons(geo, [style.water.color]);
-  const mat = new THREE.MeshLambertMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2 });
-  const mesh = new THREE.Mesh(geo, mat);
-  mesh.name = 'waterways';
-  mesh.userData.recolor = (s) => colorRibbons(geo, [s.water.color]);
-  return mesh;
 }
+
+export const ROAD_CLASSES = ROAD;
