@@ -52,7 +52,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
     // 1) геометрија
     const roofs = style.geometry?.roofs || 'flat';
-    if (world.setBuildingRoofs(roofs) && current) {
+    if (world.setBuildingRoofs(roofs) && current && animate) {
       grow.value = 0;
       growStart = performance.now();
     }
@@ -156,6 +156,10 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
 
   return {
     apply,
+    /** Ново осветлување веднаш (смена на времето без премин). */
+    relight() {
+      if (current) applyLighting();
+    },
     get current() {
       return current;
     },

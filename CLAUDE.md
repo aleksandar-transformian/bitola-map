@@ -21,7 +21,18 @@ npm run shot -- --views home,center,close,west,top   # screenshot-ови + ме�
 npm run shot -- --mobile --views home                 # мобилен профил (iPhone 13)
 npm run shot -- --style maketa --time night --views shirok-sokak,saat --clean # стил, време, погледи
 node scripts/dev/check-styles.mjs                     # проверка на интерфејсот (стил, време, погледи, тастатура, натписи)
+
+npm run bench -- --suite quick                        # бенчмарк headless (SwiftShader): структура на кадарот + споредба со основата
+npm run bench -- --suite standard --check             # цело мерење; излез 1 при регресија > 10 % (повици, триаголници)
+npm run bench -- --gpu [--uncapped]                   # вистински GPU (видлив прозорец) — за мерење на сопствена машина
+npm run bench -- --compare стар.json нов.json         # споредба на два извештаја
 ```
+
+Мерење на изведбата: `?debug` = во живо (кадар p50/p95, CPU по фаза, GPU по пас — scene, shadow,
+gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бенчмарк во прелистувачот
+со табела и JSON (копирај/сними) — така се мери на референтниот уред (MacBook Pro 2018, Radeon Pro
+555X, Retina, Chrome). Буџети: `src/config/perf.js`; основа и резултати: `docs/perf/`;
+спецификација, план и анализа: `docs/specs/002-performance/`.
 
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, charshija,
 gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip + `lm-<id>`
@@ -59,7 +70,10 @@ src/styles/index.js      ← регистар на стилови + ОПИС Н�
 src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
 src/styles/shared/       ← заеднички материјали и шејдер-додатоци (изохипси, слоеви, растење)
-src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass)
+src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass); instrument() за
+                           GPU време по пас (perfName), setPixelRatio()/setMsaa() во живо
+src/perf/                ← мерење: gpu-timer.js, perf.js (во живо), bench.js (?bench), report.js
+src/config/perf.js       ← буџети за изведба (референтен уред)
 src/render/passes/       ← сопствени пост-пасови (postcard.js — акварел/хартија, tiltshift.js — минијатура)
 src/app/camera.js        ← камера, MapControls, погледи, лет до поглед, тастатура, динамички near/far
 src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
@@ -69,7 +83,8 @@ src/ui/                  ← интерфејс: наслов, атрибуци�
                            упатство „?“), избирач на стил долу, натписи (labels.js), фонтови
 src/main.js              ← поврзување на сè погоре, јамка
 scripts/data/            ← Node скрипти: fetch-osm, fetch-overture, fetch-terrain, build (+ lib/)
-scripts/dev/             ← screenshot.mjs (слики, време, FPS), check-styles.mjs (тест на стиловите)
+scripts/dev/             ← screenshot.mjs (слики, време, FPS), check-styles.mjs (тест на стиловите),
+                           bench.mjs (бенчмарк, споредба, --check)
 .github/workflows/data-fetch.yml ← Overpass + Overture на GitHub Actions (комитува data/raw/)
 ```
 
@@ -108,6 +123,9 @@ models.js`) се градат од примитиви во рамка од OBB �
 - Нови податочни класи се додаваат само на крајот од низите во `classes.js`.
 - По секоја поголема визуелна промена: `npm run shot` и поглед на сликите.
   Headless Chromium рендерира софтверски (SwiftShader) — FPS таму е само за споредба.
+- По секоја промена што додава геометрија, ефект или стил: `npm run bench -- --suite quick` (повици,
+  триаголници наспроти основата). Оптимизациите се докажуваат со `?bench` пред/по на референтниот
+  уред; новиот пас добива `perfName` за да се гледа во мерењето.
 - `localStorage` секогаш во try/catch.
 
 ## Git тек

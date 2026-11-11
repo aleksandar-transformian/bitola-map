@@ -40,9 +40,18 @@ export function createOverlay() {
       root.querySelector('.loading-text').textContent = `Грешка: ${msg}`;
       loading.classList.add('error');
     },
-    debug(stats, info) {
+    debug(stats, info, perf, size) {
       if (!debugOn) return;
-      dbg.textContent = `${stats.fps} fps · ${info.render.calls} повици · ${(info.render.triangles / 1000).toFixed(0)}k триаголници\n` + `податоци ${stats.dataMs} ms · прв кадар ${stats.firstFrameMs} ms · ${stats.profile}`;
+      const f = (v) => (v == null ? '—' : v.toFixed(1));
+      const parts = (o) => Object.entries(o || {}).map(([k, v]) => `${k} ${f(v)}`).join(' · ');
+      const lines = [`${stats.fps} fps · ${info.render.calls} повици · ${(info.render.triangles / 1000).toFixed(0)}k триаголници`];
+      if (perf) {
+        lines.push(`кадар ${f(perf.interval.p50)} ms (p95 ${f(perf.interval.p95)}) · CPU ${f(perf.cpu.p50)}: ${parts(perf.cpuPhases)}`);
+        lines.push(perf.gpu ? `GPU ${f(perf.gpu.p50)} ms (p95 ${f(perf.gpu.p95)}): ${parts(perf.gpuPasses)}` : 'GPU: нема тајмер во овој прелистувач');
+      }
+      const px = size ? ` · ${Math.round(size.width * size.dpr)}×${Math.round(size.height * size.dpr)} (DPR ${size.dpr})` : '';
+      lines.push(`податоци ${stats.dataMs} ms · прв кадар ${stats.firstFrameMs} ms · ${stats.profile}${px}`);
+      dbg.textContent = lines.join('\n');
     },
   };
 }
