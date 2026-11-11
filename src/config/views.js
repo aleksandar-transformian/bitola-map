@@ -21,4 +21,6 @@ export const CHECK_VIEWS = [
   { id: 'saat', target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
   { id: 'dimitrija', target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
   { id: 'filip', target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
+  // сообраќај и пешаци: Широк Сокак и булеварот до Магнолија одблиску
+  { id: 'traffic', target: { x: 60, z: 200 }, bearing: 150, polar: 62, distance: 240 },
 ];

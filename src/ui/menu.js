@@ -7,13 +7,15 @@ const ICONS = {
   night: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>',
 };
 
+const LIFE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11.5 6.6 7.3A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.3L19 11.5V17h-2.2v-1.6H7.2V17H5zM7.4 10.6h9.2l-1-2.7H8.4z"/><circle cx="8" cy="13.3" r="1.1" fill="#fff"/><circle cx="16" cy="13.3" r="1.1" fill="#fff"/></svg>';
+
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 /**
  * @param {HTMLElement} root
- * @param {{ views: object[], landmarks: object[], times: object[], onGo: (id:string)=>void, onTime: (id:string)=>void }} o
+ * @param {{ views: object[], landmarks: object[], times: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onLife?: (on:boolean)=>void }} o
  */
-export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
+export function createMenu(root, { views, landmarks, times, onGo, onTime, onLife }) {
   const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места'];
   const viewIds = new Set(views.map((v) => v.id));
   const groups = new Map(GROUP_ORDER.map((g) => [g, []]));
@@ -41,6 +43,7 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
     <nav class="time-toggle" role="radiogroup" aria-label="Време од денот">
       ${times.map((t) => `<button type="button" role="radio" aria-checked="false" data-id="${t.id}" title="${t.name}" aria-label="${t.name}">${ICONS[t.id] || ''}</button>`).join('')}
     </nav>
+    <button type="button" class="help-btn life-btn" aria-pressed="true" title="Живот на мапата: сообраќај и пешаци" aria-label="Живот на мапата: сообраќај и пешаци">${LIFE_ICON}</button>
     <button type="button" class="help-btn" aria-expanded="false" aria-controls="help" title="Како се движи низ мапата">?</button>
   `;
   root.appendChild(el);
@@ -62,7 +65,9 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
       <dt>Тастатура</dt>
       <dd><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> поместување · <kbd>Q</kbd> <kbd>E</kbd> ротација</dd>
       <dd><kbd>+</kbd> <kbd>−</kbd> зум · <kbd>PgUp</kbd> <kbd>PgDn</kbd> наклон · <kbd>Home</kbd> преглед</dd>
-      <dd><kbd>1</kbd> <kbd>2</kbd> стил</dd>
+      <dd><kbd>1</kbd>–<kbd>5</kbd> стил</dd>
+      <dt>Живот на мапата</dt>
+      <dd>Копчето со автомобил ги вклучува/исклучува сообраќајот и пешаците.</dd>
     </dl>
     <p>Со „Оди до…“ камерата лета до знаменитоста. Изборот на стил и време се памти и може да се сподели со линкот.</p>
     <button type="button" class="help-close">Во ред</button>
@@ -78,7 +83,9 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
     const b = e.target.closest('button[data-id]');
     if (b) onTime(b.dataset.id);
   });
-  const btn = el.querySelector('.help-btn');
+  const lifeBtn = el.querySelector('.life-btn');
+  lifeBtn.addEventListener('click', () => onLife?.(lifeBtn.getAttribute('aria-pressed') !== 'true'));
+  const btn = el.querySelector('.help-btn:not(.life-btn)');
   const toggleHelp = (show = help.hidden) => {
     help.hidden = !show;
     btn.setAttribute('aria-expanded', String(show));
@@ -102,6 +109,9 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
         b.disabled = !!fixed;
         b.title = fixed ? 'Овој стил е секогаш ноќ' : b.getAttribute('aria-label');
       }
+    },
+    setLife(on) {
+      lifeBtn.setAttribute('aria-pressed', String(on));
     },
     setTime(id) {
       for (const b of el.querySelectorAll('.time-toggle button')) b.setAttribute('aria-checked', String(b.dataset.id === id));

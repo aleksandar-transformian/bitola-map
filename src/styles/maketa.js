@@ -98,6 +98,7 @@ export default {
     paving: '#eeeae2',
     bronze: '#b8976a',
   },
+  traffic: { cars: ['#f6f5f1', '#e6cc9f', '#ecebe6', '#d8be8f'], people: ['#f4f3ef', '#e2c697', '#d6d3cb'] },
   trees: {
     crowns: ['#dfe4d6', '#e7eadf', '#d6dccb'],
     forest: ['#cfd6c2', '#d8decd'],
