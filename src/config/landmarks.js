@@ -2,7 +2,8 @@
 // osm: 'w<id>' = линија, 'r<id>' = релација. Обичната истисната зграда со истиот OSM id
 // се отстранува од слојот на зградите и наместо неа се црта моделот.
 // rank: 0 = главни (натписот има предност), 1 = останати; label: false = без натпис.
-// at: { lat, lon } = рачна точна позиција (WGS84), има предност пред OSM.
+// at: { lat, lon } = рачна точна позиција (WGS84), има предност пред OSM; со inside: true —
+//   зградата во дворот на која покажува точката (наместо најголемата).
 // group = група во менито „Оди до…“; view = поглед ({bearing, polar, distance}) наместо стандардниот.
 // Модели и опции: src/world/landmarks/models.js.
 //
@@ -59,7 +60,8 @@ export const LANDMARKS = [
   { id: 'dom-na-kultura', group: 'Јавни згради', name: 'Дом на култура', osm: 'w38065297', model: 'publicBuilding', rank: 1, opts: { height: 15, roof: 'flat', part: 'wall', floors: 3, band: true } },
   { id: 'opshtina', group: 'Јавни згради', name: 'Општина Битола', osm: 'w789965987', model: 'publicBuilding', rank: 1, opts: { height: 17, roof: 'flat', part: 'wall', floors: 5, flag: true } },
   // „Горна гимназија“ — СОУ „Јосип Броз Тито“: главната зграда во дворот на училиштето
-  { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, model: 'publicBuilding', rank: 1, opts: { height: 14, roof: 'hip', part: 'wall2', floors: 3 } },
+  // главната зграда е до главната улица (точка од сопственикот); најголемата во дворот е спортската сала
+  { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, at: { lat: 41.0321394, lon: 21.3284611 }, model: 'publicBuilding', rank: 1, opts: { height: 14, roof: 'hip', part: 'wall2', floors: 3 } },
   { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'publicBuilding', rank: 1, opts: { height: 10, roof: 'tiles', part: 'wall2', floors: 2 } },
   { id: 'zandan-kule', group: 'Историја и спомен-места', name: 'Зандан Куле', osm: 'w992188624', model: 'stoneTower', rank: 1 },
   { id: 'stanica', group: 'Јавни згради', name: 'Железничка станица', osm: 'w333585687', model: 'station', rank: 1 },
