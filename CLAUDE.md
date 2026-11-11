@@ -41,8 +41,9 @@ Home = преглед, 1–9 = стил, ? = упатство.
 src/config/region.js     ← ЕДИНСТВЕНОТО место за опфатот (bbox), почетна точка, зум на релјефот
 src/config/classes.js    ← enum класи (улици, површини, згради) — дел од форматот на податоците
 src/config/zones.js      ← зони за проценка на висини (чаршија, Широк Сокак, центар)
-src/config/landmarks.js  ← знаменитости (30): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
-                           group (мени „Оди до…“), view, rank, label
+src/config/landmarks.js  ← знаменитости (31): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
+                           group (мени „Оди до…“), view, rank, label, parts (и OSM точки),
+                           flatten (израмнување на релјефот во обработката)
 src/config/views.js      ← брзи погледи
 src/config/labels.js     ← кои населби добиваат натпис + рачни места (Јени Маале, …)
 src/lib/pack.js          ← бинарен контејнер .bin (encode во Node, decode во прелистувач)
@@ -52,7 +53,7 @@ src/world/world.js       ← сите слоеви на светот (еднаш
 src/world/buildings.js   ← згради: рамни или двоводни покриви, атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
-                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, …)
+                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
