@@ -105,7 +105,7 @@ export default {
     crowns: ['#5cbf4a', '#6fcd52', '#4caf45', '#86d45e'],
     forest: ['#3f9e45', '#4caf45', '#5bb34c'],
   },
-  night: { lamp: '#ffd36b', windows: { ratio: 0.5 } },
+  night: { lamp: '#ffd36b', windows: { ratio: 0.5 }, flicker: { broken: true } },
 
   sky: { top: '#5fb8f0', bottom: '#d9f1ff' },
   fog: { color: '#d4eefc', near: 6000, far: 22000 },

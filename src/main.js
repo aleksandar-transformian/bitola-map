@@ -39,8 +39,16 @@ async function start() {
   const data = await loadData((f) => overlay.progress(f * 0.8));
   stats.dataMs = Math.round(performance.now() - T0);
 
-  // Заеднички uniforms за ноќта (прозорци, улици, светилки).
-  const env = { night: { value: 0 }, lamp: { value: new THREE.Color('#ffc27a') } };
+  // Заеднички uniforms за ноќта (прозорци, улици, светилки) и треперењето на светлата.
+  const env = {
+    night: { value: 0 },
+    lamp: { value: new THREE.Color('#ffc27a') },
+    time: { value: 0 },
+    flicker: { value: 1 },
+    broken: { value: 0 },
+  };
+  // „Намалено движење“ во системот → мирни светла (и детерминистички screenshot-ови).
+  const still = window.matchMedia?.('(prefers-reduced-motion: reduce)');
   const time = createTime(readPref('time', validTime) || 'day');
   document.documentElement.dataset.time = time.mode;
 
@@ -195,6 +203,10 @@ async function start() {
     const d = view.updateClipping(sky);
     updateSun(d);
     styles.update();
+    const fl = styles.current?.night?.flicker;
+    env.time.value = (now / 1000) % 3600;
+    env.flicker.value = still?.matches ? 0 : (fl?.amount ?? 1);
+    env.broken.value = fl?.broken ? 1 : 0;
     perf.mark('update');
     pipeline.render(dt);
     perf.mark('render');
@@ -226,6 +238,7 @@ async function start() {
     camera,
     controls,
     pipeline,
+    env,
     renderer: pipeline.renderer,
     perf,
     profile,
