@@ -647,3 +647,31 @@ html[data-style='crtan'] .label-mountain span {
 html[data-style='crtan'][data-time='night'] .label span {
   color: #2b2521;
 }
+
+/* ── „Low-poly“ ── */
+html[data-style='lowpoly'] {
+  --ink: #33302c;
+  --ink-soft: #6d665e;
+  --paper: rgba(246, 244, 239, 0.92);
+  --paper-solid: #f4f2ed;
+  --accent: #c9785a;
+  --title-font: 'IBM Plex Sans', system-ui, sans-serif;
+  --title-weight: 500;
+  --title-spacing: 0.06em;
+  --radius: 6px;
+  --shadow: 0 2px 10px rgba(50, 45, 40, 0.12);
+  --label-ink: #33302c;
+  --label-halo: rgba(246, 244, 239, 0.95);
+}
+
+html[data-style='lowpoly'] .label span {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+/* ноќе натписите се светли во секој стил (освен балончињата на цртаниот) — поголема специфичност
+   од темите на стиловите, за да не ја пребришат */
+html[data-time='night'][data-style]:not([data-style='crtan']) {
+  --label-ink: #f3ead8;
+  --label-halo: rgba(10, 14, 28, 0.85);
+}

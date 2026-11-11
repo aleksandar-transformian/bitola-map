@@ -4,6 +4,7 @@
 // Варијанти на геометријата (ги бара стилот преку style.geometry.roofs):
 //   'flat'   — сите покриви рамни (макета, модерен изглед)
 //   'gabled' — куќите и пониските згради добиваат двоводен покрив
+//   'hip'    — четиристрешни покриви (пирамидални кај квадратна основа) — „Low-poly“
 //
 // Секое теме има атрибут aBase (подлогата на зградата) за анимацијата „растење“.
 
@@ -20,7 +21,7 @@ const PITCHED_KINDS = new Set([BUILDING_ID.generic, BUILDING_ID.house, BUILDING_
 
 /**
  * @param {{meta:object, arrays:object}} pack  buildings.bin
- * @param {{roofs?: 'flat'|'gabled', skip?: Set<number>}} opts  skip = индекси на згради што
+ * @param {{roofs?: 'flat'|'gabled'|'hip', skip?: Set<number>}} opts  skip = индекси на згради што
  *        ги црта друг слој (знаменитости, фасади на Широк Сокак)
  * @returns {THREE.BufferGeometry} со geometry.userData.info за боење
  */
@@ -35,7 +36,8 @@ export function buildBuildingGeometry(pack, { roofs = 'flat', skip = null } = {}
   for (let b = 0; b < meta.count; b++) {
     if (skip?.has(b)) continue;
     const s = buildingShape(pack, b);
-    const pitched = roofs === 'gabled' && wantsPitch(s.rings, kind[b], roof[b], s.h, s.minH);
+    const type = roofs === 'gabled' ? 'gable' : roofs === 'hip' ? 'hip' : false;
+    const pitched = type && wantsPitch(s.rings, kind[b], roof[b], s.h, s.minH) ? type : false;
     if (shell(s, pitched, W, R, b)) pitchedFlag[b] = 1;
   }
 
@@ -80,23 +82,24 @@ export function buildingShape(pack, b) {
 }
 
 /**
- * Ѕидови + покрив (рамен или двоводен) во собирачите W и R. Враќа true ако е двоводен.
+ * Ѕидови + покрив во собирачите W и R. pitch: false | true | 'gable' | 'hip'
+ * (true = 'gable'). Враќа true ако покривот е кос.
  * Го користат и знаменитостите (фасадите на Широк Сокак).
  */
-export function shell(s, wantGable, W, R, b = 0) {
+export function shell(s, pitch, W, R, b = 0) {
   const { rings, top, bottom, gmean, h } = s;
-  const gable = wantGable && rings.length === 1 ? gableFrame(rings[0], h) : null;
-  if (gable) {
-    const ring = splitAtRidge(rings[0], gable);
-    const yAt = (p) => top + gable.rise * Math.max(0, 1 - Math.abs(gable.d(p)) / gable.hw);
+  const type = pitch === true ? 'gable' : pitch;
+  const roof = type && rings.length === 1 ? roofPlanes(rings[0], h, type) : null;
+  if (roof) {
+    const ring = splitAtCreases(rings[0], roof);
+    const yAt = (p) => top + roofHeight(roof, p);
     W.walls(ring, bottom, yAt, b, gmean);
-    for (const side of [1, -1]) {
-      const half = clipHalf(ring, gable, side);
-      if (half.length < 3) continue;
-      const k = (side * gable.rise) / gable.hw;
-      const n = new THREE.Vector3(k * gable.nx, 1, k * gable.nz).normalize();
-      R.cap([half], yAt, n, b, gmean);
-    }
+    roof.planes.forEach((pl, k) => {
+      const part = clipToPlane(ring, roof, k);
+      if (part.length < 3) return;
+      const n = new THREE.Vector3(roof.slope * pl.nx, 1, roof.slope * pl.nz).normalize();
+      R.cap([part], yAt, n, b, gmean);
+    });
     return true;
   }
   for (const ring of rings) W.walls(ring, bottom, () => top, b, gmean);
@@ -130,10 +133,11 @@ function ringArea(r) {
 }
 
 /**
- * Рамка за двоводен покрив: најмал ориентиран правоаголник околу основата;
- * слемето оди по подолгата оска низ центарот.
+ * Кос покрив како најниската од неколку рамнини над најмалиот ориентиран правоаголник
+ * околу основата. 'gable' = 2 рамнини (слеме по подолгата оска), 'hip' = 4 (четиристрешен;
+ * кај квадратна основа — пирамида). Висина над врвот на ѕидот: min_k slope·(e_k − n_k·p).
  */
-function gableFrame(ring, h) {
+function roofPlanes(ring, h, type) {
   const hull = convexHull(ring);
   let best = null;
   for (let i = 0; i < hull.length; i++) {
@@ -156,59 +160,80 @@ function gableFrame(ring, h) {
     if (!best || area < best.area) best = { area, ux, uz, u0, u1, v0, v1 };
   }
   if (!best) return null;
-  const lu = best.u1 - best.u0;
-  const lv = best.v1 - best.v0;
-  // n = нормала на слемето (преку пократката страна)
-  let nx, nz, mid, hw;
-  if (lu >= lv) {
-    nx = -best.uz;
-    nz = best.ux;
-    mid = (best.v0 + best.v1) / 2;
-    hw = lv / 2;
-  } else {
-    nx = best.ux;
-    nz = best.uz;
-    mid = (best.u0 + best.u1) / 2;
-    hw = lu / 2;
-  }
+  const { ux, uz, u0, u1, v0, v1 } = best;
+  // оски: u = (ux, uz), v = (−uz, ux); краткиот правец ја дава ширината на стреата
+  const lu = u1 - u0;
+  const lv = v1 - v0;
+  const hw = Math.min(lu, lv) / 2;
   if (hw < 1.5) return null;
   const rise = Math.min(MAX_RISE, hw * PITCH, Math.max(1.2, h * 0.45));
-  return { nx, nz, hw, rise, d: ([x, z]) => x * nx + z * nz - mid };
+  const side = (nx, nz, e) => ({ nx, nz, e });
+  const vPlanes = [side(-uz, ux, v1), side(uz, -ux, -v0)];
+  const uPlanes = [side(ux, uz, u1), side(-ux, -uz, -u0)];
+  let planes;
+  if (type === 'hip') planes = [...vPlanes, ...uPlanes];
+  else planes = lu >= lv ? vPlanes : uPlanes; // слемето по подолгата оска
+  return { planes, slope: rise / hw };
 }
 
-/** Вметни точки каде што рабовите го сечат слемето (за ѕидовите да го следат покривот). */
-function splitAtRidge(ring, g) {
+const planeVal = (roof, k, [x, z]) => roof.slope * (roof.planes[k].e - (roof.planes[k].nx * x + roof.planes[k].nz * z));
+
+function roofHeight(roof, p) {
+  let m = Infinity;
+  for (let k = 0; k < roof.planes.length; k++) m = Math.min(m, planeVal(roof, k, p));
+  return Math.max(0, m);
+}
+
+/** Вметни точки каде што по работ се менува најниската рамнина (ѕидовите го следат покривот). */
+function splitAtCreases(ring, roof) {
   const out = [];
+  const P = roof.planes.length;
   for (let i = 0; i < ring.length; i++) {
     const a = ring[i];
     const b = ring[(i + 1) % ring.length];
     out.push(a);
-    const da = g.d(a);
-    const db = g.d(b);
-    if ((da < 0 && db > 0) || (da > 0 && db < 0)) {
-      const t = da / (da - db);
-      out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+    const ts = [];
+    for (let k = 0; k < P; k++) {
+      for (let j = k + 1; j < P; j++) {
+        const da = planeVal(roof, k, a) - planeVal(roof, j, a);
+        const db = planeVal(roof, k, b) - planeVal(roof, j, b);
+        if ((da < 0 && db > 0) || (da > 0 && db < 0)) {
+          const t = da / (da - db);
+          const p = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+          // само ако двете рамнини се навистина најниски во таа точка
+          const v = planeVal(roof, k, p);
+          if (Math.abs(roofHeight(roof, p) - v) < 1e-6 && t > 1e-4 && t < 1 - 1e-4) ts.push(t);
+        }
+      }
     }
+    ts.sort((x, y) => x - y);
+    for (const t of ts) out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
   }
   return out;
 }
 
-/** Половина од основата од едната страна на слемето (side = ±1). */
-function clipHalf(ring, g, side) {
-  const out = [];
+/** Делот од основата каде што рамнината k е најниска (Sutherland–Hodgman по полурамнини). */
+function clipToPlane(ring, roof, k) {
+  let poly = ring;
   const eps = 1e-6;
-  for (let i = 0; i < ring.length; i++) {
-    const a = ring[i];
-    const b = ring[(i + 1) % ring.length];
-    const da = side * g.d(a);
-    const db = side * g.d(b);
-    if (da >= -eps) out.push(a);
-    if ((da > eps && db < -eps) || (da < -eps && db > eps)) {
-      const t = da / (da - db);
-      out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+  for (let j = 0; j < roof.planes.length && poly.length >= 3; j++) {
+    if (j === k) continue;
+    const d = (p) => planeVal(roof, j, p) - planeVal(roof, k, p); // ≥ 0 = во регионот на k
+    const input = poly;
+    poly = [];
+    for (let i = 0; i < input.length; i++) {
+      const a = input[i];
+      const b = input[(i + 1) % input.length];
+      const da = d(a);
+      const db = d(b);
+      if (da >= -eps) poly.push(a);
+      if ((da > eps && db < -eps) || (da < -eps && db > eps)) {
+        const t = da / (da - db);
+        poly.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]);
+      }
     }
   }
-  return out;
+  return poly;
 }
 
 /** Собирач на неиндексирани триаголници. */
