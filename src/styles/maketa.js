@@ -1,9 +1,9 @@
 // „Макета“ — архитектонска макета на студиска маса: бели згради, јавните и историските
 // од светло дрво (балса), подлога од картон со изохипси, бочни страни од наредени листови,
-// мека студиска светлина, амбиентна оклузија и длабочина на поле (минијатура).
+// мека студиска светлина, амбиентна оклузија (десктоп) и длабочина на поле (tilt-shift).
 
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
-import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { createTiltShift } from '../render/passes/tiltshift.js';
 import { lambertSet, withContours, withLayers } from './shared/materials.js';
 
 const WOOD = ['#e6cda3', '#ddc08f'];
@@ -14,7 +14,7 @@ export default {
   tagline: 'архитектонска макета',
   swatch: 'linear-gradient(135deg, #f7f6f2 0 50%, #e2c89c 50% 75%, #c9d6bd 75%)',
 
-  geometry: { roofs: 'flat' },
+  geometry: { roofs: 'flat', trees: 'lollipop' },
 
   ground: {
     painter: 'flat',
@@ -73,6 +73,40 @@ export default {
     ao: 0.84,
   },
 
+  // знаменитостите се од светло дрво (балса), остатокот бел
+  landmarks: {
+    wall: '#e6cc9f',
+    wall2: '#dcc092',
+    stone: '#ecdab9',
+    roof: '#d5b585',
+    dome: '#cdac7a',
+    metal: '#a88d66',
+    accent: '#f6efe2',
+    window: '#c9ae82',
+    light: '#fff3d6',
+    water: '#b9d1db',
+    blossom: '#f3e7ea',
+    green: '#d3dbc5',
+    trunk: '#cdb38a',
+    mosaic1: '#d8c29c',
+    mosaic2: '#ece0c8',
+    facade1: '#f6f5f1',
+    facade2: '#f1f0eb',
+    facade3: '#f4f2ee',
+    facade4: '#eeede8',
+    facade5: '#f8f7f3',
+    paving: '#eeeae2',
+  },
+  trees: {
+    crowns: ['#dfe4d6', '#e7eadf', '#d6dccb'],
+    forest: ['#cfd6c2', '#d8decd'],
+  },
+  night: { lamp: '#ffe2b0', windows: { ratio: 0.38 } },
+  // ноќ во „студио“: темна сива позадина, ладна месечина
+  times: {
+    night: { sky: { top: '#0b0d12', bottom: '#20242c' }, fog: { color: '#1d2028' }, hemi: { sky: '#4a5470', ground: '#1a1c22' } },
+  },
+
   sky: { top: '#d6d9da', bottom: '#f5f4f1' },
   fog: { color: '#efeeea', near: 7000, far: 24000 },
   light: {
@@ -92,23 +126,23 @@ export default {
   },
 
   post(ctx) {
-    if (ctx.profile.name === 'mobile') return { before: [], after: [] };
+    // длабочина на поле како кај фотографија на макета (tilt-shift) — само врз сликата
+    const tilt = createTiltShift({ focus: 0.5, band: 0.12, maxBlur: ctx.profile.name === 'mobile' ? 4 : 7 });
+    if (ctx.profile.name === 'mobile') return { before: [], after: tilt.passes, tilt };
     const { width, height, dpr } = ctx.size;
     const ao = new GTAOPass(ctx.scene, ctx.camera, width * dpr, height * dpr);
     ao.output = GTAOPass.OUTPUT.Default;
     ao.blendIntensity = 0.9;
     ao.updateGtaoMaterial({ radius: 8, distanceExponent: 1.5, thickness: 2, scale: 1.2, samples: 12 });
     ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 12 });
-    const dof = new BokehPass(ctx.scene, ctx.camera, { focus: 1000, aperture: 0.000009, maxblur: 0.01 });
-    return { before: [ao, dof], after: [], ao, dof };
+    return { before: [ao], after: tilt.passes, ao, tilt };
   },
 
-  /** По кадар: фокусот е на целта на камерата; радиусот на AO расте со растојанието. */
+  /** По кадар: замаглувањето е посилно на близина (минијатура); радиусот на AO расте со растојанието. */
   update(ctx, post) {
-    if (!post?.dof) return;
     const d = ctx.camera.position.distanceTo(ctx.controls.target);
-    post.dof.uniforms.focus.value = d;
-    post.dof.uniforms.aperture.value = 0.009 / d;
+    post?.tilt?.setAmount(Math.min(1, Math.max(0.15, 1.6 - Math.log10(d) * 0.42)));
+    if (!post?.ao) return;
     const r = Math.min(40, Math.max(2.5, d * 0.012));
     if (Math.abs(r - (post._aoR || 0)) > 0.5) {
       post.ao.updateGtaoMaterial({ radius: r });

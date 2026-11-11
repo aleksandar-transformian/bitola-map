@@ -12,7 +12,7 @@ export default {
   tagline: 'акварел на хартија',
   swatch: 'linear-gradient(135deg, #f3e8d2 0 45%, #c8653f 45% 70%, #9cc27a 70%)',
 
-  geometry: { roofs: 'gabled' },
+  geometry: { roofs: 'gabled', trees: 'round' },
 
   ground: {
     painter: 'watercolor',
@@ -76,6 +76,35 @@ export default {
     variation: 0.05,
     ao: 0.76,
   },
+
+  landmarks: {
+    wall: '#f1e2c8',
+    wall2: '#e8b9a0',
+    stone: '#e0cfb2',
+    roof: '#c4704f',
+    dome: '#98a5ad',
+    metal: '#7d7a74',
+    accent: '#fbf6ec',
+    window: '#8b9aa2',
+    light: '#f4d58a',
+    water: '#7cb2c9',
+    blossom: '#f1b6c5',
+    green: '#8fb36a',
+    trunk: '#7a5a42',
+    mosaic1: '#b8654a',
+    mosaic2: '#e8d4a6',
+    facade1: '#f2d2a4',
+    facade2: '#ebbfae',
+    facade3: '#d2dfc2',
+    facade4: '#f4e6c2',
+    facade5: '#cad8e2',
+    paving: '#e6d2ae',
+  },
+  trees: {
+    crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],
+    forest: ['#6f9a5c', '#7ea468', '#86a96a'],
+  },
+  night: { lamp: '#ffc27a', windows: { ratio: 0.45 } },
 
   sky: { top: '#b9d3e2', bottom: '#f6ebd7' },
   fog: { color: '#f2e7d1', near: 5500, far: 21000 },

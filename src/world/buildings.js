@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import earcut from 'earcut';
 import { BUILDING, BUILDING_ID, ROOF_ID } from '../config/classes.js';
+import { convexHull } from './geom2d.js';
 
 const SINK = 1.5; // колку ѕидовите тонат под најниската точка на теренот
 const PITCH = Math.tan((30 * Math.PI) / 180);
@@ -19,52 +20,23 @@ const PITCHED_KINDS = new Set([BUILDING_ID.generic, BUILDING_ID.house, BUILDING_
 
 /**
  * @param {{meta:object, arrays:object}} pack  buildings.bin
- * @param {{roofs?: 'flat'|'gabled'}} opts
+ * @param {{roofs?: 'flat'|'gabled', skip?: Set<number>}} opts  skip = индекси на згради што
+ *        ги црта друг слој (знаменитости, фасади на Широк Сокак)
  * @returns {THREE.BufferGeometry} со geometry.userData.info за боење
  */
-export function buildBuildingGeometry(pack, { roofs = 'flat' } = {}) {
+export function buildBuildingGeometry(pack, { roofs = 'flat', skip = null } = {}) {
   const { meta, arrays } = pack;
-  const { polyRing, ringPt, coords, height, minHeight, ground, kind, roof } = arrays;
-  const q = meta.q;
+  const { kind, roof } = arrays;
 
   const W = new Writer(); // ѕидови
   const R = new Writer(); // покриви
   const pitchedFlag = new Uint8Array(meta.count);
 
   for (let b = 0; b < meta.count; b++) {
-    const gmin = ground[b * 2];
-    const gmean = ground[b * 2 + 1];
-    const minH = minHeight[b] / 10;
-    const h = height[b] / 10;
-    const top = gmean + h;
-    const bottom = minH > 0 ? gmean + minH : gmin - SINK;
-
-    const rings = [];
-    for (let r = polyRing[b]; r < polyRing[b + 1]; r++) {
-      const ring = [];
-      for (let i = ringPt[r]; i < ringPt[r + 1]; i++) ring.push([coords[i * 2] * q, coords[i * 2 + 1] * q]);
-      rings.push(ring);
-    }
-
-    let gable = null;
-    if (roofs === 'gabled' && wantsPitch(rings, kind[b], roof[b], h, minH)) gable = gableFrame(rings[0], h);
-
-    if (gable) {
-      pitchedFlag[b] = 1;
-      const ring = splitAtRidge(rings[0], gable);
-      const yAt = (p) => top + gable.rise * Math.max(0, 1 - Math.abs(gable.d(p)) / gable.hw);
-      W.walls(ring, bottom, yAt, b, gmean);
-      for (const side of [1, -1]) {
-        const half = clipHalf(ring, gable, side);
-        if (half.length < 3) continue;
-        const k = (side * gable.rise) / gable.hw;
-        const n = new THREE.Vector3(k * gable.nx, 1, k * gable.nz).normalize();
-        R.cap([half], yAt, n, b, gmean);
-      }
-    } else {
-      for (const ring of rings) W.walls(ring, bottom, () => top, b, gmean);
-      R.cap(rings, () => top, UP, b, gmean);
-    }
+    if (skip?.has(b)) continue;
+    const s = buildingShape(pack, b);
+    const pitched = roofs === 'gabled' && wantsPitch(s.rings, kind[b], roof[b], s.h, s.minH);
+    if (shell(s, pitched, W, R, b)) pitchedFlag[b] = 1;
   }
 
   const wallCount = W.count;
@@ -89,6 +61,50 @@ export function buildBuildingGeometry(pack, { roofs = 'flat' } = {}) {
 }
 
 const UP = new THREE.Vector3(0, 1, 0);
+
+/** Основа и висини на зградата со индекс b. */
+export function buildingShape(pack, b) {
+  const { polyRing, ringPt, coords, height, minHeight, ground } = pack.arrays;
+  const q = pack.meta.q;
+  const gmin = ground[b * 2];
+  const gmean = ground[b * 2 + 1];
+  const minH = minHeight[b] / 10;
+  const h = height[b] / 10;
+  const rings = [];
+  for (let r = polyRing[b]; r < polyRing[b + 1]; r++) {
+    const ring = [];
+    for (let i = ringPt[r]; i < ringPt[r + 1]; i++) ring.push([coords[i * 2] * q, coords[i * 2 + 1] * q]);
+    rings.push(ring);
+  }
+  return { rings, h, minH, gmin, gmean, top: gmean + h, bottom: minH > 0 ? gmean + minH : gmin - SINK };
+}
+
+/**
+ * Ѕидови + покрив (рамен или двоводен) во собирачите W и R. Враќа true ако е двоводен.
+ * Го користат и знаменитостите (фасадите на Широк Сокак).
+ */
+export function shell(s, wantGable, W, R, b = 0) {
+  const { rings, top, bottom, gmean, h } = s;
+  const gable = wantGable && rings.length === 1 ? gableFrame(rings[0], h) : null;
+  if (gable) {
+    const ring = splitAtRidge(rings[0], gable);
+    const yAt = (p) => top + gable.rise * Math.max(0, 1 - Math.abs(gable.d(p)) / gable.hw);
+    W.walls(ring, bottom, yAt, b, gmean);
+    for (const side of [1, -1]) {
+      const half = clipHalf(ring, gable, side);
+      if (half.length < 3) continue;
+      const k = (side * gable.rise) / gable.hw;
+      const n = new THREE.Vector3(k * gable.nx, 1, k * gable.nz).normalize();
+      R.cap([half], yAt, n, b, gmean);
+    }
+    return true;
+  }
+  for (const ring of rings) W.walls(ring, bottom, () => top, b, gmean);
+  R.cap(rings, () => top, UP, b, gmean);
+  return false;
+}
+
+export { wantsPitch };
 
 /** Дали зградата добива кос покрив. */
 function wantsPitch(rings, k, roofTag, h, minH) {
@@ -160,23 +176,6 @@ function gableFrame(ring, h) {
   return { nx, nz, hw, rise, d: ([x, z]) => x * nx + z * nz - mid };
 }
 
-function convexHull(pts) {
-  const p = [...pts].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-  const lower = [];
-  for (const q of p) {
-    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], q) <= 0) lower.pop();
-    lower.push(q);
-  }
-  const upper = [];
-  for (let i = p.length - 1; i >= 0; i--) {
-    const q = p[i];
-    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], q) <= 0) upper.pop();
-    upper.push(q);
-  }
-  return lower.slice(0, -1).concat(upper.slice(0, -1));
-}
-
 /** Вметни точки каде што рабовите го сечат слемето (за ѕидовите да го следат покривот). */
 function splitAtRidge(ring, g) {
   const out = [];
@@ -213,7 +212,7 @@ function clipHalf(ring, g, side) {
 }
 
 /** Собирач на неиндексирани триаголници. */
-class Writer {
+export class Writer {
   constructor() {
     this.pos = [];
     this.nor = [];

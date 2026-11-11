@@ -5,10 +5,16 @@ import { heightfieldFromPack, buildTerrainGeometry } from './terrain.js';
 import { createGround } from './ground.js';
 import { buildBuildingGeometry } from './buildings.js';
 import { buildRoadGeometry, buildRailGeometry, buildWaterGeometry } from './ribbons.js';
+import { buildLandmarks } from './landmarks/index.js';
+import { createTrees } from './trees.js';
+import { createLamps } from './lamps.js';
 
 const PLACEHOLDER = new THREE.MeshBasicMaterial({ color: 0xff00ff });
 
-export function createWorld(data, profile) {
+/**
+ * @param {object} env заеднички uniforms за времето од денот ({ night, lamp })
+ */
+export function createWorld(data, profile, env) {
   const rect = data.meta.rect;
   const hf = heightfieldFromPack(data.terrain);
   const tg = buildTerrainGeometry(hf, { stride: profile.terrainStride });
@@ -38,7 +44,17 @@ export function createWorld(data, profile) {
   buildings.castShadow = true;
   buildings.receiveShadow = true;
 
-  group.add(terrain, skirt, water, rail, roads, buildings);
+  // Знаменитостите се градат пред зградите: тие одлучуваат кои згради се заменуваат.
+  const lm = buildLandmarks(data.landmarks, data.buildings, hf);
+  const landmarks = new THREE.Mesh(lm.geometry, PLACEHOLDER);
+  landmarks.name = 'landmarks';
+  landmarks.castShadow = true;
+  landmarks.receiveShadow = true;
+
+  const trees = createTrees(data.trees, hf, { every: profile.treeEvery, detail: profile.name !== 'mobile' });
+  const lamps = createLamps(data.roads, hf, env, { density: profile.name === 'mobile' ? 0.6 : 1 });
+
+  group.add(terrain, skirt, water, rail, roads, buildings, landmarks, trees, lamps);
 
   // Варијантите на геометријата на зградите се кешираат на десктоп
   // (брзо враќање при смена на стил); на телефон се ослободуваат.
@@ -48,7 +64,7 @@ export function createWorld(data, profile) {
     if (old.userData.info?.roofs === roofs) return false;
     let geo = cache.get(roofs);
     if (!geo) {
-      geo = buildBuildingGeometry(data.buildings, { roofs });
+      geo = buildBuildingGeometry(data.buildings, { roofs, skip: lm.skip });
       if (profile.cacheGeometry) cache.set(roofs, geo);
     }
     buildings.geometry = geo;
@@ -56,5 +72,5 @@ export function createWorld(data, profile) {
     return true;
   }
 
-  return { rect, hf, ground, group, terrain, skirt, water, rail, roads, buildings, setBuildingRoofs };
+  return { rect, hf, ground, group, terrain, skirt, water, rail, roads, buildings, landmarks, landmarkItems: lm.items, trees, lamps, setBuildingRoofs };
 }

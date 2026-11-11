@@ -11,6 +11,7 @@ const FILES = {
   buildings: 'buildings.bin',
   trees: 'trees.bin',
   pois: 'pois.json',
+  landmarks: 'landmarks.json',
 };
 
 /**
