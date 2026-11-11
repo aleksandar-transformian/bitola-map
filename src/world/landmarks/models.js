@@ -183,7 +183,7 @@ export function publicBuilding(kit, item, ctx, defaults = {}) {
   let g = item.ground.mean;
   let gmin = item.ground.min;
   if (item.inside) {
-    const hit = largestInside(ctx, rings[0]);
+    const hit = (item.pick && buildingAt(ctx, item.pick)) || largestInside(ctx, rings[0]);
     if (!hit) return;
     ctx.skip.add(hit.b);
     rings = hit.shape.rings;
@@ -213,6 +213,25 @@ export function publicBuilding(kit, item, ctx, defaults = {}) {
 
 function officersHome(kit, item, ctx) {
   publicBuilding(kit, item, ctx, { height: 13.5, floors: 3, part: 'wall2', roof: 'hip', attic: true, flag: true });
+}
+
+/** Зградата (од buildings.bin) што ја содржи точката, или најблиската (до 40 m). */
+export function buildingAt(ctx, [px, pz]) {
+  const pack = ctx.buildings;
+  const q = pack.meta.q;
+  let best = null;
+  for (let b = 0; b < pack.meta.count; b++) {
+    const r0 = pack.arrays.ringPt[pack.arrays.polyRing[b]];
+    const x = pack.arrays.coords[r0 * 2] * q;
+    const z = pack.arrays.coords[r0 * 2 + 1] * q;
+    if (Math.abs(x - px) > 200 || Math.abs(z - pz) > 200) continue;
+    const shape = buildingShape(pack, b);
+    if (pointInRing([px, pz], shape.rings[0])) return { b, a: Math.abs(ringArea(shape.rings[0])), shape };
+    const c = ringCentroid(shape.rings[0]);
+    const d = Math.hypot(c[0] - px, c[1] - pz);
+    if (d < 40 && (!best || d < best.d)) best = { b, d, a: Math.abs(ringArea(shape.rings[0])), shape };
+  }
+  return best;
 }
 
 /** Најголемата зграда (од buildings.bin) чиј центар е во прстенот. */
