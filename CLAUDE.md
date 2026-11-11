@@ -36,7 +36,8 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 спецификација, план и анализа: `docs/specs/002-performance/`.
 
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, charshija,
-gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip + `lm-<id>`
+gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip, dom, dom-front,
+gimnazija, gimnazija-agol + `lm-<id>`
 за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
@@ -66,7 +67,8 @@ src/world/buildings.js   ← згради: рамни, двоводни ('gabled
                            (најниската од N коси рамнини), атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
-                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …)
+                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …),
+                           civic.js (Дом на културата, Горна гимназија — рачно, според фотографии)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)

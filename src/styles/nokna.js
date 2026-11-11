@@ -96,6 +96,12 @@ export default {
     facade5: '#a9b9c6',
     paving: '#6a5a44',
     bronze: '#3f4a42',
+    eave: '#6e4c3a',
+    copper: '#22180f',
+    ochre: '#d9c08a',
+    plinth: '#7d6a58',
+    tin: '#a8564a',
+    amber: '#ffc27a',
   },
   trees: {
     crowns: ['#14261c', '#18301f', '#112219'],

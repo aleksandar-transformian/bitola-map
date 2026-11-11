@@ -29,10 +29,16 @@ export const PARTS = [
   'facade5', //  19
   'paving', //   20 калдрма
   'bronze', //   21 бронза (споменици)
+  'eave', //     22 бакарен лим на стреите (темнокафеав, Дом на културата)
+  'copper', //   23 потемнет бакар (ѕидови на Домот на културата, темни врати)
+  'ochre', //    24 жолт малтер (Горна гимназија)
+  'plinth', //   25 камен сутерен (кафеаво-сив)
+  'tin', //      26 обоен лим (рамните покриви на Домот на културата)
+  'amber', //    27 сјајно бакарно стакло (горниот кат на Домот на културата, топло ноќе)
 ];
 export const PART_ID = Object.fromEntries(PARTS.map((p, i) => [p, i]));
 
-const GLOW = { window: 0.75, light: 1 };
+const GLOW = { window: 0.75, light: 1, amber: 1 };
 const m4 = new THREE.Matrix4();
 const m4b = new THREE.Matrix4();
 const q = new THREE.Quaternion();
