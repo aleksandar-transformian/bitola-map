@@ -68,6 +68,7 @@ src/world/ground.js      ← подлога во canvas; сликари 'flat' �
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
                            extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
+src/world/traffic.js     ← „Живот на мапата“: автомобили и пешаци (инстанцирани, CPU), фарови ноќе
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
 src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js, nokna.js)
