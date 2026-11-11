@@ -736,3 +736,17 @@ html[data-time='night'][data-style]:not([data-style='crtan']) {
   opacity: 0.5;
   cursor: progress;
 }
+
+/* тесен екран: „Оди до…“ во свој ред (со 8 копчиња веќе не собира во еден) */
+@media (max-width: 760px) {
+  .panel {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .panel .go {
+    flex: 1 1 100%;
+  }
+  .help {
+    top: max(184px, calc(env(safe-area-inset-top) + 180px));
+  }
+}
