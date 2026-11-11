@@ -95,13 +95,14 @@ await page.waitForFunction(() => document.documentElement.dataset.style === 'baj
 check('тастер 4 → Бајка', (await page.evaluate(() => document.documentElement.dataset.style)) === 'bajka');
 
 // Снег: копче „Снежи“ → снегулки, URL; тастер S → следниот (без снег).
-await page.click('.weather-toggle button[data-id="snowfall"]');
-await page.waitForTimeout(2500);
+await page.click('.weather-toggle button[data-id="snowfall"]', { force: true });
+// снегулките се појавуваат постепено (по кадар) — софтверското рендерирање е бавно
+await page.waitForFunction(() => window.__bitolaApp.world.snowfall.visible, null, { timeout: 60000, polling: 300 }).catch(() => {});
 const w1 = await page.evaluate(() => ({ w: document.documentElement.dataset.weather, hash: location.hash, flakes: window.__bitolaApp.world.snowfall.visible }));
 check('копче Снежи', w1.w === 'snowfall' && w1.hash.includes('weather=snowfall') && w1.flakes, JSON.stringify(w1));
 await page.mouse.click(500, 380); // фокус на мапата (не на копчето)
 await page.keyboard.press('s');
-await page.waitForTimeout(3500);
+await page.waitForFunction(() => !window.__bitolaApp.world.snowfall.visible, null, { timeout: 60000, polling: 300 }).catch(() => {});
 const w2 = await page.evaluate(() => ({ w: document.documentElement.dataset.weather, flakes: window.__bitolaApp.world.snowfall.visible }));
 check('тастер S → без снег (снегулките исчезнуваат)', w2.w === 'clear' && !w2.flakes, JSON.stringify(w2));
 await page.evaluate(() => (location.hash = 'style=bajka&weather=snow'));
@@ -114,7 +115,7 @@ await page.waitForTimeout(1500);
 check('hashchange → Макета', (await page.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
 
 // Време од денот: копче, URL, localStorage.
-await page.click('.time-toggle button[data-id="night"]');
+await page.click('.time-toggle button[data-id="night"]', { force: true });
 await page.waitForTimeout(2500);
 const t1 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, hash: location.hash }));
 check('копче Ноќ', t1.time === 'night' && t1.hash.includes('time=night'), t1.hash);

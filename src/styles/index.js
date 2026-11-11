@@ -18,7 +18,8 @@
 //                 shadow: јачина 0–1, shadows?: false (без сенки), toneMapping: 'neutral' | 'aces' | 'none', exposure }
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
-//   night       { lamp, windows?: { ratio, cross?, halo?, fill? }, streets?: [јачина по класа на улица] } — ноќни светла
+//   night       { lamp, windows?: { ratio, cross?, halo?, fill? }, streets?: [јачина по класа на улица],
+//                 landmarkFill? } — ноќни светла (fill = топол одблесок врз ѕидовите)
 //   snow?       { color } — боја на снегот (временски услови „Снег“/„Снежи“, app/weather.js)
 //   times?      { sunset?, night? } — делумно пребришување на стандардното зајдисонце/ноќ (app/time.js)
 //   ui          { paper } — бои за интерфејсот (CSS: html[data-style=<id>])

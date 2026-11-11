@@ -44,6 +44,9 @@ const VIEWS = {
   saat: { target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
   dimitrija: { target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
   filip: { target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
+  // зградите на Магнолија од споменикот (како на фотографиите на сопственикот)
+  'mag-red': { target: { x: -17, z: 63 }, bearing: 42, polar: 77, distance: 42 },
+  'mag-plostad': { target: { x: 10, z: 58 }, bearing: 300, polar: 68, distance: 90 },
 };
 
 // lm-<id> = поглед кон знаменитост од public/data/landmarks.json (растојание по големина)

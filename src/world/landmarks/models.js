@@ -5,6 +5,7 @@
 import { obb, longestEdge, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geom2d.js';
 import { buildingShape, shell, wantsPitch, Writer } from '../buildings.js';
 import { BUILDING_ID } from '../../config/classes.js';
+import { magnoliaHouses } from './magnolija.js';
 
 const TAU = Math.PI * 2;
 
@@ -338,13 +339,18 @@ function placeAlong(ring, step, inset, fn) {
 
 // ───────────────────────── Широк Сокак ─────────────────────────
 // Зградите долж пешачката улица: пастелни фасади (по зграда), прозорци по кат, корниз,
-// дуќани во приземје, коси покриви; светилки по улицата.
+// дуќани во приземје, коси покриви; светилки по улицата. Зградите на Магнолија (влезот на
+// улицата) се детални модели од фотографии — world/landmarks/magnolija.js.
 function promenade(kit, item, ctx) {
   const pack = ctx.buildings;
   const n = pack.meta.count;
   const lines = item.lines;
   const facades = ['facade1', 'facade2', 'facade3', 'facade4', 'facade5'];
+  // зградите на Магнолија (влезот на улицата) имаат свои детални модели
+  magnoliaHouses(kit, ctx);
+  kit.setFrame(0, 0, 0);
   for (let b = 0; b < n; b++) {
+    if (ctx.skip.has(b)) continue; // веќе ја црта друга знаменитост
     const s0 = pack.arrays.polyRing[b];
     const r0 = pack.arrays.ringPt[s0];
     const q = pack.meta.q;

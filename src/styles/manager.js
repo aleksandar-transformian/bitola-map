@@ -66,7 +66,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     withGrow(m.walls, grow);
     withWindows(m.walls, env, style.night?.windows);
     withGrow(m.roofs, grow);
-    withGlow(m.landmarks, env);
+    withGlow(m.landmarks, env, { fill: style.night?.landmarkFill || 0 });
     withStreetGlow(m.roads, env, style.night?.streets);
     // снег (временски услови): ги бели површините свртени нагоре; улиците се погазени
     withSnow(m.terrain, env, { lo: 0.62, hi: 0.86 });

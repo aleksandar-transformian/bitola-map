@@ -28,6 +28,10 @@ export const PARTS = [
   'facade5', //  19
   'paving', //   20 калдрма
   'bronze', //   21 бронза (споменици)
+  'plaster', //  22 бел малтер (згради на Магнолија)
+  'peach', //    23 праскова фасада
+  'ochre', //    24 окер/жолта фасада
+  'wood', //     25 обоено дрво (балкони, рамки, стреи)
 ];
 export const PART_ID = Object.fromEntries(PARTS.map((p, i) => [p, i]));
 

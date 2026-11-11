@@ -161,8 +161,8 @@ function chain(material, key, fn) {
 }
 
 /** Делови што светат ноќе (атрибут aGlow: прозорци, светилки на знаменитостите). */
-export function withGlow(material, env) {
-  return chain(material, 'glow', (shader) => {
+export function withGlow(material, env, { fill = 0 } = {}) {
+  return chain(material, `glow${fill}`, (shader) => {
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
     shader.vertexShader = shader.vertexShader
@@ -170,7 +170,13 @@ export function withGlow(material, env) {
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlow = aGlow;');
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', '#include <common>\nuniform float uNight;\nuniform vec3 uLamp;\nvarying float vGlow;')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vGlow * uNight * 1.6;');
+      .replace(
+        '#include <emissivemap_fragment>',
+        // fill = топол одблесок од светилките врз фасадите (ноќе не се сосема црни)
+        `#include <emissivemap_fragment>
+        totalEmissiveRadiance += uLamp * vGlow * uNight * 1.6;
+        ${fill ? `totalEmissiveRadiance += diffuseColor.rgb * uLamp * uNight * (1.0 - vGlow) * ${fill.toFixed(3)};` : ''}`,
+      );
   });
 }
 

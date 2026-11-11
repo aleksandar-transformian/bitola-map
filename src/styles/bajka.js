@@ -105,13 +105,18 @@ export default {
     facade5: '#97a6b0',
     paving: '#bfae93',
     bronze: '#5f6a5a',
+    // зградите на Магнолија (world/landmarks/magnolija.js)
+    plaster: '#ebe2d2',
+    peach: '#ddb89d',
+    ochre: '#d8b26c',
+    wood: '#7b3f2a',
   },
   trees: {
     crowns: ['#3f5a4c', '#46604f', '#3a5246', '#506a55'],
     forest: ['#34493f', '#3b5245', '#2f443a'],
   },
   // улиците светат само малку (одблесок од светилките врз снегот/калдрмата)
-  night: { lamp: LAMP, windows: { ratio: 0.55, cross: 1, halo: 0.32, fill: 0.45 }, streets: [0.1, 0.1, 0.1, 0.09, 0.08, 0.06, 0.03, 0.2, 0.02, 0.0] },
+  night: { lamp: LAMP, windows: { ratio: 0.55, cross: 1, halo: 0.32, fill: 0.45 }, landmarkFill: 0.07, streets: [0.1, 0.1, 0.1, 0.09, 0.08, 0.06, 0.03, 0.2, 0.02, 0.0] },
   snow: { color: '#f4f1ec' },
   times: {
     // ноќ: длабоко сино-тиркизно небо и магла, топли светла

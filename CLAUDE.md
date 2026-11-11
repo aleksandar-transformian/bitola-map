@@ -24,9 +24,9 @@ npm run shot -- --style bajka --time night --weather snowfall --views saat     #
 node scripts/dev/check-styles.mjs                     # проверка на интерфејсот (стил, време, погледи, тастатура, натписи)
 ```
 
-Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, charshija,
-gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip + `lm-<id>`
-за секоја знаменитост.
+Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
+charshija, gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip,
+mag-red, mag-plostad + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa|crtan|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>`.
@@ -53,7 +53,9 @@ src/world/world.js       ← сите слоеви на светот (еднаш
 src/world/buildings.js   ← згради: рамни или двоводни покриви, атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
-                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, …)
+                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, …),
+                           magnolija.js (детални згради на Магнолија/влезот на Широк Сокак по OSM id,
+                           од фотографии)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/snowfall.js    ← снегулки што паѓаат (точки околу камерата); lightpoints.js ← точки на
                            светлата (прозорци, светилки) за боке-дисковите
