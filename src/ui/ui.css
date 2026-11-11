@@ -34,6 +34,14 @@ html[data-style='maketa'] {
   --shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
 }
 
+html[data-style='bajka'] {
+  --ink: #2e2722;
+  --ink-soft: #6e6155;
+  --paper: rgba(244, 236, 222, 0.9);
+  --paper-solid: #efe6d6;
+  --accent: #a8602c;
+}
+
 html,
 body {
   margin: 0;
@@ -288,6 +296,16 @@ body {
     font-size: 13px;
     padding: 7px 12px 7px 7px;
   }
+  /* четири стила не собираат во еден ред на телефон — два реда по два */
+  .style-picker {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: min(340px, calc(100vw - 24px));
+    box-sizing: border-box;
+  }
+  .style-picker button {
+    flex: 1 1 40%;
+  }
   .title {
     padding: 8px 14px 9px;
   }
@@ -405,6 +423,12 @@ html[data-time='night'] {
 .time-toggle {
   display: flex;
   gap: 2px;
+}
+
+/* снегот е одделен од времето од денот со тенка линија */
+.weather-toggle {
+  padding-left: 4px;
+  border-left: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
 }
 
 .sr {

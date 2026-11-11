@@ -1,19 +1,27 @@
-// Мени горе десно: „Оди до…“ (брзи погледи + знаменитости по групи), време од денот
-// и упатство за движење низ мапата.
+// Мени горе десно: „Оди до…“ (брзи погледи + знаменитости по групи), време од денот,
+// временски услови (снег) и упатство за движење низ мапата.
 
 const ICONS = {
   day: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><g stroke-width="1.8" stroke-linecap="round"><path d="M12 2.5v2.4M12 19.1v2.4M2.5 12h2.4M19.1 12h2.4M5.3 5.3l1.7 1.7M17 17l1.7 1.7M5.3 18.7 7 17M17 7l1.7-1.7"/></g></svg>',
   sunset: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 16a5.5 5.5 0 0 1 11 0z"/><g stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M2.5 19.5h19M12 5v2.4M4.6 9.2l1.6 1.4M19.4 9.2l-1.6 1.4"/></g></svg>',
   night: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>',
+  // без снег: прецртана снегулка
+  clear:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke-width="1.7" stroke-linecap="round"><path d="M12 4v16M5.1 8l13.8 8M5.1 16l13.8-8" opacity=".45"/><path d="M4 20 20 4"/></g></svg>',
+  // снег: покрив под снег
+  snow: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13.5 12 6l9 7.5v1.8l-9-7.4-9 7.4z"/><path d="M6.5 14.2V20h11v-5.8L12 9.6z" opacity=".55"/><path d="M2.6 13.2C5 8.6 9 5 12 4.4c3 .6 7 4.2 9.4 8.8-2.4-1.4-5-2.6-9.4-6-4.4 3.4-7 4.6-9.4 6z"/></svg>',
+  // снежи: снегулка
+  snowfall:
+    '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.6 4.6 12 6.6l2.4-2M9.6 19.4l2.4-2 2.4 2M4.6 10.6l3-1-.7-3M19.4 13.4l-3 1 .7 3M4.6 13.4l3 1-.7 3M19.4 10.6l-3-1 .7-3"/></g></svg>',
 };
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 /**
  * @param {HTMLElement} root
- * @param {{ views: object[], landmarks: object[], times: object[], onGo: (id:string)=>void, onTime: (id:string)=>void }} o
+ * @param {{ views: object[], landmarks: object[], times: object[], weathers: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onWeather: (id:string)=>void }} o
  */
-export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
+export function createMenu(root, { views, landmarks, times, weathers, onGo, onTime, onWeather }) {
   const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места'];
   const viewIds = new Set(views.map((v) => v.id));
   const groups = new Map(GROUP_ORDER.map((g) => [g, []]));
@@ -41,6 +49,9 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
     <nav class="time-toggle" role="radiogroup" aria-label="Време од денот">
       ${times.map((t) => `<button type="button" role="radio" aria-checked="false" data-id="${t.id}" title="${t.name}" aria-label="${t.name}">${ICONS[t.id] || ''}</button>`).join('')}
     </nav>
+    <nav class="time-toggle weather-toggle" role="radiogroup" aria-label="Снег">
+      ${weathers.map((t) => `<button type="button" role="radio" aria-checked="false" data-id="${t.id}" title="${t.name}" aria-label="${t.name}">${ICONS[t.id] || ''}</button>`).join('')}
+    </nav>
     <button type="button" class="help-btn" aria-expanded="false" aria-controls="help" title="Како се движи низ мапата">?</button>
   `;
   root.appendChild(el);
@@ -62,9 +73,9 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
       <dt>Тастатура</dt>
       <dd><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> поместување · <kbd>Q</kbd> <kbd>E</kbd> ротација</dd>
       <dd><kbd>+</kbd> <kbd>−</kbd> зум · <kbd>PgUp</kbd> <kbd>PgDn</kbd> наклон · <kbd>Home</kbd> преглед</dd>
-      <dd><kbd>1</kbd> <kbd>2</kbd> стил</dd>
+      <dd><kbd>1</kbd>–<kbd>4</kbd> стил · <kbd>S</kbd> снег</dd>
     </dl>
-    <p>Со „Оди до…“ камерата лета до знаменитоста. Изборот на стил и време се памти и може да се сподели со линкот.</p>
+    <p>Со „Оди до…“ камерата лета до знаменитоста. Изборот на стил, време и снег се памти и може да се сподели со линкот.</p>
     <button type="button" class="help-close">Во ред</button>
   `;
   root.appendChild(help);
@@ -74,9 +85,15 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
     if (select.value) onGo(select.value);
     select.blur(); // стрелките пак да ја движат мапата
   });
-  el.querySelector('.time-toggle').addEventListener('click', (e) => {
+  const timeNav = el.querySelector('.time-toggle:not(.weather-toggle)');
+  const weatherNav = el.querySelector('.weather-toggle');
+  timeNav.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-id]');
     if (b) onTime(b.dataset.id);
+  });
+  weatherNav.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-id]');
+    if (b) onWeather(b.dataset.id);
   });
   const btn = el.querySelector('.help-btn');
   const toggleHelp = (show = help.hidden) => {
@@ -95,7 +112,10 @@ export function createMenu(root, { views, landmarks, times, onGo, onTime }) {
       select.value = id && [...select.options].some((o) => o.value === id) ? id : '';
     },
     setTime(id) {
-      for (const b of el.querySelectorAll('.time-toggle button')) b.setAttribute('aria-checked', String(b.dataset.id === id));
+      for (const b of timeNav.querySelectorAll('button')) b.setAttribute('aria-checked', String(b.dataset.id === id));
+    },
+    setWeather(id) {
+      for (const b of weatherNav.querySelectorAll('button')) b.setAttribute('aria-checked', String(b.dataset.id === id));
     },
     showHelp: toggleHelp,
   };

@@ -5,6 +5,7 @@ import { createSky } from './world/sky.js';
 import { createPipeline } from './render/pipeline.js';
 import { createCamera } from './app/camera.js';
 import { createTime, TIMES } from './app/time.js';
+import { createWeather, WEATHERS } from './app/weather.js';
 import { readPref, hashPref, writePref } from './app/prefs.js';
 import { createStyleManager } from './styles/manager.js';
 import { STYLES, getStyle, initialStyleId, rememberStyle, styleFromHash } from './styles/index.js';
@@ -22,6 +23,7 @@ const T0 = performance.now();
 const profile = detectProfile();
 const firstStyle = getStyle(initialStyleId());
 const validTime = (id) => TIMES.some((t) => t.id === id);
+const validWeather = (id) => WEATHERS.some((w) => w.id === id);
 let validView = (id) => VIEWS.some((v) => v.id === id);
 document.documentElement.dataset.style = firstStyle.id;
 const overlay = createOverlay();
@@ -36,10 +38,13 @@ async function start() {
   const data = await loadData((f) => overlay.progress(f * 0.8));
   stats.dataMs = Math.round(performance.now() - T0);
 
-  // Заеднички uniforms за ноќта (прозорци, улици, светилки).
-  const env = { night: { value: 0 }, lamp: { value: new THREE.Color('#ffc27a') } };
+  // Заеднички uniforms за ноќта (прозорци, улици, светилки) и снегот.
+  const env = { night: { value: 0 }, lamp: { value: new THREE.Color('#ffc27a') }, snow: { value: 0 }, snowColor: { value: new THREE.Color('#f3f6fa') } };
   const time = createTime(readPref('time', validTime) || 'day');
   document.documentElement.dataset.time = time.mode;
+  const weather = createWeather(readPref('weather', validWeather) || 'clear');
+  env.snow.value = weather.snow;
+  document.documentElement.dataset.weather = weather.mode;
 
   const t1 = performance.now();
   const world = createWorld(data, profile, env);
@@ -95,8 +100,18 @@ async function start() {
     places.set(l.id, { target: { x: l.center[0], z: l.center[1] }, bearing: 200, polar: 58, distance: SIZE[l.model] || 170, ...(l.view || {}) });
   }
   validView = (id) => places.has(id);
-  const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id) });
+  const menu = createMenu(ui, {
+    views: VIEWS,
+    landmarks: data.landmarks,
+    times: TIMES,
+    weathers: WEATHERS,
+    onGo: (id) => goTo(id),
+    onTime: (id) => setTime(id),
+    onWeather: (id) => setWeather(id),
+  });
   menu.setTime(time.mode);
+  menu.setWeather(weather.mode);
+  world.snowfall.userData.set(weather.falling);
   const dock = document.createElement('div');
   dock.className = 'dock';
   ui.appendChild(dock);
@@ -128,6 +143,14 @@ async function start() {
     document.documentElement.dataset.time = id;
     writePref('time', id);
   }
+  function setWeather(id) {
+    if (!validWeather(id) || id === weather.mode) return;
+    weather.set(id);
+    world.snowfall.userData.set(weather.falling);
+    menu.setWeather(id);
+    document.documentElement.dataset.weather = id;
+    writePref('weather', id);
+  }
   function goTo(id, animate = true) {
     const v = places.get(id);
     if (!v) return;
@@ -141,11 +164,18 @@ async function start() {
     if (s) setStyle(s);
     const t = hashPref('time', validTime);
     if (t) setTime(t);
+    const w = hashPref('weather', validWeather);
+    if (w) setWeather(w);
     const v = hashPref('view', validView);
     if (v) goTo(v);
   });
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Home') goTo('pregled');
+    // S = снег: без снег → снег → снежи → без снег
+    if (['s', 'S', 'с', 'С'].includes(e.key) && !e.target.closest?.('select, input, textarea') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const i = WEATHERS.findIndex((w) => w.id === weather.mode);
+      setWeather(WEATHERS[(i + 1) % WEATHERS.length].id);
+    }
   });
 
   goTo(hashPref('view', validView) || 'pregled', false);
@@ -184,6 +214,8 @@ async function start() {
     controls.update();
     const d = view.updateClipping(sky);
     updateSun(d);
+    if (weather.update()) env.snow.value = weather.snow;
+    world.snowfall.userData.update(dt, camera, d, { height: container.clientHeight, dpr: pipeline.size.dpr }, env.night.value);
     styles.update();
     pipeline.render(dt);
     labels.update(camera, container.clientWidth, container.clientHeight, d);
@@ -203,12 +235,13 @@ async function start() {
       lastFpsT = now;
       stats.style = styles.current?.id;
       stats.time = time.mode;
+      stats.weather = weather.mode;
       overlay.debug(stats, pipeline.renderer.info);
     }
   });
 
   Object.assign(stats, { buildings: data.meta.stats.buildings.count });
-  window.__bitolaApp = { scene, camera, controls, pipeline, setView: view.setView, getView: view.getView, goTo, setStyle, setTime, world, data };
+  window.__bitolaApp = { scene, camera, controls, pipeline, setView: view.setView, getView: view.getView, goTo, setStyle, setTime, setWeather, world, data };
 }
 
 start().catch((err) => {

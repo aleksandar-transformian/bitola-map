@@ -8,6 +8,8 @@ import { buildRoadGeometry, buildRailGeometry, buildWaterGeometry } from './ribb
 import { buildLandmarks } from './landmarks/index.js';
 import { createTrees } from './trees.js';
 import { createLamps } from './lamps.js';
+import { createSnowfall } from './snowfall.js';
+import { buildLightPoints } from './lightpoints.js';
 
 const PLACEHOLDER = new THREE.MeshBasicMaterial({ color: 0xff00ff });
 
@@ -54,7 +56,19 @@ export function createWorld(data, profile, env) {
   const trees = createTrees(data.trees, hf, { every: profile.treeEvery, detail: profile.name !== 'mobile' });
   const lamps = createLamps(data.roads, hf, env, { density: profile.name === 'mobile' ? 0.6 : 1 });
 
-  group.add(terrain, skirt, water, rail, roads, buildings, landmarks, trees, lamps);
+  const snowfall = createSnowfall({ count: profile.name === 'mobile' ? 1800 : 4000 });
+
+  group.add(terrain, skirt, water, rail, roads, buildings, landmarks, trees, lamps, snowfall);
+
+  // Точки на светлата за боке-дисковите — се пресметуваат при прво барање (само некои стилови).
+  let lights = null;
+  function lightPoints() {
+    lights ||= buildLightPoints(data.buildings, lamps.geometry.attributes.position.array, {
+      budget: profile.name === 'mobile' ? 14000 : 45000,
+      skip: lm.skip,
+    });
+    return lights;
+  }
 
   // Варијантите на геометријата на зградите се кешираат на десктоп
   // (брзо враќање при смена на стил); на телефон се ослободуваат.
@@ -72,5 +86,5 @@ export function createWorld(data, profile, env) {
     return true;
   }
 
-  return { rect, hf, ground, group, terrain, skirt, water, rail, roads, buildings, landmarks, landmarkItems: lm.items, trees, lamps, setBuildingRoofs };
+  return { rect, hf, ground, group, terrain, skirt, water, rail, roads, buildings, landmarks, landmarkItems: lm.items, trees, lamps, snowfall, lightPoints, setBuildingRoofs };
 }

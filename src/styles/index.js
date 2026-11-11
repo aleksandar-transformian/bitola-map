@@ -12,27 +12,29 @@
 //   roads       { класа: боја }   (класи: config/classes.js → ROAD)
 //   rail        [активна, напуштена]
 //   water       боја на водотеците
-//   buildings   { класа: [ѕид, покрив], roofAlt?, variation, ao }
+//   buildings   { класа: [ѕид, покрив], roofAlt?, wallAlt?, variation, ao }
 //   sky, fog    небо (градиент) и магла (метри)
 //   light       { sun: {color, intensity, azimuth, elevation}, hemi: {sky, ground, intensity},
 //                 shadow: јачина 0–1, shadows?: false (без сенки), toneMapping: 'neutral' | 'aces' | 'none', exposure }
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
-//   night       { lamp, windows?: { ratio }, streets?: [јачина по класа на улица] } — ноќни светла
+//   night       { lamp, windows?: { ratio, cross?, halo?, fill? }, streets?: [јачина по класа на улица] } — ноќни светла
+//   snow?       { color } — боја на снегот (временски услови „Снег“/„Снежи“, app/weather.js)
 //   times?      { sunset?, night? } — делумно пребришување на стандардното зајдисонце/ноќ (app/time.js)
 //   ui          { paper } — бои за интерфејсот (CSS: html[data-style=<id>])
 //   materials(ctx)        → { terrain, skirt, walls, roofs, roads, rail, water } — нови материјали
 //   post(ctx)?            → { before: Pass[], after: Pass[], ... } — пост-процесирање
 //   update(ctx, post)?    по кадар (на пр. фокус за длабочина на поле)
 //
-// ctx = { scene, camera, controls, renderer, profile, size, ground }
+// ctx = { scene, camera, controls, renderer, profile, size, ground, world, env }
 
 import razglednica from './razglednica.js';
 import maketa from './maketa.js';
 import crtan from './crtan.js';
+import bajka from './bajka.js';
 import { readPref, hashPref, writePref } from '../app/prefs.js';
 
-export const STYLES = [razglednica, maketa, crtan];
+export const STYLES = [razglednica, maketa, crtan, bajka];
 export const DEFAULT_STYLE = 'razglednica';
 
 export function getStyle(id) {
