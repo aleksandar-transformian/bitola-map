@@ -1,7 +1,9 @@
 // Улични светилки: светли точки над улиците што се палат ноќе (адитивно, без сенки).
+// Секоја светилка благо трепери во свој ритам (styles/shared/flicker.js).
 
 import * as THREE from 'three';
 import { ROAD_ID } from '../config/classes.js';
+import { FLICKER_GLSL, flickerUniforms, seedOf } from '../styles/shared/flicker.js';
 
 // растојание меѓу светилки по класа (m); 0 = без светилки
 const STEP = {
@@ -33,7 +35,7 @@ function sprite() {
 /**
  * @param {object} roads roads.bin
  * @param {import('./heightfield.js').Heightfield} hf
- * @param {{night:{value:number}, lamp:{value:THREE.Color}}} env
+ * @param {{night:{value:number}, lamp:{value:THREE.Color}, time, flicker, broken}} env
  */
 export function createLamps(roads, hf, env, { density = 1 } = {}) {
   const { linePt, coords, cls, flags } = roads.arrays;
@@ -60,6 +62,9 @@ export function createLamps(roads, hf, env, { density = 1 } = {}) {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+  const seeds = new Float32Array(P.length / 3);
+  for (let i = 0; i < seeds.length; i++) seeds[i] = seedOf(i);
+  geo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
   const mat = new THREE.PointsMaterial({
     size: 16,
     map: sprite(),
@@ -70,6 +75,15 @@ export function createLamps(roads, hf, env, { density = 1 } = {}) {
     blending: THREE.AdditiveBlending,
     fog: false,
   });
+  mat.onBeforeCompile = (shader) => {
+    flickerUniforms(shader, env);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n${FLICKER_GLSL}\nattribute float aSeed;\nvarying float vFk;`)
+      .replace('#include <project_vertex>', '#include <project_vertex>\nvFk = fkTwinkle(aSeed, -mvPosition.z) * fkBroken(aSeed);');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying float vFk;')
+      .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.rgb *= vFk;');
+  };
   const points = new THREE.Points(geo, mat);
   points.name = 'lamps';
   points.frustumCulled = false;

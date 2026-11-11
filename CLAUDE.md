@@ -20,6 +20,7 @@ npm run data                # сè погоре по ред
 npm run shot -- --views home,center,close,west,top   # screenshot-ови + мерења (dev серверот мора да работи)
 npm run shot -- --mobile --views home                 # мобилен профил (iPhone 13)
 npm run shot -- --style maketa --time night --views shirok-sokak,saat --clean # стил, време, погледи
+npm run shot -- --time night --motion --views saat     # со треперење на светлата (стандардно: мирни)
 node scripts/dev/check-styles.mjs                     # проверка на интерфејсот (стил, време, погледи, тастатура, натписи)
 
 npm run bench -- --suite quick                        # бенчмарк headless (SwiftShader): структура на кадарот + споредба со основата
@@ -69,7 +70,8 @@ src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна �
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
 src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
-src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ)
+src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ);
+                           flicker.js — „живи“ светла ноќе (треперење, прозорци што се палат, телевизори)
 src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass); instrument() за
                            GPU време по пас (perfName), setPixelRatio()/setMsaa() во живо
 src/perf/                ← мерење: gpu-timer.js, perf.js (во живо), bench.js (?bench), report.js
@@ -106,7 +108,9 @@ scripts/dev/             ← screenshot.mjs (слики, време, FPS), check
 Време од денот: денот го дава стилот (`light`, `sky`, `fog`); зајдисонцето и ноќта се стандардни
 поставки во `app/time.js` што стилот може делумно да ги пребрише (`style.times`). Заедничкиот
 uniform `env.night` (0–1) ги пали прозорците (`withWindows`), улиците (`withStreetGlow`),
-светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки.
+светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки. Светлата благо
+треперат (`env.time`, `env.flicker`; атрибут `aSeed` = семе по светло); при
+`prefers-reduced-motion` се мирни. Големи површини (улиците) не треперат.
 
 Знаменитости: `build.mjs` ги извлекува основите во `landmarks.json`; моделите (`world/landmarks/
 models.js`) се градат од примитиви во рамка од OBB на основата. Обичните згради што ги заменуваат

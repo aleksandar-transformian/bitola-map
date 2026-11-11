@@ -158,6 +158,14 @@ await p3.goto(url + '#style=nepostoi');
 await p3.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 check('непознат #style= се игнорира', (await p3.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
 
+// Треперење на светлата: вклучено стандардно, исклучено при „намалено движење“.
+await p3.waitForTimeout(300);
+const fk1 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
+await p3.emulateMedia({ reducedMotion: 'reduce' });
+await p3.waitForTimeout(500);
+const fk2 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
+check('треперење: вклучено / исклучено при reduced-motion', fk1.f > 0 && fk2.f === 0 && fk2.t > fk1.t, `${fk1.f} → ${fk2.f}`);
+
 check('без JS грешки', errors.length === 0, errors.slice(0, 3).join(' | '));
 await browser.close();
 process.exit(Object.values(result).every(Boolean) ? 0 : 1);
