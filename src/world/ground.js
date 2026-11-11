@@ -89,19 +89,30 @@ function paintFlat({ ctx, canvas, areas, waterways, scale }, style) {
     ctx.fillStyle = g.areas[a.cls] || g.base;
     ctx.fill(a.path, 'evenodd');
   }
-  ctx.strokeStyle = g.areas.water;
   ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  if (g.outline && g.outlineWater) {
+    // контура околу реките/потоците: потемна, поширока линија под водата
+    ctx.strokeStyle = g.outline;
+    for (const w of waterways) {
+      if (w.kind === 'ditch') continue;
+      ctx.lineWidth = Math.max(1.2, w.width) + 2 * Math.max(0.6, (g.outlineWidth ?? 0.5) * scale);
+      ctx.stroke(w.path);
+    }
+  }
+  ctx.strokeStyle = g.areas.water;
   for (const w of waterways) {
     if (w.kind === 'ditch') continue;
     ctx.lineWidth = Math.max(1.2, w.width);
     ctx.stroke(w.path);
   }
   if (g.outline) {
-    // тенки рабови на површините (на пр. исечени листови кај макетата)
+    // рабови на површините: тенки (макета) или дебели (цртан филм); outlineWidth во метри
+    const skip = new Set(g.outlineSkip || ['residential', 'farmland']);
     ctx.strokeStyle = g.outline;
-    ctx.lineWidth = Math.max(0.6, 0.5 * scale);
-    for (const a of areas) if (a.cls !== 'residential' && a.cls !== 'farmland') ctx.stroke(a.path);
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = Math.max(0.6, (g.outlineWidth ?? 0.5) * scale);
+    for (const a of areas) if (!skip.has(a.cls)) ctx.stroke(a.path);
   }
 }
 

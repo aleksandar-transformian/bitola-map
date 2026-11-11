@@ -18,7 +18,12 @@ export function createPipeline(container, profile) {
   renderer.info.autoReset = false; // композиторот црта во повеќе чекори — бројиме цел кадар
   container.appendChild(renderer.domElement);
 
-  const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: profile.msaa });
+  // текстура за длабочина: ја користат пасовите што бараат рабови (на пр. „мастило“ кај цртаниот стил)
+  const target = new THREE.WebGLRenderTarget(1, 1, {
+    type: THREE.HalfFloatType,
+    samples: profile.msaa,
+    depthTexture: new THREE.DepthTexture(1, 1, THREE.UnsignedIntType),
+  });
   const composer = new EffectComposer(renderer, target);
   composer.setPixelRatio(dpr);
   composer.setSize(container.clientWidth, container.clientHeight);

@@ -79,6 +79,16 @@ await page.waitForTimeout(1500);
 const s2 = await page.evaluate(() => ({ style: document.documentElement.dataset.style, roofs: window.__bitolaApp.world.buildings.geometry.userData.info.roofs, ms: window.__bitola.lastSwitchMs }));
 check('тастер 1 → Разгледница', s2.style === 'razglednica' && s2.roofs === 'gabled', `${s2.ms} ms (геометријата од кеш)`);
 
+// Тастер 3 → „Цртан филм“ (без сенки).
+await page.keyboard.press('3');
+await page.waitForFunction(() => document.documentElement.dataset.style === 'crtan', null, { timeout: 60000 }).catch(() => {});
+const s3 = await page.evaluate(() => {
+  let sun;
+  window.__bitolaApp.scene.traverse((o) => o.isDirectionalLight && (sun = o));
+  return { style: document.documentElement.dataset.style, shadows: sun.castShadow };
+});
+check('тастер 3 → Цртан филм (без сенки)', s3.style === 'crtan' && !s3.shadows, JSON.stringify(s3));
+
 // Смена преку hashchange.
 await page.evaluate(() => (location.hash = 'style=maketa'));
 await page.waitForTimeout(1500);

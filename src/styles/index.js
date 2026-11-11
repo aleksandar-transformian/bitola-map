@@ -15,7 +15,7 @@
 //   buildings   { класа: [ѕид, покрив], roofAlt?, variation, ao }
 //   sky, fog    небо (градиент) и магла (метри)
 //   light       { sun: {color, intensity, azimuth, elevation}, hemi: {sky, ground, intensity},
-//                 shadow: јачина 0–1, toneMapping: 'neutral' | 'aces' | 'none', exposure }
+//                 shadow: јачина 0–1, shadows?: false (без сенки), toneMapping: 'neutral' | 'aces' | 'none', exposure }
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
 //   night       { lamp, windows?: { ratio }, streets?: [јачина по класа на улица] } — ноќни светла
@@ -29,9 +29,10 @@
 
 import razglednica from './razglednica.js';
 import maketa from './maketa.js';
+import crtan from './crtan.js';
 import { readPref, hashPref, writePref } from '../app/prefs.js';
 
-export const STYLES = [razglednica, maketa];
+export const STYLES = [razglednica, maketa, crtan];
 export const DEFAULT_STYLE = 'razglednica';
 
 export function getStyle(id) {
