@@ -53,7 +53,7 @@
   "place": "village",
   "lat": 41.0552713,
   "lon": 21.2614947,
-  "inBBox": false
+  "inBBox": true
  },
  {
   "name": "Брусник",
@@ -85,7 +85,7 @@
   "place": "village",
   "lat": 41.0308006,
   "lon": 21.2642076,
-  "inBBox": false
+  "inBBox": true
  },
  {
   "name": "Довлеџик",
