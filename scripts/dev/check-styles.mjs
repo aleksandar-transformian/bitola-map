@@ -22,6 +22,9 @@ page.on('pageerror', (e) => errors.push(e.message));
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 const ready = () => page.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 const result = {};
+// клик директно во страницата: софтверското рендерирање е бавно, па Playwright-овото чекање
+// „елементот е стабилен два кадра“ знае да истече иако копчето е таму
+const tap = (p, sel) => p.$eval(sel, (el) => el.click());
 const check = (name, ok, detail = '') => {
   result[name] = ok;
   console.log(`${ok ? '✓' : '✗'} ${name}${detail ? ' — ' + detail : ''}`);
@@ -33,9 +36,9 @@ check('почеток со #style=razglednica', (await page.evaluate(() => docum
 
 // Упатство: само при првата посета, се затвора со копче.
 check('упатството при првата посета', await page.isVisible('.help'));
-await page.click('.help-close');
+await tap(page, '.help-close');
 check('упатството се затвора', !(await page.isVisible('.help')));
-await page.click('.help-btn');
+await tap(page, '.help-btn');
 check('копче ? го отвора упатството', await page.isVisible('.help'));
 await page.keyboard.press('Escape');
 
@@ -64,7 +67,7 @@ check(
 );
 
 // Смена преку копчето (со анимација) — снимка среде премин.
-await page.click('.style-picker button[data-id="maketa"]');
+await tap(page, '.style-picker button[data-id="maketa"]');
 await page.waitForTimeout(250);
 await page.screenshot({ path: `${out}/switch-mid.png`, timeout: 300000 });
 await page.waitForTimeout(2000);
@@ -89,18 +92,32 @@ const s3 = await page.evaluate(() => {
 });
 check('тастер 3 → Цртан филм (без сенки)', s3.style === 'crtan' && !s3.shadows, JSON.stringify(s3));
 
-// Тастер 4 → „Бајка“ (боке-пас со точки на светлата).
-await page.keyboard.press('4');
+// Тастер 5 → „Ноќна Битола“: секогаш ноќ, копчињата за време се заклучени.
+await page.keyboard.press('5');
+await page.waitForFunction(() => document.documentElement.dataset.style === 'nokna', null, { timeout: 60000 }).catch(() => {});
+const s5 = await page.evaluate(() => ({
+  time: document.documentElement.dataset.time,
+  locked: [...document.querySelectorAll('.time-toggle:not(.weather-toggle) button')].every((b) => b.disabled),
+  night: window.__bitolaApp.scene.getObjectByName('lamps')?.visible,
+}));
+check('тастер 5 → Ноќна Битола (ноќ, заклучено време)', s5.time === 'night' && s5.locked && s5.night, JSON.stringify(s5));
+await page.keyboard.press('1');
+await page.waitForFunction(() => document.documentElement.dataset.style === 'razglednica', null, { timeout: 60000 }).catch(() => {});
+const s6 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, unlocked: [...document.querySelectorAll('.time-toggle:not(.weather-toggle) button')].every((b) => !b.disabled) }));
+check('назад на Разгледница → времето отклучено', s6.time === 'day' && s6.unlocked, JSON.stringify(s6));
+
+// Тастер 6 → „Бајка“ (боке-пас со точки на светлата).
+await page.keyboard.press('6');
 await page.waitForFunction(() => document.documentElement.dataset.style === 'bajka', null, { timeout: 60000 }).catch(() => {});
-check('тастер 4 → Бајка', (await page.evaluate(() => document.documentElement.dataset.style)) === 'bajka');
+check('тастер 6 → Бајка', (await page.evaluate(() => document.documentElement.dataset.style)) === 'bajka');
 
 // Снег: копче „Снежи“ → снегулки, URL; тастер S → следниот (без снег).
-await page.click('.weather-toggle button[data-id="snowfall"]', { force: true });
+await tap(page, '.weather-toggle button[data-id="snowfall"]');
 // снегулките се појавуваат постепено (по кадар) — софтверското рендерирање е бавно
 await page.waitForFunction(() => window.__bitolaApp.world.snowfall.visible, null, { timeout: 60000, polling: 300 }).catch(() => {});
 const w1 = await page.evaluate(() => ({ w: document.documentElement.dataset.weather, hash: location.hash, flakes: window.__bitolaApp.world.snowfall.visible }));
 check('копче Снежи', w1.w === 'snowfall' && w1.hash.includes('weather=snowfall') && w1.flakes, JSON.stringify(w1));
-await page.mouse.click(500, 380); // фокус на мапата (не на копчето)
+await page.evaluate(() => document.activeElement?.blur());
 await page.keyboard.press('s');
 await page.waitForFunction(() => !window.__bitolaApp.world.snowfall.visible, null, { timeout: 60000, polling: 300 }).catch(() => {});
 const w2 = await page.evaluate(() => ({ w: document.documentElement.dataset.weather, flakes: window.__bitolaApp.world.snowfall.visible }));
@@ -115,7 +132,7 @@ await page.waitForTimeout(1500);
 check('hashchange → Макета', (await page.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
 
 // Време од денот: копче, URL, localStorage.
-await page.click('.time-toggle button[data-id="night"]', { force: true });
+await tap(page, '.time-toggle button[data-id="night"]');
 await page.waitForTimeout(2500);
 const t1 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, hash: location.hash }));
 check('копче Ноќ', t1.time === 'night' && t1.hash.includes('time=night'), t1.hash);
@@ -178,6 +195,14 @@ p3.on('pageerror', (e) => errors.push(e.message));
 await p3.goto(url + '#style=nepostoi');
 await p3.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 check('непознат #style= се игнорира', (await p3.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
+
+// Треперење на светлата: вклучено стандардно, исклучено при „намалено движење“.
+await p3.waitForTimeout(300);
+const fk1 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
+await p3.emulateMedia({ reducedMotion: 'reduce' });
+await p3.waitForTimeout(500);
+const fk2 = await p3.evaluate(() => ({ f: window.__bitolaApp.env.flicker.value, t: window.__bitolaApp.env.time.value }));
+check('треперење: вклучено / исклучено при reduced-motion', fk1.f > 0 && fk2.f === 0 && fk2.t > fk1.t, `${fk1.f} → ${fk2.f}`);
 
 check('без JS грешки', errors.length === 0, errors.slice(0, 3).join(' | '));
 await browser.close();

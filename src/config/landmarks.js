@@ -2,8 +2,11 @@
 // osm: 'w<id>' = линија, 'r<id>' = релација. Обичната истисната зграда со истиот OSM id
 // се отстранува од слојот на зградите и наместо неа се црта моделот.
 // rank: 0 = главни (натписот има предност), 1 = останати; label: false = без натпис.
-// at: { lat, lon } = рачна точна позиција (WGS84), има предност пред OSM.
+// at: { lat, lon } = рачна точна позиција (WGS84), има предност пред OSM; со inside: true —
+//   зградата во дворот на која покажува точката (наместо најголемата).
 // group = група во менито „Оди до…“; view = поглед ({bearing, polar, distance}) наместо стандардниот.
+// parts: дополнителни OSM делови ('w…'/'r…' = основа, 'n…' = точка); flatten: { lat, lon, r, blend }
+//   = израмнување на релјефот во обработката (рамно место што Terrain Tiles не го гледа).
 // Модели и опции: src/world/landmarks/models.js.
 //
 // Позициите и основите се од OSM; моделите се стилизирани (препознатливи, не архитектонски точни).
@@ -59,7 +62,8 @@ export const LANDMARKS = [
   { id: 'dom-na-kultura', group: 'Јавни згради', name: 'Дом на култура', osm: 'w38065297', model: 'publicBuilding', rank: 1, opts: { height: 15, roof: 'flat', part: 'wall', floors: 3, band: true } },
   { id: 'opshtina', group: 'Јавни згради', name: 'Општина Битола', osm: 'w789965987', model: 'publicBuilding', rank: 1, opts: { height: 17, roof: 'flat', part: 'wall', floors: 5, flag: true } },
   // „Горна гимназија“ — СОУ „Јосип Броз Тито“: главната зграда во дворот на училиштето
-  { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, model: 'publicBuilding', rank: 1, opts: { height: 14, roof: 'hip', part: 'wall2', floors: 3 } },
+  // главната зграда е до главната улица (точка од сопственикот); најголемата во дворот е спортската сала
+  { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, at: { lat: 41.0321394, lon: 21.3284611 }, model: 'publicBuilding', rank: 1, opts: { height: 14, roof: 'hip', part: 'wall2', floors: 3 } },
   { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'publicBuilding', rank: 1, opts: { height: 10, roof: 'tiles', part: 'wall2', floors: 2 } },
   { id: 'zandan-kule', group: 'Историја и спомен-места', name: 'Зандан Куле', osm: 'w992188624', model: 'stoneTower', rank: 1 },
   { id: 'stanica', group: 'Јавни згради', name: 'Железничка станица', osm: 'w333585687', model: 'station', rank: 1 },
@@ -74,4 +78,27 @@ export const LANDMARKS = [
   // ── Битолскиот филџан: скулптура на кружниот тек „11. Бригада“ (западен влез) ──
   // точна позиција од сопственикот (Google Maps: 41.0329632, 21.3160347)
   { id: 'fildzan', group: 'Историја и спомен-места', name: 'Битолскиот филџан', roundabout: 'w196560544', at: { lat: 41.0329632, lon: 21.3160347 }, model: 'fildzan', rank: 1 },
+
+  // ── „Кај авионите“: рамна ливада (дел од поранешната касарна) со два изложени авиони ──
+  // F-86 „Сејбр“ на ВВС на СФРЈ, служеле за вежби. Местото: точка од сопственикот (Google Maps);
+  // авионите: OSM (historic=aircraft) — Ф-86Е (северно) и Ф-86Д (јужно, со радарски нос).
+  // Насоката (heading, степени од север, во насока на стрелките) и кружните патеки (pad, m)
+  // се од сателитската снимка: двата се свртени со носот кон север.
+  {
+    id: 'kaj-avionite', group: 'Историја и спомен-места',
+    name: 'Кај авионите',
+    at: { lat: 41.0188323, lon: 21.3293992 },
+    parts: { f86e: 'n9653138816', f86d: 'n9653178117' },
+    // ливадата е рамна (израмнета за вежбите), а релјефот од Terrain Tiles таму паѓа ~1 m на 10 m
+    flatten: { lat: 41.018765, lon: 21.32933, r: 32, blend: 35 },
+    model: 'jets',
+    rank: 1,
+    opts: {
+      planes: [
+        { part: 'f86e', heading: 0, pad: 7.5 },
+        { part: 'f86d', heading: 8, pad: 10, radome: true },
+      ],
+    },
+    view: { bearing: 200, polar: 56, distance: 95 },
+  },
 ];

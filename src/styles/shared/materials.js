@@ -3,6 +3,7 @@
 // за да останат осветлувањето, сенките и маглата.
 
 import * as THREE from 'three';
+import { FLICKER_GLSL, flickerUniforms } from './flicker.js';
 
 /**
  * Основен комплет материјали за сите слоеви на сцената.
@@ -146,8 +147,9 @@ export function withGrow(material, grow) {
 }
 
 // ───────────────────────── Ноќ: светла ─────────────────────────
-// env = { night: { value: 0..1 }, lamp: { value: THREE.Color } } — заеднички uniforms што ги
-// менува времето од денот (src/app/time.js).
+// env = { night: { value: 0..1 }, lamp: { value: THREE.Color }, time, flicker, broken } —
+// заеднички uniforms што ги менува времето од денот (src/app/time.js) и јамката (треперење,
+// styles/shared/flicker.js).
 
 function chain(material, key, fn) {
   const prev = material.onBeforeCompile;
@@ -160,14 +162,19 @@ function chain(material, key, fn) {
   return material;
 }
 
-/** Делови што светат ноќе (атрибут aGlow: прозорци, светилки на знаменитостите). */
+/** Делови што светат ноќе (атрибут aGlow: прозорци, светилки на знаменитостите); трепери како фенер.
+ *  fill = топол одблесок од светилките врз фасадите на знаменитостите (ноќе не се сосема црни). */
 export function withGlow(material, env, { fill = 0 } = {}) {
   return chain(material, `glow${fill}`, (shader) => {
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
+    flickerUniforms(shader, env);
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nattribute float aGlow;\nvarying float vGlow;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvGlow = aGlow;');
+      .replace('#include <common>', `#include <common>\n${FLICKER_GLSL}\nattribute float aGlow;\nattribute float aSeed;\nvarying float vGlow;`)
+      .replace(
+        '#include <project_vertex>',
+        '#include <project_vertex>\nvGlow = aGlow > 0.0 ? aGlow * fkFlame(aSeed) * fkTwinkle(aSeed, -mvPosition.z) : 0.0;',
+      );
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', '#include <common>\nuniform float uNight;\nuniform vec3 uLamp;\nvarying float vGlow;')
       .replace(
@@ -175,7 +182,7 @@ export function withGlow(material, env, { fill = 0 } = {}) {
         // fill = топол одблесок од светилките врз фасадите (ноќе не се сосема црни)
         `#include <emissivemap_fragment>
         totalEmissiveRadiance += uLamp * vGlow * uNight * 1.6;
-        ${fill ? `totalEmissiveRadiance += diffuseColor.rgb * uLamp * uNight * (1.0 - vGlow) * ${fill.toFixed(3)};` : ''}`,
+        ${fill ? `totalEmissiveRadiance += diffuseColor.rgb * uLamp * uNight * (1.0 - min(vGlow, 1.0)) * ${fill.toFixed(3)};` : ''}`,
       );
   });
 }
@@ -189,6 +196,7 @@ export function withWindows(material, env, { ratio = 0.42, cross = 0, halo = 0, 
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
     shader.uniforms.uRatio = { value: ratio };
+    flickerUniforms(shader, env);
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\n#ifndef HAS_ABASE\n#define HAS_ABASE\nattribute float aBase;\n#endif\nvarying vec3 vWPos;\nvarying vec3 vWNor;\nvarying float vWBase;')
       .replace(
@@ -204,7 +212,8 @@ export function withWindows(material, env, { ratio = 0.42, cross = 0, halo = 0, 
         varying vec3 vWPos;
         varying vec3 vWNor;
         varying float vWBase;
-        float wHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`,
+        float wHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+        ${FLICKER_GLSL}`,
       )
       .replace(
         '#include <emissivemap_fragment>',
@@ -218,8 +227,18 @@ export function withWindows(material, env, { ratio = 0.42, cross = 0, halo = 0, 
           float inWin = step(0.28, f.x) * step(f.x, 0.72) * step(0.22, f.y) * step(f.y, 0.78) * step(0.0, v);
           float h = wHash(cell + floor(vWNor.xz * 3.0) * 17.0);
           float lit = step(1.0 - uRatio, h);
+          // ~7 % од прозорците се палат/гаснат на секои 20–60 s (некој влегол или излегол од соба)
+          if (uFlicker > 0.0 && fract(h * 7.31) > 0.93) {
+            float ep = floor(uTime / (20.0 + 40.0 * fract(h * 3.7)) + fract(h * 5.3));
+            lit = step(1.0 - uRatio, wHash(cell + vec2(ep * 1.37, ep * 0.71)));
+          }
           vec3 warm = mix(uLamp, vec3(1.0, 0.95, 0.85), step(0.85, h));
-          float on = lit * smoothstep(0.3, 0.95, uNight) * (0.9 + 0.6 * fract(h * 13.0));
+          float k = (0.9 + 0.6 * fract(h * 13.0)) * fkTwinkle(h, distance(vWPos, cameraPosition));
+          // ~2 % се телевизори: синкаво, немирно светло
+          float tv = step(0.98, fract(h * 29.7)) * step(0.001, uFlicker);
+          warm = mix(warm, vec3(0.55, 0.7, 1.0), tv * 0.8);
+          k *= 1.0 + tv * uFlicker * (fkNoise(uTime * 2.5 + h * 50.0) - 0.5) * 0.7;
+          float on = lit * smoothstep(0.3, 0.95, uNight) * k;
           ${
             cross
               ? `// крстеста рамка (пречки) во прозорецот
@@ -254,12 +273,13 @@ export function withStreetGlow(material, env, strength = [0.4, 0.38, 0.36, 0.32,
     shader.uniforms.uNight = env.night;
     shader.uniforms.uLamp = env.lamp;
     shader.uniforms.uStrength = { value: strength };
+    shader.uniforms.uStreetGain = env.streetGain || { value: 1 };
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nattribute float cls;\nuniform float uStrength[10];\nvarying float vStreet;')
       .replace('#include <begin_vertex>', '#include <begin_vertex>\nvStreet = uStrength[int(cls + 0.5)];');
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', '#include <common>\nuniform float uNight;\nuniform vec3 uLamp;\nvarying float vStreet;')
-      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vStreet * uNight;');
+      .replace('#include <common>', '#include <common>\nuniform float uNight, uStreetGain;\nuniform vec3 uLamp;\nvarying float vStreet;')
+      .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += uLamp * vStreet * uNight * uStreetGain;');
   });
 }
 

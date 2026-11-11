@@ -11,3 +11,19 @@ export const VIEWS = [
   { id: 'gradski-park', name: 'Градски парк', target: { x: 440, z: 1180 }, bearing: 330, polar: 54, distance: 1200 },
   { id: 'herakleja', name: 'Хераклеа', target: { x: 625, z: 2150 }, bearing: 25, polar: 55, distance: 300 },
 ];
+
+// Дополнителни погледи за проверки и мерења (scripts/dev/screenshot.mjs, perf/bench.js) —
+// не се во менито.
+export const CHECK_VIEWS = [
+  { id: 'center', target: { x: 0, z: 0 }, bearing: 200, polar: 55, distance: 900 },
+  { id: 'close', target: { x: 30, z: -60 }, bearing: 160, polar: 62, distance: 350 },
+  { id: 'west', target: { x: -2500, z: 800 }, bearing: 70, polar: 65, distance: 4500 },
+  { id: 'top', target: { x: -500, z: 400 }, bearing: 0, polar: 1, distance: 11000 },
+  // крупни планови на знаменитостите
+  { id: 'saat', target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
+  { id: 'dimitrija', target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
+  { id: 'filip', target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
+  // зградите на Магнолија од споменикот (како на фотографиите на сопственикот)
+  { id: 'mag-red', target: { x: -17, z: 63 }, bearing: 42, polar: 77, distance: 42 },
+  { id: 'mag-plostad', target: { x: 10, z: 58 }, bearing: 300, polar: 68, distance: 90 },
+];

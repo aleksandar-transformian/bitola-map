@@ -103,6 +103,27 @@ async function buildTerrain() {
       smooth[j * cols + i] = s / n;
     }
   }
+  // Израмнети места (landmarks.js: flatten) — рамнини што Terrain Tiles (~10 m пиксел) ги
+  // нема: во кругот r на средната висина, до r + blend благ премин кон природниот релјеф.
+  for (const L of LANDMARKS) {
+    if (!L.flatten) continue;
+    const { lat, lon, r, blend = r } = L.flatten;
+    const [fx, fz] = proj.toXZ(lat, lon);
+    const near = [];
+    for (let j = 0; j < rows; j++) {
+      for (let i = 0; i < cols; i++) {
+        const d = Math.hypot(rect.minX + i * step - fx, rect.minZ + j * step - fz);
+        if (d < r + blend) near.push([j * cols + i, d]);
+      }
+    }
+    const inner = near.filter(([, d]) => d <= r);
+    const level = inner.reduce((a, [k]) => a + smooth[k], 0) / Math.max(1, inner.length);
+    for (const [k, d] of near) {
+      const t = d <= r ? 1 : 1 - (d - r) / blend;
+      const w = t * t * (3 - 2 * t); // smoothstep
+      smooth[k] = smooth[k] * (1 - w) + level * w;
+    }
+  }
   const grid = { cols, rows, minX: rect.minX, minZ: rect.minZ, step };
   const hf = new Heightfield(grid, smooth);
   // Зачувај во дециметри (Uint16) релативно на минимумот.
@@ -765,7 +786,10 @@ function roofShape(t) {
     if (L.at) {
       // рачна позиција (WGS84) — има предност пред OSM (на пр. точна локација од сопственикот)
       const [x, z] = proj.toXZ(L.at.lat, L.at.lon);
-      if (item.polys) {
+      if (L.inside) {
+        // „inside“: основата е двор/парцела — не се поместува; at ја посочува самата зграда
+        item.pick = [+x.toFixed(2), +z.toFixed(2)];
+      } else if (item.polys) {
         // помести ја основата заедно со центарот
         const dx = x - item.center[0];
         const dz = z - item.center[1];
@@ -777,6 +801,15 @@ function roofShape(t) {
       item.at = L.at;
     }
     for (const [k, ref] of Object.entries(L.parts || {})) {
+      if (ref[0] === 'n') {
+        // дел-точка (на пр. изложен авион): само позиција и подлога
+        const n = osm.nodes.get(+ref.slice(1));
+        if (!n) throw new Error(`Знаменитост: не најдов ${ref} во OSM`);
+        const [x, z] = proj.toXZ(n.lat, n.lon);
+        item.parts = item.parts || {};
+        item.parts[k] = { osmId: n.id, center: [+x.toFixed(2), +z.toFixed(2)], ground: +hf.sample(x, z).toFixed(2) };
+        continue;
+      }
       const { el, polys } = ringsOf(ref);
       item.parts = item.parts || {};
       item.parts[k] = { osmId: el.type === 'relation' ? -el.id : el.id, polys: polys.map((p) => p.map(r1)), center: G.centroid(polys[0][0]).map((v) => +v.toFixed(2)) };

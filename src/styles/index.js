@@ -6,7 +6,7 @@
 //   name        име во интерфејсот (македонски)
 //   tagline     краток опис
 //   swatch      CSS позадина за копчето во избирачот
-//   geometry    { roofs: 'flat' | 'gabled', trees } — барања за геометрија; ако се разликуваат од
+//   geometry    { roofs: 'flat' | 'gabled' | 'hip', trees } — барања за геометрија; ако се разликуваат од
 //               тековните, менаџерот ги пресоздава само засегнатите слоеви (со анимација)
 //   ground      { painter: 'flat' | 'watercolor', base, edge, washes?, outline?, areas: {класа: боја} }
 //   roads       { класа: боја }   (класи: config/classes.js → ROAD)
@@ -19,9 +19,12 @@
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
 //   night       { lamp, windows?: { ratio, cross?, halo?, fill? }, streets?: [јачина по класа на улица],
-//                 landmarkFill? } — ноќни светла (fill = топол одблесок врз ѕидовите)
+//                 landmarkFill?, flicker?: { amount?: 0–1 (стандардно 1), broken?: true } } — ноќни светла;
+//               fill = топол одблесок врз ѕидовите; flicker = благо треперење (styles/shared/flicker.js),
+//               broken = понекоја „расипана“ светилка
 //   snow?       { color } — боја на снегот (временски услови „Снег“/„Снежи“, app/weather.js)
 //   times?      { sunset?, night? } — делумно пребришување на стандардното зајдисонце/ноќ (app/time.js)
+//   fixedTime?  'night' | 'sunset' | 'day' — стилот е секогаш во тоа време (копчињата се заклучуваат)
 //   ui          { paper } — бои за интерфејсот (CSS: html[data-style=<id>])
 //   materials(ctx)        → { terrain, skirt, walls, roofs, roads, rail, water } — нови материјали
 //   post(ctx)?            → { before: Pass[], after: Pass[], ... } — пост-процесирање
@@ -32,10 +35,12 @@
 import razglednica from './razglednica.js';
 import maketa from './maketa.js';
 import crtan from './crtan.js';
+import lowpoly from './lowpoly.js';
+import nokna from './nokna.js';
 import bajka from './bajka.js';
 import { readPref, hashPref, writePref } from '../app/prefs.js';
 
-export const STYLES = [razglednica, maketa, crtan, bajka];
+export const STYLES = [razglednica, maketa, crtan, lowpoly, nokna, bajka];
 export const DEFAULT_STYLE = 'razglednica';
 
 export function getStyle(id) {

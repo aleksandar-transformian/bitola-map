@@ -21,15 +21,27 @@ npm run shot -- --views home,center,close,west,top   # screenshot-ови + ме�
 npm run shot -- --mobile --views home                 # мобилен профил (iPhone 13)
 npm run shot -- --style maketa --time night --views shirok-sokak,saat --clean # стил, време, погледи
 npm run shot -- --style bajka --time night --weather snowfall --views saat     # снег: clear|snow|snowfall
+npm run shot -- --time night --motion --views saat     # со треперење на светлата (стандардно: мирни)
 node scripts/dev/check-styles.mjs                     # проверка на интерфејсот (стил, време, погледи, тастатура, натписи)
+
+npm run bench -- --suite quick                        # бенчмарк headless (SwiftShader): структура на кадарот + споредба со основата
+npm run bench -- --suite standard --check             # цело мерење; излез 1 при регресија > 10 % (повици, триаголници)
+npm run bench -- --gpu [--uncapped]                   # вистински GPU (видлив прозорец) — за мерење на сопствена машина
+npm run bench -- --compare стар.json нов.json         # споредба на два извештаја
 ```
 
+Мерење на изведбата: `?debug` = во живо (кадар p50/p95, CPU по фаза, GPU по пас — scene, shadow,
+gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бенчмарк во прелистувачот
+со табела и JSON (копирај/сними) — така се мери на референтниот уред (MacBook Pro 2018, Radeon Pro
+555X, Retina, Chrome). Буџети: `src/config/perf.js`; основа и резултати: `docs/perf/`;
+спецификација, план и анализа: `docs/specs/002-performance/`.
+
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
-charshija, gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip,
-mag-red, mag-plostad + `lm-<id>` за секоја знаменитост.
+charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
+filip, mag-red, mag-plostad) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa|crtan|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>`.
+`#style=razglednica|maketa|crtan|lowpoly|nokna|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
 Home = преглед, 1–9 = стил, S = снег (без → снег → снежи), ? = упатство.
 
@@ -42,18 +54,20 @@ Home = преглед, 1–9 = стил, S = снег (без → снег → �
 src/config/region.js     ← ЕДИНСТВЕНОТО место за опфатот (bbox), почетна точка, зум на релјефот
 src/config/classes.js    ← enum класи (улици, површини, згради) — дел од форматот на податоците
 src/config/zones.js      ← зони за проценка на висини (чаршија, Широк Сокак, центар)
-src/config/landmarks.js  ← знаменитости (30): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
-                           group (мени „Оди до…“), view, rank, label
+src/config/landmarks.js  ← знаменитости (31): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
+                           group (мени „Оди до…“), view, rank, label, parts (и OSM точки),
+                           flatten (израмнување на релјефот во обработката)
 src/config/views.js      ← брзи погледи
 src/config/labels.js     ← кои населби добиваат натпис + рачни места (Јени Маале, …)
 src/lib/pack.js          ← бинарен контејнер .bin (encode во Node, decode во прелистувач)
 src/world/heightfield.js ← мрежа со висини + sample(x,z); заедничка за Node и прелистувач
 src/world/*.js           ← градење геометрија од податоците (релјеф, подлога, згради, ленти, небо)
 src/world/world.js       ← сите слоеви на светот (еднаш); setBuildingRoofs() = варијанта на геометрија
-src/world/buildings.js   ← згради: рамни или двоводни покриви, атрибут aBase за „растење“
+src/world/buildings.js   ← згради: рамни, двоводни ('gabled') или четиристрешни ('hip') покриви
+                           (најниската од N коси рамнини), атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
-                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, …),
+                           extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …),
                            magnolija.js (детални згради на Магнолија/влезот на Широк Сокак по OSM id,
                            од фотографии)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
@@ -61,11 +75,15 @@ src/world/snowfall.js    ← снегулки што паѓаат (точки о
                            светлата (прозорци, светилки) за боке-дисковите
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
-src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, bajka.js)
+src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js, nokna.js, bajka.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
 src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ,
-                           снег `withSnow`, „рачна изработка“ `withCraft`)
-src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass)
+                           снег `withSnow`, „рачна изработка“ `withCraft`);
+                           flicker.js — „живи“ светла ноќе (треперење, прозорци што се палат, телевизори)
+src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass); instrument() за
+                           GPU време по пас (perfName), setPixelRatio()/setMsaa() во живо
+src/perf/                ← мерење: gpu-timer.js, perf.js (во живо), bench.js (?bench), report.js
+src/config/perf.js       ← буџети за изведба (референтен уред)
 src/render/passes/       ← сопствени пост-пасови (postcard.js — акварел/хартија, tiltshift.js — минијатура,
                            ink.js — контури од длабочината; bokeh.js — длабочина на поле + боке-дискови;
                            grade.js — тонирање/винета/зрно; композиторот има depthTexture)
@@ -78,7 +96,8 @@ src/ui/                  ← интерфејс: наслов, атрибуци�
                            упатство „?“), избирач на стил долу, натписи (labels.js), фонтови
 src/main.js              ← поврзување на сè погоре, јамка
 scripts/data/            ← Node скрипти: fetch-osm, fetch-overture, fetch-terrain, build (+ lib/)
-scripts/dev/             ← screenshot.mjs (слики, време, FPS), check-styles.mjs (тест на стиловите)
+scripts/dev/             ← screenshot.mjs (слики, време, FPS), check-styles.mjs (тест на стиловите),
+                           bench.mjs (бенчмарк, споредба, --check)
 .github/workflows/data-fetch.yml ← Overpass + Overture на GitHub Actions (комитува data/raw/)
 ```
 
@@ -99,7 +118,9 @@ scripts/dev/             ← screenshot.mjs (слики, време, FPS), check
 Време од денот: денот го дава стилот (`light`, `sky`, `fog`); зајдисонцето и ноќта се стандардни
 поставки во `app/time.js` што стилот може делумно да ги пребрише (`style.times`). Заедничкиот
 uniform `env.night` (0–1) ги пали прозорците (`withWindows`), улиците (`withStreetGlow`),
-светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки.
+светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки. Светлата благо
+треперат (`env.time`, `env.flicker`; атрибут `aSeed` = семе по светло); при
+`prefers-reduced-motion` се мирни. Големи површини (улиците) не треперат.
 
 Снег: временските услови се независни од стилот и од времето. `env.snow` (0–1) го користи
 `withSnow` (површини свртени нагоре; параметрите по слој се во менаџерот), а снегулките се
@@ -121,6 +142,9 @@ models.js`) се градат од примитиви во рамка од OBB �
 - Нови податочни класи се додаваат само на крајот од низите во `classes.js`.
 - По секоја поголема визуелна промена: `npm run shot` и поглед на сликите.
   Headless Chromium рендерира софтверски (SwiftShader) — FPS таму е само за споредба.
+- По секоја промена што додава геометрија, ефект или стил: `npm run bench -- --suite quick` (повици,
+  триаголници наспроти основата). Оптимизациите се докажуваат со `?bench` пред/по на референтниот
+  уред; новиот пас добива `perfName` за да се гледа во мерењето.
 - `localStorage` секогаш во try/catch.
 
 ## Git тек
@@ -129,6 +153,8 @@ models.js`) се градат од примитиви во рамка од OBB �
 - `main` — објавува на GitHub Pages (`.github/workflows/deploy.yml`, извор „GitHub Actions“):
   https://aleksandar-transformian.github.io/bitola-map/ — **push на `main` само по изречна
   дозвола од сопственикот** (дадена за објавата во фаза 4; секоја следна објава — прашај).
+  Околината `github-pages` мора да ја дозволува гранката `main` (Settings → Environments);
+  инаку `deploy` се одбива за 2 s без лог.
 - Лиценца: MIT за кодот (`LICENSE`); податоците ODbL, фонтовите OFL.
 - Спецификации и план: `docs/specs/`; одлуки, бројки и проблеми: `docs/NOTES.md`.
 

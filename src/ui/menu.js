@@ -111,6 +111,15 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
     setPlace(id) {
       select.value = id && [...select.options].some((o) => o.value === id) ? id : '';
     },
+    /** Заклучи ги копчињата за време (стилот има фиксно време) или отклучи со null. */
+    lockTime(fixed) {
+      const nav = el.querySelector('.time-toggle');
+      nav.classList.toggle('locked', !!fixed);
+      for (const b of nav.querySelectorAll('button')) {
+        b.disabled = !!fixed;
+        b.title = fixed ? 'Овој стил е секогаш ноќ' : b.getAttribute('aria-label');
+      }
+    },
     setTime(id) {
       for (const b of timeNav.querySelectorAll('button')) b.setAttribute('aria-checked', String(b.dataset.id === id));
     },
