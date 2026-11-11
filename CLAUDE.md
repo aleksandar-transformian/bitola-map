@@ -28,7 +28,7 @@ gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, fili
 за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa|crtan&time=day|sunset|night&view=<id>`.
+`#style=razglednica|maketa|crtan|lowpoly&time=day|sunset|night&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
 Home = преглед, 1–9 = стил, ? = упатство.
 
@@ -49,14 +49,15 @@ src/lib/pack.js          ← бинарен контејнер .bin (encode во
 src/world/heightfield.js ← мрежа со висини + sample(x,z); заедничка за Node и прелистувач
 src/world/*.js           ← градење геометрија од податоците (релјеф, подлога, згради, ленти, небо)
 src/world/world.js       ← сите слоеви на светот (еднаш); setBuildingRoofs() = варијанта на геометрија
-src/world/buildings.js   ← згради: рамни или двоводни покриви, атрибут aBase за „растење“
+src/world/buildings.js   ← згради: рамни, двоводни ('gabled') или четиристрешни ('hip') покриви
+                           (најниската од N коси рамнини), атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
                            extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, …)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
-src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js)
+src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
 src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ)
 src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass)
