@@ -10,7 +10,7 @@ export function createStylePicker(root, styles, onPick) {
       (s, i) => `
       <button type="button" role="radio" data-id="${s.id}" aria-checked="false" title="${s.name} — ${s.tagline} (${i + 1})">
         <span class="swatch" style="background:${s.swatch}"></span>
-        <span class="label">${s.name}</span>
+        <span class="name">${s.name}</span>
       </button>`,
     )
     .join('');

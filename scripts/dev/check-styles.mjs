@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Проверка на системот за стилови: смена во живо, анимација на премин,
-// #style= во URL и памтење во localStorage по превчитување.
+// Проверка на интерфејсот: смена на стил и време од денот во живо, #style= / #time= во URL,
+// памтење во localStorage, брзи погледи, тастатура и натписи.
 //   node scripts/dev/check-styles.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
 
 import { createRequire } from 'node:module';
@@ -52,6 +52,41 @@ await page.evaluate(() => (location.hash = 'style=maketa'));
 await page.waitForTimeout(1500);
 check('hashchange → Макета', (await page.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
 
+// Време од денот: копче, URL, localStorage.
+await page.click('.time-toggle button[data-id="night"]');
+await page.waitForTimeout(2500);
+const t1 = await page.evaluate(() => ({ time: document.documentElement.dataset.time, hash: location.hash }));
+check('копче Ноќ', t1.time === 'night' && t1.hash.includes('time=night'), t1.hash);
+await page.evaluate(() => (location.hash = 'style=maketa&time=sunset'));
+await page.waitForTimeout(2500);
+check('hashchange → зајдисонце', (await page.evaluate(() => document.documentElement.dataset.time)) === 'sunset');
+
+// Брз поглед: лет до Хераклеа.
+await page.click('.view-bar button[data-id="herakleja"]');
+// летот е временски (1.8 s), но софтверското рендерирање е бавно — чекај да заврши
+await page
+  .waitForFunction(() => {
+    const v = window.__bitolaApp.getView();
+    return Math.hypot(v.target.x - 625, v.target.z - 2150) < 5 && Math.abs(v.distance - 300) < 5;
+  }, null, { timeout: 90000, polling: 500 })
+  .catch(() => {});
+const v1 = await page.evaluate(() => window.__bitolaApp.getView());
+check('поглед Хераклеа', Math.hypot(v1.target.x - 625, v1.target.z - 2150) < 5 && Math.abs(v1.distance - 300) < 5, `цел ${v1.target.x.toFixed(0)}, ${v1.target.z.toFixed(0)}; ${v1.distance.toFixed(0)} m`);
+
+// Тастатура: Q ротира.
+const b0 = v1.bearing;
+await page.keyboard.press('q');
+await page
+  .waitForFunction((b) => Math.abs(((window.__bitolaApp.getView().bearing - b + 540) % 360) - 180 + 12) < 1.5, b0, { timeout: 60000, polling: 300 })
+  .catch(() => {});
+await page.waitForTimeout(1500); // натписите се ажурираат во следниот кадар
+const b1 = (await page.evaluate(() => window.__bitolaApp.getView())).bearing;
+check('тастер Q ротира', Math.abs(((b1 - b0 + 540) % 360) - 180 + 12) < 1.5, `${b0.toFixed(1)}° → ${b1.toFixed(1)}°`);
+
+// Натписи: на близина само знаменитости.
+const labels = await page.evaluate(() => [...document.querySelectorAll('.label.on')].map((e) => e.textContent));
+check('натпис Хераклеа', labels.includes('Хераклеа Линкестис'), labels.join(', '));
+
 // „Превчитување“ без hash → од localStorage (нова страница во истиот контекст;
 // старата се затвора за софтверското рендерирање да не ја блокира навигацијата).
 await page.close();
@@ -60,6 +95,7 @@ p2.on('pageerror', (e) => errors.push(e.message));
 await p2.goto(url);
 await p2.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 check('localStorage по превчитување', (await p2.evaluate(() => document.documentElement.dataset.style)) === 'maketa');
+check('времето запаметено', (await p2.evaluate(() => document.documentElement.dataset.time)) === 'sunset');
 await p2.close();
 
 // Непознат стил во URL → запаметениот, без грешка.

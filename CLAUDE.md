@@ -19,12 +19,17 @@ npm run data                # сè погоре по ред
 
 npm run shot -- --views home,center,close,west,top   # screenshot-ови + мерења (dev серверот мора да работи)
 npm run shot -- --mobile --views home                 # мобилен профил (iPhone 13)
-npm run shot -- --style maketa --views center --clean # даден стил, без debug панел
-node scripts/dev/check-styles.mjs                     # проверка: смена на стил, #style=, localStorage
+npm run shot -- --style maketa --time night --views shirok-sokak,saat --clean # стил, време, погледи
+node scripts/dev/check-styles.mjs                     # проверка на интерфејсот (стил, време, погледи, тастатура, натписи)
 ```
 
-URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`, `#style=razglednica|maketa`.
-Тастатура: стрелки = поместување, 1–9 = стил.
+Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, charshija,
+gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija.
+
+URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
+`#style=razglednica|maketa&time=day|sunset|night&view=<id>`.
+Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
+Home = преглед, 1–9 = стил.
 
 ## Архитектура
 
@@ -32,21 +37,30 @@ URL: `?debug` (FPS, повици, триаголници, време), `?profile
 src/config/region.js     ← ЕДИНСТВЕНОТО место за опфатот (bbox), почетна точка, зум на релјефот
 src/config/classes.js    ← enum класи (улици, површини, згради) — дел од форматот на податоците
 src/config/zones.js      ← зони за проценка на висини (чаршија, Широк Сокак, центар)
+src/config/landmarks.js  ← знаменитости: OSM основа + модел (Саат Кула, џамии, Безистен, …)
+src/config/views.js      ← брзи погледи
+src/config/labels.js     ← кои населби добиваат натпис + рачни места (Јени Маале, …)
 src/lib/pack.js          ← бинарен контејнер .bin (encode во Node, decode во прелистувач)
 src/world/heightfield.js ← мрежа со висини + sample(x,z); заедничка за Node и прелистувач
 src/world/*.js           ← градење геометрија од податоците (релјеф, подлога, згради, ленти, небо)
 src/world/world.js       ← сите слоеви на светот (еднаш); setBuildingRoofs() = варијанта на геометрија
 src/world/buildings.js   ← згради: рамни или двоводни покриви, атрибут aBase за „растење“
 src/world/ground.js      ← подлога во canvas; сликари 'flat' и 'watercolor'
+src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js (моделите)
+src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
+src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
 src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
 src/styles/shared/       ← заеднички материјали и шејдер-додатоци (изохипси, слоеви, растење)
 src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass)
-src/render/passes/       ← сопствени пост-процесирачки пасови (postcard.js — акварел/хартија)
-src/app/camera.js        ← камера, MapControls, погледи (bearing/polar/distance), динамички near/far
+src/render/passes/       ← сопствени пост-пасови (postcard.js — акварел/хартија, tiltshift.js — минијатура)
+src/app/camera.js        ← камера, MapControls, погледи, лет до поглед, тастатура, динамички near/far
+src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
+src/app/prefs.js         ← поставки во URL hash + localStorage
 src/data/loader.js       ← вчитување на public/data/*
-src/ui/                  ← интерфејс (наслов, атрибуција, вчитување, избирач на стил, фонтови)
+src/ui/                  ← интерфејс: наслов, атрибуција, избирач на стил, погледи и време (controls.js),
+                           натписи (labels.js — проекција + одбегнување преклоп), фонтови
 src/main.js              ← поврзување на сè погоре, јамка
 scripts/data/            ← Node скрипти: fetch-osm, fetch-overture, fetch-terrain, build (+ lib/)
 scripts/dev/             ← screenshot.mjs (слики, време, FPS), check-styles.mjs (тест на стиловите)
@@ -66,6 +80,15 @@ scripts/dev/             ← screenshot.mjs (слики, време, FPS), check
 Нов стил = нов модул во `src/styles/` + ред во `STYLES`. Ако стилот бара друга геометрија
 (`geometry.roofs`), менаџерот ја пресоздава само таа (и ја кешира на десктоп), а зградите „растат“
 (uniform `uGrow`, атрибут `aBase`). Секоја смена е покриена со претопување (снимка во `#fade`).
+
+Време од денот: денот го дава стилот (`light`, `sky`, `fog`); зајдисонцето и ноќта се стандардни
+поставки во `app/time.js` што стилот може делумно да ги пребрише (`style.times`). Заедничкиот
+uniform `env.night` (0–1) ги пали прозорците (`withWindows`), улиците (`withStreetGlow`),
+светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки.
+
+Знаменитости: `build.mjs` ги извлекува основите во `landmarks.json`; моделите (`world/landmarks/
+models.js`) се градат од примитиви во рамка од OBB на основата. Обичните згради што ги заменуваат
+(по OSM id, по растојание од Широк Сокак, во оградата на Хераклеа) се прескокнуваат.
 
 ## Конвенции
 

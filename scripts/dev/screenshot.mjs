@@ -3,13 +3,15 @@
 // мери време и FPS и прави screenshot-ови.
 //
 //   node scripts/dev/screenshot.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
-//        [--mobile] [--views home,center] [--scale 1] [--style razglednica|maketa] [--clean]
+//        [--mobile] [--views home,center] [--scale 1] [--style razglednica|maketa] [--time day|sunset|night] [--clean]
+//        погледи: home, center, close, west, top + брзите погледи (pregled, shirok-sokak, charshija, …)
 //
 // Забелешка: headless Chromium рендерира софтверски (SwiftShader) —
 // FPS бројките се многу пониски од вистински GPU; корисни се само за споредба.
 
 import { createRequire } from 'node:module';
 import { mkdir } from 'node:fs/promises';
+import { VIEWS as APP_VIEWS } from '../../src/config/views.js';
 
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require('playwright');
@@ -27,13 +29,17 @@ const mobile = has('mobile');
 const scale = Number(opt('scale', '1'));
 const views = opt('views', 'home').split(',');
 
-// Погледи за проверка (во фаза 3 ова ќе стане дел од апликацијата).
+// Погледи за проверка: брзите погледи од апликацијата (config/views.js) + неколку дополнителни.
 const VIEWS = {
   home: null,
+  ...Object.fromEntries(APP_VIEWS.map((v) => [v.id, v])),
   center: { target: { x: 0, z: 0 }, bearing: 200, polar: 55, distance: 900 },
   close: { target: { x: 30, z: -60 }, bearing: 160, polar: 62, distance: 350 },
   west: { target: { x: -2500, z: 800 }, bearing: 70, polar: 65, distance: 4500 },
   top: { target: { x: -500, z: 400 }, bearing: 0, polar: 1, distance: 11000 },
+  // крупни планови на знаменитостите
+  saat: { target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
+  dimitrija: { target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
 };
 
 await mkdir(out, { recursive: true });
@@ -49,10 +55,15 @@ page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
 const t0 = Date.now();
 const u = new URL(url);
 if (!has('clean')) u.searchParams.set('debug', ''); // --clean = без debug панел
-if (opt('style')) u.hash = `style=${opt('style')}`;
+const hash = new URLSearchParams();
+if (opt('style')) hash.set('style', opt('style'));
+if (opt('time')) hash.set('time', opt('time'));
+u.hash = hash.toString();
 await page.goto(u.toString());
 await page.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 const wall = Date.now() - t0;
+// без CSS анимации (софтверското рендерирање е премногу бавно за нив)
+await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
 
 for (const v of views) {
   if (VIEWS[v]) {
@@ -62,7 +73,7 @@ for (const v of views) {
     }, VIEWS[v]);
   }
   await page.waitForTimeout(2500);
-  const file = `${out}/${mobile ? 'mobile-' : ''}${opt('style') ? opt('style') + '-' : ''}${v}.png`;
+  const file = `${out}/${mobile ? 'mobile-' : ''}${opt('style') ? opt('style') + '-' : ''}${opt('time') ? opt('time') + '-' : ''}${v}.png`;
   await page.screenshot({ path: file, timeout: 180000 });
   console.log(`screenshot: ${file}`);
 }
