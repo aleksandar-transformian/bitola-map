@@ -12,7 +12,7 @@ import { VIEWS } from './config/views.js';
 import { PLACE_RANK, PLACE_SKIP, EXTRA_PLACES } from './config/labels.js';
 import { createOverlay } from './ui/overlay.js';
 import { createStylePicker } from './ui/style-picker.js';
-import { createViewBar, createTimeToggle } from './ui/controls.js';
+import { createMenu } from './ui/menu.js';
 import { createLabels, collectLabels } from './ui/labels.js';
 import { detectProfile } from './profile.js';
 import './ui/fonts.js';
@@ -22,7 +22,7 @@ const T0 = performance.now();
 const profile = detectProfile();
 const firstStyle = getStyle(initialStyleId());
 const validTime = (id) => TIMES.some((t) => t.id === id);
-const validView = (id) => VIEWS.some((v) => v.id === id);
+let validView = (id) => VIEWS.some((v) => v.id === id);
 document.documentElement.dataset.style = firstStyle.id;
 const overlay = createOverlay();
 const stats = { profile: profile.name, ready: false };
@@ -87,14 +87,30 @@ async function start() {
     ui,
     collectLabels({ pois: data.pois, landmarks: data.landmarks, hf: world.hf, rect: world.rect, placeRank: PLACE_RANK, placeSkip: PLACE_SKIP, extra: EXTRA_PLACES }),
   );
-  const viewBar = createViewBar(ui, VIEWS, (id) => goTo(id));
+  // Погледи кон знаменитостите: свој `view` или стандарден според големината на моделот.
+  const SIZE = { stadium: 420, warCemetery: 380, fortress: 320, monastery: 300, totenburg: 220, heraclea: 380, promenade: 430, square: 200, fildzan: 140, publicBuilding: 220, station: 220 };
+  const places = new Map(VIEWS.map((v) => [v.id, v]));
+  for (const l of data.landmarks) {
+    if (!l.group || places.has(l.id)) continue; // брзиот поглед со истото име има предност
+    places.set(l.id, { target: { x: l.center[0], z: l.center[1] }, bearing: 200, polar: 58, distance: SIZE[l.model] || 170, ...(l.view || {}) });
+  }
+  validView = (id) => places.has(id);
+  const menu = createMenu(ui, { views: VIEWS, landmarks: data.landmarks, times: TIMES, onGo: (id) => goTo(id), onTime: (id) => setTime(id) });
+  menu.setTime(time.mode);
   const dock = document.createElement('div');
   dock.className = 'dock';
   ui.appendChild(dock);
   const picker = createStylePicker(dock, STYLES, (id) => setStyle(id));
   picker.setActive(firstStyle.id);
-  const timeToggle = createTimeToggle(dock, TIMES, (id) => setTime(id));
-  timeToggle.setActive(time.mode);
+  // упатството се покажува сам само при првата посета
+  try {
+    if (!localStorage.getItem('bitola.helpSeen')) {
+      menu.showHelp(true);
+      localStorage.setItem('bitola.helpSeen', '1');
+    }
+  } catch {
+    // без складирање — без автоматско упатство
+  }
 
   function setStyle(id) {
     const s = getStyle(id);
@@ -108,18 +124,18 @@ async function start() {
   function setTime(id) {
     if (!validTime(id) || id === time.mode) return;
     time.set(id);
-    timeToggle.setActive(id);
+    menu.setTime(id);
     document.documentElement.dataset.time = id;
     writePref('time', id);
   }
   function goTo(id, animate = true) {
-    const v = VIEWS.find((x) => x.id === id);
+    const v = places.get(id);
     if (!v) return;
     if (animate) view.flyTo(v);
     else view.setView(v);
-    viewBar.setActive(id);
+    menu.setPlace(id);
   }
-  controls.addEventListener('start', () => viewBar.setActive(null));
+  controls.addEventListener('start', () => menu.setPlace(null));
   window.addEventListener('hashchange', () => {
     const s = styleFromHash();
     if (s) setStyle(s);
