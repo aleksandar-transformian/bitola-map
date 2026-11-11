@@ -1,0 +1,57 @@
+{
+ "region": {
+  "id": "bitola",
+  "name": "Битола",
+  "bbox": {
+   "south": 40.99,
+   "west": 21.255,
+   "north": 41.065,
+   "east": 21.39
+  },
+  "origin": {
+   "lat": 41.0306,
+   "lon": 21.3349
+  },
+  "terrain": {
+   "zoom": 14,
+   "gridStep": 15
+  }
+ },
+ "rect": {
+  "minX": -6709.592100886398,
+  "maxX": 4627.015328646151,
+  "minZ": -3829.390483288387,
+  "maxZ": 4519.5713262066565
+ },
+ "osmTimestamp": "2026-11-11T09:31:59Z",
+ "generatedAt": "2026-11-11T09:47:41.884Z",
+ "stats": {
+  "terrain": {
+   "cols": 757,
+   "rows": 558,
+   "step": 15,
+   "minH": 577,
+   "maxH": 1864.9
+  },
+  "areas": 487,
+  "roads": 3134,
+  "rail": 31,
+  "waterways": 80,
+  "buildings": {
+   "count": 4543,
+   "heightFromOsm": 3,
+   "levelsFromOsm": 57,
+   "estimated": 4483,
+   "outlinesReplacedByParts": 0,
+   "extra": 0,
+   "extraOverlappingOsm": 0,
+   "extraSource": null
+  },
+  "trees": 412,
+  "pois": 87
+ },
+ "attribution": [
+  "© соработниците на OpenStreetMap (ODbL)",
+  "Релјеф: Terrain Tiles (Mapzen, AWS Open Data)"
+ ]
+}

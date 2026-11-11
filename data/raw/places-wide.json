@@ -1,0 +1,338 @@
+[
+ {
+  "name": "40. Браќа / Кркардаш",
+  "nameEn": "40 Brothers / Krkardash",
+  "place": "locality",
+  "lat": 41.0420113,
+  "lon": 21.3353722,
+  "inBBox": true
+ },
+ {
+  "name": "Баир",
+  "nameEn": "Bair",
+  "place": "neighbourhood",
+  "lat": 41.0381815,
+  "lon": 21.3338828,
+  "inBBox": true
+ },
+ {
+  "name": "Барешани",
+  "nameEn": "Bareshani",
+  "place": "village",
+  "lat": 40.9529865,
+  "lon": 21.3554985,
+  "inBBox": false
+ },
+ {
+  "name": "Бистрица",
+  "nameEn": "Bistrica",
+  "place": "village",
+  "lat": 40.9801868,
+  "lon": 21.3677085,
+  "inBBox": false
+ },
+ {
+  "name": "Битола",
+  "nameEn": "Bitola",
+  "place": "city",
+  "lat": 41.0316005,
+  "lon": 21.3302511,
+  "inBBox": true
+ },
+ {
+  "name": "Боримечка",
+  "nameEn": "Borimechka",
+  "place": "suburb",
+  "lat": 41.0217724,
+  "lon": 21.3474849,
+  "inBBox": true
+ },
+ {
+  "name": "Братин Дол",
+  "nameEn": "Bratin Dol",
+  "place": "village",
+  "lat": 41.0552713,
+  "lon": 21.2614947,
+  "inBBox": true
+ },
+ {
+  "name": "Брусник",
+  "nameEn": "Brusnik",
+  "place": "village",
+  "lat": 41.0235257,
+  "lon": 21.2855914,
+  "inBBox": true
+ },
+ {
+  "name": "Буково",
+  "nameEn": "Bukovo",
+  "place": "village",
+  "lat": 40.9947462,
+  "lon": 21.3324419,
+  "inBBox": true
+ },
+ {
+  "name": "Горно Оризари",
+  "nameEn": "Gorno Orizari",
+  "place": "suburb",
+  "lat": 41.0503687,
+  "lon": 21.3459627,
+  "inBBox": true
+ },
+ {
+  "name": "Дихово",
+  "nameEn": "Dihovo",
+  "place": "village",
+  "lat": 41.0308006,
+  "lon": 21.2642076,
+  "inBBox": true
+ },
+ {
+  "name": "Довлеџик",
+  "nameEn": "Dovledzhik",
+  "place": "quarter",
+  "lat": 41.0361115,
+  "lon": 21.3042535,
+  "inBBox": true
+ },
+ {
+  "name": "Долно Оризари",
+  "nameEn": "Dolno Orizari",
+  "place": "village",
+  "lat": 41.0509759,
+  "lon": 21.3779297,
+  "inBBox": true
+ },
+ {
+  "name": "Драгарино",
+  "nameEn": "Dragarino",
+  "place": "village",
+  "lat": 41.0973003,
+  "lon": 21.309402,
+  "inBBox": false
+ },
+ {
+  "name": "Жабени",
+  "nameEn": "Zhabeni",
+  "place": "village",
+  "lat": 40.9561672,
+  "lon": 21.3925667,
+  "inBBox": false
+ },
+ {
+  "name": "Кај Авионите",
+  "nameEn": "Kaj Avionite",
+  "place": "locality",
+  "lat": 41.0187368,
+  "lon": 21.3293067,
+  "inBBox": true
+ },
+ {
+  "name": "Карамани",
+  "nameEn": "Karamani",
+  "place": "village",
+  "lat": 41.0641757,
+  "lon": 21.396894,
+  "inBBox": false
+ },
+ {
+  "name": "Кравари",
+  "nameEn": "Kravari",
+  "place": "village",
+  "lat": 40.9957628,
+  "lon": 21.3788291,
+  "inBBox": true
+ },
+ {
+  "name": "Крклино",
+  "nameEn": "Krklino",
+  "place": "village",
+  "lat": 41.0728276,
+  "lon": 21.3339286,
+  "inBBox": false
+ },
+ {
+  "name": "Крстоар",
+  "nameEn": "Krstoar",
+  "place": "village",
+  "lat": 40.9916975,
+  "lon": 21.3470124,
+  "inBBox": true
+ },
+ {
+  "name": "Кукуречани",
+  "nameEn": "Kukurechani",
+  "place": "village",
+  "lat": 41.0948673,
+  "lon": 21.3256004,
+  "inBBox": false
+ },
+ {
+  "name": "Лавци",
+  "nameEn": "Lavci",
+  "place": "village",
+  "lat": 41.014454,
+  "lon": 21.3020635,
+  "inBBox": true
+ },
+ {
+  "name": "Логоварди",
+  "nameEn": "Logovardi",
+  "place": "village",
+  "lat": 41.0311664,
+  "lon": 21.4090495,
+  "inBBox": false
+ },
+ {
+  "name": "Магарево",
+  "nameEn": "Magarevo",
+  "place": "village",
+  "lat": 41.042684,
+  "lon": 21.2382671,
+  "inBBox": false
+ },
+ {
+  "name": "Нижеполе",
+  "nameEn": "Nizhepole",
+  "place": "village",
+  "lat": 41.0089125,
+  "lon": 21.2445642,
+  "inBBox": false
+ },
+ {
+  "name": "Ново Стрежево",
+  "nameEn": "Novo Strezhevo",
+  "place": "suburb",
+  "lat": 41.0503101,
+  "lon": 21.3387856,
+  "inBBox": true
+ },
+ {
+  "name": "Олевени",
+  "nameEn": "Oleveni",
+  "place": "village",
+  "lat": 40.9621324,
+  "lon": 21.3582948,
+  "inBBox": false
+ },
+ {
+  "name": "Оптичари",
+  "nameEn": "Optichari",
+  "place": "village",
+  "lat": 40.9892751,
+  "lon": 21.420434,
+  "inBBox": false
+ },
+ {
+  "name": "Орехово",
+  "nameEn": "Orehovo",
+  "place": "village",
+  "lat": 40.983211,
+  "lon": 21.3112481,
+  "inBBox": false
+ },
+ {
+  "name": "Поешево",
+  "nameEn": "Poeshevo",
+  "place": "village",
+  "lat": 41.0156354,
+  "lon": 21.3912504,
+  "inBBox": false
+ },
+ {
+  "name": "Раштани",
+  "nameEn": "Rashtani",
+  "place": "village",
+  "lat": 41.0527075,
+  "lon": 21.3254259,
+  "inBBox": true
+ },
+ {
+  "name": "Ротино",
+  "nameEn": "Rotino",
+  "place": "village",
+  "lat": 41.0569385,
+  "lon": 21.2107975,
+  "inBBox": false
+ },
+ {
+  "name": "Снегово",
+  "nameEn": "Snegovo",
+  "place": "locality",
+  "lat": 41.069741,
+  "lon": 21.2930418,
+  "inBBox": false
+ },
+ {
+  "name": "Српци",
+  "nameEn": "Srpci",
+  "place": "village",
+  "lat": 41.0859259,
+  "lon": 21.2109438,
+  "inBBox": false
+ },
+ {
+  "name": "Стара чаршија",
+  "nameEn": "Old Bazaar",
+  "place": "quarter",
+  "lat": 41.0320472,
+  "lon": 21.3369376,
+  "inBBox": true
+ },
+ {
+  "name": "Старо Змирново",
+  "nameEn": "Staro Zmirnovo",
+  "place": "locality",
+  "lat": 41.0963551,
+  "lon": 21.2926421,
+  "inBBox": false
+ },
+ {
+  "name": "Старо Село",
+  "nameEn": "Staro Selo",
+  "place": "locality",
+  "lat": 40.9632563,
+  "lon": 21.3503506,
+  "inBBox": false
+ },
+ {
+  "name": "Тепсија",
+  "nameEn": "Tepsija",
+  "place": "locality",
+  "lat": 41.0344498,
+  "lon": 21.3243649,
+  "inBBox": true
+ },
+ {
+  "name": "Тотенборг",
+  "nameEn": "Totenborg",
+  "place": "locality",
+  "lat": 41.0354729,
+  "lon": 21.3179253,
+  "inBBox": true
+ },
+ {
+  "name": "Трн",
+  "nameEn": "Trn",
+  "place": "village",
+  "lat": 41.0720788,
+  "lon": 21.4119576,
+  "inBBox": false
+ },
+ {
+  "name": "Трново",
+  "nameEn": "Trnovo",
+  "place": "village",
+  "lat": 41.0428367,
+  "lon": 21.2466178,
+  "inBBox": false
+ },
+ {
+  "name": "Ушици",
+  "nameEn": "Ushici",
+  "place": "neighbourhood",
+  "lat": 41.0403689,
+  "lon": 21.3418599,
+  "inBBox": true
+ }
+]
