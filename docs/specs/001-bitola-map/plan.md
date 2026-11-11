@@ -32,26 +32,32 @@ public/data/  terrain.bin  buildings.bin  roads.bin  lines.bin  areas.bin  trees
 | згради | една споена геометрија, групи ѕид/покрив | вертекс бои (`recolor`), материјали |
 | светла / магла | DirectionalLight (сенки) + HemisphereLight | параметри |
 
-## Систем за стилови (фаза 2 — нацрт)
+## Систем за стилови (спроведен во фаза 2)
+
+Интерфејсот е опишан во `src/styles/index.js`. Секој стил е податочен објект + неколку функции:
 
 ```js
-// styles/<id>.js
+// src/styles/<id>.js
 export default {
-  id, name,                     // „Разгледница“…
-  palette: {...},               // бои на површини, згради, улици
-  geometry: { roofs: 'flat' | 'pitched' | 'lowpoly', trees: 'round' | 'lowpoly' },
-  createMaterials(ctx),         // материјали/шејдери
-  lights(ctx), fog, sky,
-  post(ctx),                    // пост-процесирање (EffectComposer passes)
-  dispose(),
+  id, name, tagline, swatch,             // „razglednica“, „Разгледница“, …
+  geometry: { roofs: 'flat' | 'gabled' },
+  ground: { painter: 'flat' | 'watercolor', base, areas: {...}, washes?, outline? },
+  roads: {...}, rail: [..], water, buildings: { класа: [ѕид, покрив], roofAlt?, variation, ao },
+  sky, fog, light: { sun, hemi, shadow, toneMapping, exposure }, ui: { paper },
+  materials(ctx) → { terrain, skirt, walls, roofs, roads, rail, water },
+  post(ctx)?     → { before: Pass[], after: Pass[] },   // before = HDR (AO, DOF), after = sRGB (хартија)
+  update(ctx, post)?                                     // по кадар (фокус на DOF, радиус на AO)
 };
 ```
 
-Менаџерот на стилови: споредува `geometry` со тековниот стил → пресоздава само слоевите што се
-разликуваат (со анимација на премин), а за останатите повикува `recolor/restyle`.
+`src/styles/manager.js` при смена: (1) снимка на тековниот кадар во `#fade` за претопување;
+(2) ако `geometry.roofs` се разликува — нова геометрија на зградите (кеш на десктоп) и анимација
+„растење“; (3) нови материјали (додатоци: `withGrow`, `withContours`, `withLayers`), старите се
+ослободуваат; (4) бои по теме и ново цртање на подлогата; (5) светла, магла, небо, tone mapping;
+(6) нови пост-пасови; (7) тема на интерфејсот преку `html[data-style]`.
 
 ## Ризици
 
-- **Покриеност на OSM згради** (4.5 k) — предлог: дополнување од Overture/Microsoft (види NOTES).
+- ~~Покриеност на OSM згради~~ — решено со Overture/Microsoft (20.5 k згради).
 - Меморија на iOS: текстурата на подлогата (4096² = 64 MB) → мобилниот профил користи 2048².
 - Проценка на висини е груба — знаменитостите и Широк Сокак ќе се моделираат рачно.

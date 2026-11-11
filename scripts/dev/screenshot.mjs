@@ -3,7 +3,7 @@
 // мери време и FPS и прави screenshot-ови.
 //
 //   node scripts/dev/screenshot.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
-//        [--mobile] [--views home,center] [--scale 1]
+//        [--mobile] [--views home,center] [--scale 1] [--style razglednica|maketa] [--clean]
 //
 // Забелешка: headless Chromium рендерира софтверски (SwiftShader) —
 // FPS бројките се многу пониски од вистински GPU; корисни се само за споредба.
@@ -47,7 +47,10 @@ page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));
 page.on('pageerror', (e) => logs.push(`[pageerror] ${e.message}`));
 
 const t0 = Date.now();
-await page.goto(url + (url.includes('?') ? '&' : '?') + 'debug');
+const u = new URL(url);
+if (!has('clean')) u.searchParams.set('debug', ''); // --clean = без debug панел
+if (opt('style')) u.hash = `style=${opt('style')}`;
+await page.goto(u.toString());
 await page.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
 const wall = Date.now() - t0;
 
@@ -59,7 +62,7 @@ for (const v of views) {
     }, VIEWS[v]);
   }
   await page.waitForTimeout(2500);
-  const file = `${out}/${mobile ? 'mobile-' : ''}${v}.png`;
+  const file = `${out}/${mobile ? 'mobile-' : ''}${opt('style') ? opt('style') + '-' : ''}${v}.png`;
   await page.screenshot({ path: file, timeout: 180000 });
   console.log(`screenshot: ${file}`);
 }
