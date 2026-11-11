@@ -370,4 +370,92 @@ function fildzan(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan };
+// ───────────────────────── Кај авионите ─────────────────────────
+// Изложени млазни ловци со стреловидни крила (стилизирани по F-86), секој на рамно тревно
+// плато со кружна патека. Позициите се од OSM (parts), насоката и големината на кругот — opts.planes.
+
+/** Рамна плоча по многуаголник во (u, v) со дебелина t, легната хоризонтално на висина y. */
+function flatPlate(kit, pts, y, t, part) {
+  const shape = new THREE.Shape(pts.map(([u, v]) => new THREE.Vector2(u, -v)));
+  const g = new THREE.ExtrudeGeometry(shape, { depth: t, bevelEnabled: false });
+  g.rotateX(-Math.PI / 2); // (u, -v, z) → (u, z, v)
+  kit.add(g, Kit.at(0, y, 0), part);
+}
+
+/** Вертикална перка во рамнината (u, y), дебелина t по v. */
+function finPlate(kit, pts, t, part) {
+  const shape = new THREE.Shape(pts.map(([u, y]) => new THREE.Vector2(u, y)));
+  const g = new THREE.ExtrudeGeometry(shape, { depth: t, bevelEnabled: false });
+  g.translate(0, 0, -t / 2);
+  kit.add(g, Kit.at(0, 0, 0), part);
+}
+
+/** Млазен ловец во тековната рамка: нос кон +u, должина ~11.5 m, оската на трупот на висина Y. */
+function jet(kit, { radome = false } = {}) {
+  const Y = 1.55;
+  const BODY = 'dome';
+  const WING = 'accent';
+  // труп: профил (радиус по должината, од опашката кон носот), вртен околу оската u
+  const prof = [
+    [0.01, -5.75], [0.42, -5.75], [0.5, -5.2], [0.62, -3.6], [0.74, -1.2], [0.78, 0.8], [0.74, 2.6],
+    [0.66, 4.2], [0.55, 5.3], [0.5, 5.75], [0.01, 5.75],
+  ].map(([r, u]) => new THREE.Vector2(r, u));
+  const body = new THREE.LatheGeometry(prof, 18);
+  body.rotateZ(-Math.PI / 2); // оската y → u
+  kit.add(body, Kit.at(0, Y, 0), BODY);
+  // отвор за воздух во носот (темен) и млазник на опашката
+  kit.add(new THREE.CylinderGeometry(0.42, 0.42, 0.06, 16).rotateZ(Math.PI / 2), Kit.at(5.76, Y, 0), 'metal');
+  kit.add(new THREE.CylinderGeometry(0.36, 0.36, 0.06, 12).rotateZ(Math.PI / 2), Kit.at(-5.76, Y, 0), 'metal');
+  if (radome) {
+    // Ф-86Д: радарски нос над отворот (карактеристичната „муцка“)
+    kit.add(new THREE.SphereGeometry(0.34, 12, 8), Kit.at(5.65, Y + 0.3, 0, 0, 1.9, 0.75, 0.9), 'metal');
+  }
+  // кабина: издолжена „капка“ над трупот, пред крилата
+  kit.add(new THREE.SphereGeometry(0.5, 14, 8), Kit.at(2.6, Y + 0.55, 0, 0, 2.1, 0.95, 0.85), 'water');
+  // крила: стреловидни (~35°), ниско на трупот
+  flatPlate(kit, [[1.5, 0], [-2.2, 5.65], [-3.4, 5.65], [-1.6, 0.5], [-1.6, -0.5], [-3.4, -5.65], [-2.2, -5.65]], Y - 0.42, 0.16, WING);
+  // хоризонтална и вертикална опашка
+  flatPlate(kit, [[-3.9, 0], [-5.0, 2.0], [-5.75, 2.0], [-5.4, 0.3], [-5.4, -0.3], [-5.75, -2.0], [-5.0, -2.0]], Y + 0.12, 0.1, WING);
+  finPlate(kit, [[-3.5, Y + 0.45], [-5.15, Y + 2.65], [-5.85, Y + 2.65], [-5.7, Y + 0.3]], 0.12, WING);
+  // стајни трапови: нос и два главни, со тркала
+  for (const [u, v, len] of [[3.9, 0, Y - 0.25], [-0.9, 1.35, Y - 0.6], [-0.9, -1.35, Y - 0.6]]) {
+    kit.cylinder(u, 0.32, v, 0.07, len, 'metal', { seg: 5 });
+    kit.add(new THREE.CylinderGeometry(0.32, 0.32, 0.2, 10).rotateX(Math.PI / 2), Kit.at(u, 0.32, v), 'metal');
+  }
+}
+
+function jets(kit, item, ctx) {
+  for (const p of item.opts.planes || []) {
+    const part = item.parts?.[p.part];
+    if (!part) continue;
+    const [x, z] = part.center;
+    const R = p.pad || 8;
+    // рамно плато (мала тераса): горе над највисоката точка на теренот во кругот, така што
+    // падината не го покрива; искосениот раб се спушта до теренот на пониската страна
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const r of [0, R * 0.5, R + 0.3, R + 2.8]) {
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * TAU;
+        const g = ctx.hf.sample(x + Math.cos(a) * r, z + Math.sin(a) * r);
+        lo = Math.min(lo, g);
+        if (r <= R + 0.3) hi = Math.max(hi, g);
+      }
+    }
+    const top = hi + 0.1;
+    kit.setFrame(x, lo - 0.6, z);
+    kit.cylinder(0, 0, 0, R + 2.8, top - lo + 0.6, 'green', { top: R + 0.3, seg: 36 });
+    // кружна патека (утабана земја) и подлога под авионот
+    kit.add(new THREE.TorusGeometry(R - 0.5, 0.45, 4, 40), Kit.atE(0, top - lo + 0.6, 0, Math.PI / 2, 0, 0, 1, 1, 0.12), 'paving');
+    // авионот, свртен по heading (степени од север, во насока на стрелките)
+    const h = ((p.heading || 0) * Math.PI) / 180;
+    kit.setFrame(x, top, z, Math.sin(h), -Math.cos(h));
+    kit.box(0, -0.05, 0, 9, 0.1, 5, 'paving');
+    jet(kit, { radome: p.radome });
+    // мала табла пред авионот
+    kit.box(7.4, 0, -1.6, 0.08, 0.9, 0.08, 'metal');
+    kit.box(7.4, 0.9, -1.6, 0.06, 0.55, 0.9, 'wall', 0);
+  }
+}
+
+export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };
