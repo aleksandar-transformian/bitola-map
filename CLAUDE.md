@@ -39,7 +39,7 @@ gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, fili
 за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa&time=day|sunset|night&view=<id>`.
+`#style=razglednica|maketa|crtan&time=day|sunset|night&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
 Home = преглед, 1–9 = стил, ? = упатство.
 
@@ -67,14 +67,15 @@ src/world/landmarks/     ← kit.js (примитиви → една геоме�
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
-src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js)
+src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
-src/styles/shared/       ← заеднички материјали и шејдер-додатоци (изохипси, слоеви, растење)
+src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ)
 src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass); instrument() за
                            GPU време по пас (perfName), setPixelRatio()/setMsaa() во живо
 src/perf/                ← мерење: gpu-timer.js, perf.js (во живо), bench.js (?bench), report.js
 src/config/perf.js       ← буџети за изведба (референтен уред)
-src/render/passes/       ← сопствени пост-пасови (postcard.js — акварел/хартија, tiltshift.js — минијатура)
+src/render/passes/       ← сопствени пост-пасови (postcard.js — акварел/хартија, tiltshift.js — минијатура,
+                           ink.js — контури од длабочината; композиторот има depthTexture)
 src/app/camera.js        ← камера, MapControls, погледи, лет до поглед, тастатура, динамички near/far
 src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
 src/app/prefs.js         ← поставки во URL hash + localStorage
@@ -131,7 +132,12 @@ models.js`) се градат од примитиви во рамка од OBB �
 ## Git тек
 
 - `develop` — интеграциска гранка (ќе стане default); feature гранките се спојуваат таму.
-- `main` — објавува на GitHub Pages. **Push на `main` само по изречна дозвола од сопственикот.**
+- `main` — објавува на GitHub Pages (`.github/workflows/deploy.yml`, извор „GitHub Actions“):
+  https://aleksandar-transformian.github.io/bitola-map/ — **push на `main` само по изречна
+  дозвола од сопственикот** (дадена за објавата во фаза 4; секоја следна објава — прашај).
+  Околината `github-pages` мора да ја дозволува гранката `main` (Settings → Environments);
+  инаку `deploy` се одбива за 2 s без лог.
+- Лиценца: MIT за кодот (`LICENSE`); податоците ODbL, фонтовите OFL.
 - Спецификации и план: `docs/specs/`; одлуки, бројки и проблеми: `docs/NOTES.md`.
 
 ## Мрежни ограничувања во cloud сесии

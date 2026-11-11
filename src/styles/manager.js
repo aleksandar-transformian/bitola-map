@@ -96,6 +96,8 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     current = style;
     applyLighting();
     pipeline.renderer.toneMapping = TONE[style.light.toneMapping] ?? THREE.NeutralToneMapping;
+    // некои стилови (цртан филм) се без сенки — поевтино и поедноставно
+    lights.sun.castShadow = profile.shadows > 0 && style.light.shadows !== false;
 
     post = style.post?.(ctx) || { before: [], after: [] };
     pipeline.setPasses(post.before, post.after);

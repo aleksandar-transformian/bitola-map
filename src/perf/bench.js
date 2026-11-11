@@ -1,4 +1,4 @@
-// Бенчмарк во прелистувачот: ?bench[=quick|standard|ablation][&frames=120&warmup=45&ms=4000]
+// Бенчмарк во прелистувачот: ?bench[=quick|standard|ablation][&styles=a,b][&frames=120&warmup=45&ms=4000]
 //
 // Ги поминува истите сценарија секој пат (стил × време × поглед + лет низ градот), а потоа
 // „аблација“: го исклучува делот по делот (дрвја, згради, сенки, пост-ефекти, DPR, MSAA) за да се
@@ -11,12 +11,13 @@ import { describeEnv } from './perf.js';
 import { summarize, over } from './stats.js';
 import { checkBudgets, formatReport } from './report.js';
 import { JANK_MS } from '../config/perf.js';
+import { STYLES } from '../styles/index.js';
 
 const SUITES = {
-  // брза проверка: двата стила, дење, преглед и улица + лет
-  quick: { styles: ['razglednica', 'maketa'], day: ['pregled', 'shirok-sokak'], night: [], fly: true, ablation: false },
-  standard: { styles: ['razglednica', 'maketa'], day: ['pregled', 'center', 'shirok-sokak', 'close', 'top'], night: ['pregled', 'shirok-sokak'], fly: true, ablation: true },
-  ablation: { styles: ['razglednica', 'maketa'], day: [], night: [], fly: false, ablation: true },
+  // брза проверка: сите стилови, дење, преглед и улица + лет
+  quick: { day: ['pregled', 'shirok-sokak'], night: [], fly: true, ablation: false },
+  standard: { day: ['pregled', 'center', 'shirok-sokak', 'close', 'top'], night: ['pregled', 'shirok-sokak'], fly: true, ablation: true },
+  ablation: { day: [], night: [], fly: false, ablation: true },
 };
 const ABLATION_VIEW = 'center';
 const FLY = ['pregled', 'center', 'shirok-sokak', 'herakleja'];
@@ -28,7 +29,9 @@ const r2 = (v) => (v == null ? null : Math.round(v * 100) / 100);
 export async function startBench(app) {
   const qs = new URLSearchParams(location.search);
   const suiteId = SUITES[qs.get('bench')] ? qs.get('bench') : 'standard';
-  const suite = SUITES[suiteId];
+  // сите стилови од регистарот (или ?styles=razglednica,crtan)
+  const pick = (qs.get('styles') || '').split(',').filter((id) => STYLES.some((st) => st.id === id));
+  const suite = { ...SUITES[suiteId], styles: pick.length ? pick : STYLES.map((st) => st.id) };
   const params = {
     frames: Number(qs.get('frames')) || 120,
     warmup: Number(qs.get('warmup')) || 45,

@@ -597,3 +597,53 @@ html[data-time='night'] {
 .perf-no-blur #ui * {
   backdrop-filter: none !important;
 }
+
+/* ── „Цртан филм“ ── */
+html[data-style='crtan'] {
+  --ink: #2b2521;
+  --ink-soft: #5a4f47;
+  --paper: rgba(255, 250, 240, 0.95);
+  --paper-solid: #fffaf0;
+  --accent: #ef5b3a;
+  --title-font: 'IBM Plex Sans', system-ui, sans-serif;
+  --title-weight: 500;
+  --title-spacing: 0.02em;
+  --radius: 16px;
+  --shadow: 0 0 0 2px #2b2521, 0 3px 0 2px #2b2521;
+  --label-ink: #2b2521;
+  --label-halo: transparent;
+}
+
+/* натписи во „балончиња“ */
+html[data-style='crtan'] .label span {
+  background: #fffaf0;
+  border: 2px solid #2b2521;
+  border-radius: 999px;
+  padding: 2px 9px 3px;
+  font-size: 13px;
+  text-shadow: none;
+  box-shadow: 0 2px 0 #2b2521;
+  margin-bottom: 4px;
+}
+
+html[data-style='crtan'] .label-landmark span,
+html[data-style='crtan'] .label-landmark2 span {
+  background: #ffd23f;
+  padding-bottom: 3px;
+}
+
+html[data-style='crtan'] .label-village span {
+  background: #d9f1ff;
+}
+
+html[data-style='crtan'] .label-mountain span {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-weight: 600;
+  text-shadow: 0 0 4px #fff, 0 0 8px #fff;
+}
+
+html[data-style='crtan'][data-time='night'] .label span {
+  color: #2b2521;
+}

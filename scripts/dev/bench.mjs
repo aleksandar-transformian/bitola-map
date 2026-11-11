@@ -3,7 +3,7 @@
 // го печати како табела, го снима како JSON и (по желба) го споредува со основа.
 //
 //   node scripts/dev/bench.mjs [--suite quick|standard|ablation] [--url http://127.0.0.1:5173/]
-//        [--gpu] [--uncapped] [--mobile] [--width 720 --height 450 --scale 1]  (со --gpu: 1440×900)
+//        [--styles razglednica,crtan] [--gpu] [--uncapped] [--mobile] [--width 720 --height 450 --scale 1]  (со --gpu: 1440×900)
 //        [--frames N --warmup N --ms N] [--out docs/perf/results] [--label име]
 //        [--baseline docs/perf/baseline-swiftshader.json] [--check]
 //   node scripts/dev/bench.mjs --compare стар.json нов.json [--check]
@@ -72,6 +72,7 @@ page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 
 const u = new URL(opt('url', 'http://127.0.0.1:5173/'));
 u.searchParams.set('bench', suite);
+if (opt('styles')) u.searchParams.set('styles', opt('styles'));
 if (frames) u.searchParams.set('frames', frames);
 if (warmup) u.searchParams.set('warmup', warmup);
 if (ms) u.searchParams.set('ms', ms);

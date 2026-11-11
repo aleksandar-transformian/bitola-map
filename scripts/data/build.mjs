@@ -765,7 +765,10 @@ function roofShape(t) {
     if (L.at) {
       // рачна позиција (WGS84) — има предност пред OSM (на пр. точна локација од сопственикот)
       const [x, z] = proj.toXZ(L.at.lat, L.at.lon);
-      if (item.polys) {
+      if (L.inside) {
+        // „inside“: основата е двор/парцела — не се поместува; at ја посочува самата зграда
+        item.pick = [+x.toFixed(2), +z.toFixed(2)];
+      } else if (item.polys) {
         // помести ја основата заедно со центарот
         const dx = x - item.center[0];
         const dz = z - item.center[1];
