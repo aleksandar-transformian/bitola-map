@@ -45,7 +45,7 @@ export function createWorld(data, profile, env) {
   buildings.receiveShadow = true;
 
   // Знаменитостите се градат пред зградите: тие одлучуваат кои згради се заменуваат.
-  const lm = buildLandmarks(data.landmarks, data.buildings, hf);
+  const lm = buildLandmarks(data.landmarks, data.buildings, hf, data.lines);
   const landmarks = new THREE.Mesh(lm.geometry, PLACEHOLDER);
   landmarks.name = 'landmarks';
   landmarks.castShadow = true;

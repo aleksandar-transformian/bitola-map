@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Проверка на интерфејсот: смена на стил и време од денот во живо, #style= / #time= во URL,
-// памтење во localStorage, брзи погледи, тастатура и натписи.
+// памтење во localStorage, брзи погледи, глувче, тастатура и натписи.
 //   node scripts/dev/check-styles.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
 
 import { createRequire } from 'node:module';
@@ -30,6 +30,38 @@ const check = (name, ok, detail = '') => {
 await page.goto(url + '#style=razglednica');
 await ready();
 check('почеток со #style=razglednica', (await page.evaluate(() => document.documentElement.dataset.style)) === 'razglednica');
+
+// Упатство: само при првата посета, се затвора со копче.
+check('упатството при првата посета', await page.isVisible('.help'));
+await page.click('.help-close');
+check('упатството се затвора', !(await page.isVisible('.help')));
+await page.click('.help-btn');
+check('копче ? го отвора упатството', await page.isVisible('.help'));
+await page.keyboard.press('Escape');
+
+// „Оди до…“: знаменитостите се во листата, по групи.
+const opts = await page.evaluate(() => [...document.querySelectorAll('.panel select optgroup')].map((g) => `${g.label} (${g.children.length})`));
+check('листа „Оди до…“ со групи', opts.length >= 5, opts.join(', '));
+
+// Глувче: средината на екранот мора да е canvas-от (ништо не смее да ги „голта“ настаните).
+const hit = await page.evaluate(() => document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.tagName);
+check('средината на екранот е мапата', hit === 'CANVAS', hit);
+const before = await page.evaluate(() => window.__bitolaApp.getView());
+await page.mouse.move(500, 380);
+await page.mouse.down();
+await page.mouse.move(380, 330, { steps: 6 });
+await page.mouse.up();
+await page.mouse.wheel(0, -600);
+await page.waitForFunction((b) => {
+  const v = window.__bitolaApp.getView();
+  return Math.hypot(v.target.x - b.target.x, v.target.z - b.target.z) > 20 && v.distance < b.distance * 0.97;
+}, before, { timeout: 60000, polling: 300 }).catch(() => {});
+const after = await page.evaluate(() => window.__bitolaApp.getView());
+check(
+  'влечење и тркалце ја движат камерата',
+  Math.hypot(after.target.x - before.target.x, after.target.z - before.target.z) > 20 && after.distance < before.distance * 0.97,
+  `цел помесна ${Math.hypot(after.target.x - before.target.x, after.target.z - before.target.z).toFixed(0)} m, растојание ${before.distance.toFixed(0)} → ${after.distance.toFixed(0)} m`,
+);
 
 // Смена преку копчето (со анимација) — снимка среде премин.
 await page.click('.style-picker button[data-id="maketa"]');
@@ -62,7 +94,7 @@ await page.waitForTimeout(2500);
 check('hashchange → зајдисонце', (await page.evaluate(() => document.documentElement.dataset.time)) === 'sunset');
 
 // Брз поглед: лет до Хераклеа.
-await page.click('.view-bar button[data-id="herakleja"]');
+await page.selectOption('.panel select', 'herakleja');
 // летот е временски (1.8 s), но софтверското рендерирање е бавно — чекај да заврши
 await page
   .waitForFunction(() => {
@@ -86,6 +118,17 @@ check('тастер Q ротира', Math.abs(((b1 - b0 + 540) % 360) - 180 + 12
 // Натписи: на близина само знаменитости.
 const labels = await page.evaluate(() => [...document.querySelectorAll('.label.on')].map((e) => e.textContent));
 check('натпис Хераклеа', labels.includes('Хераклеа Линкестис'), labels.join(', '));
+
+// „Оди до…“ знаменитост: Битолскиот филџан.
+await page.selectOption('.panel select', 'fildzan');
+await page
+  .waitForFunction(() => {
+    const v = window.__bitolaApp.getView();
+    return Math.hypot(v.target.x + 1584, v.target.z + 263) < 5;
+  }, null, { timeout: 90000, polling: 500 })
+  .catch(() => {});
+const vf = await page.evaluate(() => window.__bitolaApp.getView());
+check('Оди до → Битолскиот филџан', Math.hypot(vf.target.x + 1584, vf.target.z + 263) < 5, `цел ${vf.target.x.toFixed(0)}, ${vf.target.z.toFixed(0)}`);
 
 // „Превчитување“ без hash → од localStorage (нова страница во истиот контекст;
 // старата се затвора за софтверското рендерирање да не ја блокира навигацијата).

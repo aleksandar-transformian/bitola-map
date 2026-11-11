@@ -66,6 +66,12 @@ body {
   pointer-events: auto;
 }
 
+/* слојот со натписите е преку цел екран — мора да ги пропушта глувчето и допирот до мапата */
+#ui > .labels,
+#ui > .labels * {
+  pointer-events: none;
+}
+
 .title {
   position: absolute;
   top: max(14px, env(safe-area-inset-top));
@@ -202,8 +208,7 @@ body {
 }
 
 .style-picker,
-.time-toggle,
-.view-bar {
+.panel {
   display: flex;
   gap: 4px;
   padding: 4px;
@@ -216,8 +221,8 @@ body {
 }
 
 .style-picker button,
-.view-bar button,
-.time-toggle button {
+.time-toggle button,
+.help-btn {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -232,10 +237,6 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 
-.view-bar button {
-  padding: 8px 12px;
-}
-
 .time-toggle button {
   padding: 7px;
 }
@@ -248,22 +249,23 @@ body {
 }
 
 .style-picker button:hover,
-.view-bar button:hover,
-.time-toggle button:hover {
+.time-toggle button:hover,
+.help-btn:hover {
   color: var(--ink);
   background: rgba(0, 0, 0, 0.04);
 }
 
 .style-picker button[aria-checked='true'],
 .time-toggle button[aria-checked='true'],
-.view-bar button.active {
+.help-btn[aria-expanded='true'] {
   color: var(--ink);
   background: rgba(0, 0, 0, 0.07);
 }
 
 .style-picker button:focus-visible,
-.view-bar button:focus-visible,
-.time-toggle button:focus-visible {
+.time-toggle button:focus-visible,
+.help-btn:focus-visible,
+.panel select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
@@ -298,14 +300,6 @@ body {
   .attribution {
     font-size: 10px;
   }
-}
-
-/* ── Брзи погледи ── */
-.view-bar {
-  position: absolute;
-  top: max(14px, env(safe-area-inset-top));
-  right: max(16px, env(safe-area-inset-right));
-  max-width: calc(100vw - 260px);
 }
 
 /* ── Натписи ── */
@@ -353,7 +347,8 @@ body {
   opacity: 0.8;
 }
 
-.label-landmark span {
+.label-landmark span,
+.label-landmark2 span {
   font-size: 13px;
   font-weight: 500;
   padding-bottom: 10px;
@@ -370,7 +365,8 @@ html[data-style='razglednica'] .label span {
   font-size: 18px;
 }
 
-html[data-style='razglednica'] .label-landmark span {
+html[data-style='razglednica'] .label-landmark span,
+html[data-style='razglednica'] .label-landmark2 span {
   font-size: 16px;
 }
 
@@ -391,17 +387,146 @@ html[data-time='night'] {
   --label-halo: rgba(10, 14, 28, 0.85);
 }
 
+
+.label-landmark2 span {
+  opacity: 0.88;
+}
+
+/* ── Мени горе десно: Оди до… / време / помош ── */
+.panel {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+}
+
+.time-toggle {
+  display: flex;
+  gap: 2px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.panel select {
+  appearance: none;
+  -webkit-appearance: none;
+  font: 500 14px/1 var(--font);
+  color: var(--ink);
+  background: rgba(0, 0, 0, 0.05)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23776' stroke-width='1.6' fill='none'/%3E%3C/svg%3E")
+    no-repeat right 10px center / 11px 8px;
+  border: 0;
+  border-radius: var(--radius);
+  padding: 9px 30px 9px 12px;
+  min-width: 210px;
+  max-width: 280px;
+  cursor: pointer;
+}
+
+.panel select:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.help-btn {
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0 !important;
+  font: 600 16px/1 var(--font) !important;
+}
+
+.help {
+  position: absolute;
+  top: max(66px, calc(env(safe-area-inset-top) + 62px));
+  right: max(16px, env(safe-area-inset-right));
+  width: min(340px, calc(100vw - 32px));
+  max-height: calc(100vh - 180px);
+  overflow: auto;
+  background: var(--paper);
+  backdrop-filter: blur(8px);
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow: var(--shadow);
+  padding: 14px 18px 16px;
+  font: 13.5px/1.45 var(--font);
+  color: var(--ink);
+}
+
+.help h2 {
+  margin: 0 0 8px;
+  font: var(--title-weight) 17px/1.2 var(--title-font);
+  letter-spacing: 0.02em;
+}
+
+.help dl {
+  margin: 0;
+}
+
+.help dt {
+  margin-top: 8px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.help dd {
+  margin: 2px 0 0;
+}
+
+.help kbd {
+  display: inline-block;
+  min-width: 1.4em;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.07);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+  font: 500 12px/1.6 var(--font);
+  text-align: center;
+}
+
+.help p {
+  margin: 10px 0 12px;
+  color: var(--ink-soft);
+}
+
+.help-close {
+  border: 0;
+  background: var(--accent);
+  color: #fff;
+  font: 500 13px/1 var(--font);
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
 @media (max-width: 760px) {
-  /* погледите под насловот, низ целата ширина (со лизгање) */
-  .view-bar {
+  /* менито под насловот, низ целата ширина */
+  .panel {
     left: 12px;
     right: 12px;
-    max-width: none;
     top: max(84px, calc(env(safe-area-inset-top) + 80px));
   }
-  .view-bar button {
-    font-size: 13px;
-    padding: 7px 10px;
-    white-space: nowrap;
+  .panel .go {
+    flex: 1;
+    min-width: 0;
+  }
+  .panel select {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    font-size: 15px;
+  }
+  .help {
+    top: max(136px, calc(env(safe-area-inset-top) + 132px));
+    right: 12px;
   }
 }

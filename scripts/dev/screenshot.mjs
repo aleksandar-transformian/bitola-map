@@ -5,6 +5,7 @@
 //   node scripts/dev/screenshot.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
 //        [--mobile] [--views home,center] [--scale 1] [--style razglednica|maketa] [--time day|sunset|night] [--clean]
 //        погледи: home, center, close, west, top + брзите погледи (pregled, shirok-sokak, charshija, …)
+//                 + lm-<id> за секоја знаменитост (config/landmarks.js)
 //
 // Забелешка: headless Chromium рендерира софтверски (SwiftShader) —
 // FPS бројките се многу пониски од вистински GPU; корисни се само за споредба.
@@ -12,6 +13,7 @@
 import { createRequire } from 'node:module';
 import { mkdir } from 'node:fs/promises';
 import { VIEWS as APP_VIEWS } from '../../src/config/views.js';
+import { readFileSync } from 'node:fs';
 
 const require = createRequire(import.meta.url);
 const { chromium, devices } = require('playwright');
@@ -40,13 +42,27 @@ const VIEWS = {
   // крупни планови на знаменитостите
   saat: { target: { x: -40, z: -20 }, bearing: 215, polar: 62, distance: 170 },
   dimitrija: { target: { x: -82, z: 68 }, bearing: 140, polar: 58, distance: 160 },
+  filip: { target: { x: -18, z: 38 }, bearing: 135, polar: 64, distance: 85 },
 };
+
+// lm-<id> = поглед кон знаменитост од public/data/landmarks.json (растојание по големина)
+const LMS = JSON.parse(readFileSync('public/data/landmarks.json', 'utf8'));
+for (const lm of LMS) {
+  const big = { stadium: 420, warCemetery: 380, fortress: 300, monastery: 300, totenburg: 200, heraclea: 380, promenade: 420 }[lm.model] || 150;
+  VIEWS[`lm-${lm.id}`] = { target: { x: lm.center[0], z: lm.center[1] }, bearing: 200, polar: 58, distance: big };
+}
 
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const context = mobile
   ? await browser.newContext({ ...devices['iPhone 13'] })
   : await browser.newContext({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: scale });
+// упатството при првата посета не е потребно на сликите
+await context.addInitScript(() => {
+  try {
+    localStorage.setItem('bitola.helpSeen', '1');
+  } catch {}
+});
 const page = await context.newPage();
 const logs = [];
 page.on('console', (m) => logs.push(`[${m.type()}] ${m.text()}`));

@@ -10,6 +10,7 @@ const RANGE = {
   village: [1800, Infinity],
   quarter: [500, 9000],
   landmark: [0, 2800],
+  landmark2: [0, 1500], // помалку важните знаменитости — само на поблизок зум
 };
 
 export function createLabels(root, items) {
@@ -36,7 +37,7 @@ export function createLabels(root, items) {
   document.fonts?.ready.then(measure);
 
   let obstacleEls = null;
-  const obstacles = () => (obstacleEls ||= [...document.querySelectorAll('.title, .view-bar, .dock, .attribution')]);
+  const obstacles = () => (obstacleEls ||= [...document.querySelectorAll('.title, .panel, .help, .dock, .attribution')]);
   const v = new THREE.Vector3();
   const placed = [];
   return {
@@ -46,6 +47,7 @@ export function createLabels(root, items) {
       placed.length = 0;
       // панелите на интерфејсот се пречки за натписите
       for (const el of obstacles()) {
+        if (el.hidden) continue;
         const r = el.getBoundingClientRect();
         if (r.width) placed.push([r.left, r.top, r.right, r.bottom]);
       }
@@ -90,10 +92,17 @@ export function collectLabels({ pois, landmarks, hf, rect, placeRank, placeSkip,
     if (!inside(e.x, e.z)) continue;
     out.push({ ...e, y: hf.sample(e.x, e.z) + (e.lift ?? 25) });
   }
-  const H = { clockTower: 36, mosque: 30, church: 30, officersHome: 22, bezisten: 14, square: 10, promenade: 16, heraclea: 10 };
+  // висина на натписот над подлогата, по модел
+  const H = {
+    clockTower: 36, mosque: 30, church: 30, officersHome: 22, publicBuilding: 22, bezisten: 14, square: 10, promenade: 16,
+    heraclea: 10, equestrian: 17, stoneTower: 18, station: 16, stadium: 36, fortress: 14, totenburg: 14, warCemetery: 18,
+    monastery: 22, fildzan: 9,
+  };
   for (const lm of landmarks) {
+    if (lm.label === false) continue;
     const [x, z] = lm.center;
-    out.push({ name: lm.name, x, z, y: (lm.ground?.mean ?? hf.sample(x, z)) + (H[lm.model] ?? 15), rank: 0, kind: 'landmark' });
+    const rank = lm.rank ?? 0;
+    out.push({ name: lm.name, x, z, y: (lm.ground?.mean ?? hf.sample(x, z)) + (H[lm.model] ?? 15), rank, kind: rank ? 'landmark2' : 'landmark' });
   }
   return out;
 }

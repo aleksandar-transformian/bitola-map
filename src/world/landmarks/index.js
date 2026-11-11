@@ -3,14 +3,18 @@
 import * as THREE from 'three';
 import { Kit, PARTS } from './kit.js';
 import { MODELS } from './models.js';
+import { EXTRA_MODELS } from './extra.js';
+
+const ALL = { ...MODELS, ...EXTRA_MODELS };
 
 /**
  * @param {object[]} items  landmarks.json
  * @param {object} buildings  buildings.bin (пакет)
  * @param {import('../heightfield.js').Heightfield} hf
+ * @param {object} [lines] lines.bin (пругата — за перонот на станицата)
  * @returns {{ geometry: THREE.BufferGeometry, skip: Set<number>, items: object[] }}
  */
-export function buildLandmarks(items, buildings, hf) {
+export function buildLandmarks(items, buildings, hf, lines) {
   const skip = new Set();
   // OSM зградите што се заменуваат со модел
   const byOsm = new Map();
@@ -19,9 +23,19 @@ export function buildLandmarks(items, buildings, hf) {
   for (const it of items) if (it.osmId && byOsm.has(it.osmId)) skip.add(byOsm.get(it.osmId));
 
   const kit = new Kit();
-  const ctx = { hf, buildings, skip };
+  const rails = [];
+  if (lines) {
+    const { railLinePt, railCoords } = lines.arrays;
+    const q = lines.meta.q;
+    for (let l = 0; l < lines.meta.rail; l++) {
+      const pts = [];
+      for (let i = railLinePt[l]; i < railLinePt[l + 1]; i++) pts.push([railCoords[i * 2] * q, railCoords[i * 2 + 1] * q]);
+      rails.push(pts);
+    }
+  }
+  const ctx = { hf, buildings, skip, rails, items };
   for (const it of items) {
-    const model = MODELS[it.model];
+    const model = ALL[it.model];
     if (!model) continue;
     kit.setFrame(0, 0, 0);
     try {

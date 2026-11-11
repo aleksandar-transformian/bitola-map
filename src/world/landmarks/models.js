@@ -174,26 +174,69 @@ function bezisten(kit, item) {
   for (const s of [-1, 1]) kit.box((s * f.L) / 2, -7.5, 0, 0.4, 6.5, 3.2, 'stone');
 }
 
-// ───────────────────────── Офицерски дом ─────────────────────────
-function officersHome(kit, item) {
-  const ring = item.polys[0][0];
-  const g = item.ground.mean;
-  const top = g + 13.5;
-  kit.slab([ring], item.ground.min - 0.5, g + 1.2, 'stone');
-  kit.slab([ring], g + 1.2, top, 'wall2');
-  kit.slab([grow(ring, 0.45)], top, top + 0.7, 'accent');
-  kit.windows(ring, [{ y: g + 2.2, h: 2.2 }, { y: g + 6.2, h: 2.4 }, { y: g + 10.2, h: 1.9 }], { spacing: 3.2, width: 1.2 });
+// ───────────────────────── Јавни згради ─────────────────────────
+// opts: height, floors, part ('wall'|'wall2'), roof ('hip'|'flat'|'tiles'), attic, flag, band.
+// item.inside = основата е двор/парцела → моделот е врз најголемата зграда во неа.
+export function publicBuilding(kit, item, ctx, defaults = {}) {
+  const o = { height: 13, floors: 3, part: 'wall2', roof: 'hip', ...defaults, ...item.opts };
+  let rings = item.polys[0];
+  let g = item.ground.mean;
+  let gmin = item.ground.min;
+  if (item.inside) {
+    const hit = largestInside(ctx, rings[0]);
+    if (!hit) return;
+    ctx.skip.add(hit.b);
+    rings = hit.shape.rings;
+    g = hit.shape.gmean;
+    gmin = hit.shape.gmin;
+  }
+  const ring = rings[0];
+  const top = g + o.height;
+  kit.slab(rings, gmin - 0.5, g + 1.2, 'stone');
+  kit.slab(rings, g + 1.2, top, o.part);
+  kit.slab([grow(ring, 0.45), ...rings.slice(1)], top, top + 0.7, 'accent');
+  const floorH = (o.height - 1.6) / o.floors;
+  const floors = [];
+  for (let k = 0; k < o.floors; k++) floors.push({ y: g + 2 + k * floorH, h: Math.min(2.4, floorH * 0.62) });
+  for (const r of rings) kit.windows(r, floors, { spacing: o.band ? 2.2 : 3.2, width: o.band ? 1.9 : 1.2 });
   const f = obb(ring);
   kit.setFrame(f.cx, top + 0.7, f.cz, f.ax, f.az);
-  kit.hip(0, 0, 0, f.L * 0.92, 4.2, f.W * 0.86, 'roof');
-  // централен атик со знаме
-  kit.box(0, 0, 0, Math.min(10, f.L * 0.3), 2.6, f.W * 0.5, 'wall2');
-  kit.box(0, 2.6, 0, Math.min(10.6, f.L * 0.32), 0.4, f.W * 0.52, 'accent');
-  kit.cylinder(0, 3, 0, 0.06, 5, 'metal', { seg: 5 });
+  if (o.roof === 'hip') kit.hip(0, 0, 0, f.L * 0.92, Math.min(5, f.W * 0.3), f.W * 0.86, 'roof');
+  else if (o.roof === 'tiles') kit.slab(rings, top + 0.7, top + 1.5, 'roof');
+  else kit.box(0, 0, 0, f.L * 0.5, 1.2, f.W * 0.4, 'stone'); // машинска просторија на рамниот покрив
+  if (o.attic) {
+    kit.box(0, 0, 0, Math.min(10, f.L * 0.3), 2.6, f.W * 0.5, o.part);
+    kit.box(0, 2.6, 0, Math.min(10.6, f.L * 0.32), 0.4, f.W * 0.52, 'accent');
+  }
+  if (o.flag) kit.cylinder(0, o.attic ? 3 : 1.2, 0, 0.06, 5, 'metal', { seg: 5 });
+}
+
+function officersHome(kit, item, ctx) {
+  publicBuilding(kit, item, ctx, { height: 13.5, floors: 3, part: 'wall2', roof: 'hip', attic: true, flag: true });
+}
+
+/** Најголемата зграда (од buildings.bin) чиј центар е во прстенот. */
+export function largestInside(ctx, ring) {
+  const pack = ctx.buildings;
+  const q = pack.meta.q;
+  const [cx, cz] = ringCentroid(ring);
+  let best = null;
+  for (let b = 0; b < pack.meta.count; b++) {
+    const r0 = pack.arrays.ringPt[pack.arrays.polyRing[b]];
+    const x = pack.arrays.coords[r0 * 2] * q;
+    const z = pack.arrays.coords[r0 * 2 + 1] * q;
+    if (Math.abs(x - cx) > 400 || Math.abs(z - cz) > 400) continue;
+    const shape = buildingShape(pack, b);
+    const c = ringCentroid(shape.rings[0]);
+    if (!pointInRing(c, ring)) continue;
+    const a = Math.abs(ringArea(shape.rings[0]));
+    if (!best || a > best.a) best = { b, a, shape };
+  }
+  return best;
 }
 
 /** Прстен „надуен“ од центарот за d метри (приближно — за корнизи). */
-function grow(ring, d) {
+export function grow(ring, d) {
   const [cx, cz] = ringCentroid(ring);
   return ring.map(([x, z]) => {
     const dx = x - cx;
@@ -203,49 +246,52 @@ function grow(ring, d) {
   });
 }
 
-// ───────────────────────── Св. Димитрија ─────────────────────────
+// ───────────────────────── Цркви ─────────────────────────
+// opts: wallH, dome (true), tower ('west' | 'front' | 'none'), towerH, spire (шилест врв).
 function church(kit, item) {
-  const ring = item.polys[0][0];
-  const g = item.ground.mean;
-  const top = g + 10;
-  kit.slab([ring], item.ground.min - 0.5, top, 'wall');
-  kit.windows(ring, [{ y: g + 2.5, h: 2.6 }, { y: g + 6.6, h: 2 }], { spacing: 3.6, width: 1 });
+  churchOn(kit, item.polys[0][0], item.ground.mean, item.ground.min, item.opts);
+}
+
+export function churchOn(kit, ring, g, gmin, opts = {}) {
+  const o = { wallH: 10, dome: true, tower: 'west', towerH: 26, spire: false, ...opts };
+  const top = g + o.wallH;
+  kit.slab([ring], gmin - 0.5, top, 'wall');
+  const rows = o.wallH > 7 ? [{ y: g + 2.5, h: o.wallH * 0.26 }, { y: g + o.wallH * 0.66, h: o.wallH * 0.2 }] : [{ y: g + 2, h: 1.8 }];
+  kit.windows(ring, rows, { spacing: 3.6, width: 1 });
   const f = obb(ring);
   kit.setFrame(f.cx, top, f.cz, f.ax, f.az);
   kit.box(0, 0, 0, f.L * 0.97, 0.4, f.W * 0.97, 'stone');
   kit.gable(0, 0.4, 0, f.L * 0.94, Math.min(7, f.W * 0.33), f.W * 0.94, 'roof');
-  // мала купола над средината
-  kit.cylinder(f.L * 0.12, 3.2, 0, 3, 3, 'wall', { seg: 8, rotY: Math.PI / 8 });
-  kit.dome(f.L * 0.12, 6.2, 0, 3, 'dome', { seg: 16 });
-  kit.cylinder(f.L * 0.12, 9.2, 0, 0.08, 1.6, 'metal', { seg: 5 });
-  kit.box(f.L * 0.12, 10.1, 0, 0.9, 0.08, 0.08, 'metal');
-  // камбанарија на западниот крај (кон помалото x по оската)
+  if (o.dome) {
+    const r = Math.min(3, f.W * 0.2);
+    kit.cylinder(f.L * 0.12, r * 1.05, 0, r, r, 'wall', { seg: 8, rotY: Math.PI / 8 });
+    kit.dome(f.L * 0.12, r * 2.05, 0, r, 'dome', { seg: 16 });
+    kit.cylinder(f.L * 0.12, r * 3.05, 0, 0.08, 1.6, 'metal', { seg: 5 });
+    kit.box(f.L * 0.12, r * 3.05 + 0.9, 0, 0.9, 0.08, 0.08, 'metal');
+  }
+  if (o.tower === 'none') return;
+  // камбанарија: 'west' = до западниот крај, 'front' = вградена во предниот крај
   const west = f.ax > 0 ? -1 : 1;
-  const bu = west * (f.L / 2 + 2.6);
-  kit.setFrame(f.cx, item.ground.min - 0.5, f.cz, f.ax, f.az);
-  const H = 26;
-  kit.box(bu, 0, 0, 5.2, H - 6, 5.2, 'wall');
-  kit.box(bu, H - 6, 0, 5.6, 0.4, 5.6, 'stone');
-  kit.box(bu, H - 5.6, 0, 4.6, 3.4, 4.6, 'wall');
-  for (const [du, dv, r] of [[2.33, 0, Math.PI / 2], [-2.33, 0, -Math.PI / 2], [0, 2.33, 0], [0, -2.33, Math.PI]]) kit.box(bu + du, H - 5, dv, 1.2, 2.2, 0.06, 'window', r);
-  kit.hip(bu, H - 2.2, 0, 5.2, 4, 5.2, 'roof');
-  kit.cylinder(bu, H + 1.8, 0, 0.08, 1.8, 'metal', { seg: 5 });
-  kit.box(bu, H + 2.9, 0, 0.9, 0.08, 0.08, 'metal');
+  const ts = Math.min(5.2, f.W * 0.45);
+  const bu = o.tower === 'front' ? west * (f.L / 2 - ts / 2) : west * (f.L / 2 + ts / 2);
+  kit.setFrame(f.cx, gmin - 0.5, f.cz, f.ax, f.az);
+  const H = o.towerH;
+  kit.box(bu, 0, 0, ts, H - 6, ts, 'wall');
+  kit.box(bu, H - 6, 0, ts + 0.4, 0.4, ts + 0.4, 'stone');
+  kit.box(bu, H - 5.6, 0, ts - 0.6, 3.4, ts - 0.6, 'wall');
+  const h2 = (ts - 0.6) / 2 + 0.03;
+  for (const [du, dv, r] of [[h2, 0, Math.PI / 2], [-h2, 0, -Math.PI / 2], [0, h2, 0], [0, -h2, Math.PI]]) kit.box(bu + du, H - 5, dv, 1.1, 2.2, 0.06, 'window', r);
+  if (o.spire) kit.cone(bu, H - 2.2, 0, ts * 0.62, 9, 'dome', { seg: 8 });
+  else kit.hip(bu, H - 2.2, 0, ts, 4, ts, 'roof');
+  const capTop = H - 2.2 + (o.spire ? 9 : 4);
+  kit.cylinder(bu, capTop, 0, 0.08, 1.8, 'metal', { seg: 5 });
+  kit.box(bu, capTop + 1.1, 0, 0.9, 0.08, 0.08, 'metal');
 }
 
 // ───────────────────────── Плоштад Магнолија ─────────────────────────
 function square(kit, item, ctx) {
   const ring = item.polys[0][0];
-  const [cx, cz] = ringCentroid(ring);
-  const y = ctx.hf.sample(cx, cz);
-  kit.setFrame(cx, y, cz);
-  // фонтана
-  kit.cylinder(0, -0.2, 0, 4.2, 0.8, 'stone', { seg: 28 });
-  kit.cylinder(0, 0.45, 0, 3.8, 0.08, 'water', { seg: 28 });
-  kit.cylinder(0, 0, 0, 0.45, 2.6, 'stone', { seg: 12 });
-  kit.cylinder(0, 2.0, 0, 1.4, 0.35, 'stone', { top: 1.6, seg: 16 });
-  kit.cylinder(0, 2.35, 0, 1.3, 0.05, 'water', { seg: 16 });
-  kit.cylinder(0, 2.6, 0, 0.2, 1.0, 'stone', { seg: 8 });
+  // (фонтаната со споменикот на Филип II е посебна знаменитост — equestrian)
   // магнолии и светилки по работ на плоштадот (навнатре 3.5 m)
   placeAlong(ring, 11, 3.5, (x, z, i) => {
     const gy = ctx.hf.sample(x, z);
@@ -255,13 +301,13 @@ function square(kit, item, ctx) {
   });
 }
 
-function magnolia(kit, u, v, s = 1) {
+export function magnolia(kit, u, v, s = 1) {
   kit.cylinder(u, 0, v, 0.18 * s, 2.2 * s, 'trunk', { seg: 6 });
   kit.sphere(u, 3.2 * s, v, 2.1 * s, 'blossom', { seg: 10, sy: 0.85 });
   kit.sphere(u + 0.9 * s, 2.6 * s, v + 0.5 * s, 1.3 * s, 'blossom', { seg: 8 });
 }
 
-function lamp(kit, u, v, h = 4.2) {
+export function lamp(kit, u, v, h = 4.2) {
   kit.cylinder(u, 0, v, 0.08, h, 'metal', { seg: 6 });
   kit.sphere(u, h + 0.25, v, 0.32, 'light', { seg: 8 });
 }
@@ -339,7 +385,7 @@ function promenade(kit, item, ctx) {
   }
 }
 
-function walk(line, step, fn) {
+export function walk(line, step, fn) {
   let carry = step / 2;
   for (let i = 0; i + 1 < line.length; i++) {
     const [ax, az] = line[i];
@@ -434,4 +480,4 @@ function heraclea(kit, item, ctx) {
   }
 }
 
-export const MODELS = { clockTower, mosque, bezisten, officersHome, church, square, promenade, heraclea };
+export const MODELS = { clockTower, mosque, bezisten, officersHome, publicBuilding, church, square, promenade, heraclea };

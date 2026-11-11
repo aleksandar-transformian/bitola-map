@@ -640,6 +640,15 @@ function roofShape(t) {
   // m² по дрво; шумите подалеку од центарот се поретки
   const DENSITY = { park: [1, 110], cemetery: [1, 160], grass: [1, 900], forest: [2, 220], orchard: [3, 70], scrub: [3, 500] };
   const inBuilding = (p) => buildingIdx.query(p).some((rings) => G.pointInPolygon(p, rings));
+  // без семплирани дрвја во воените гробишта и стадионот (таму се модели со крстови/трибини)
+  const NO_TREES = new Set(['totenburg', 'warCemetery', 'stadium']);
+  const noTreeRings = [];
+  for (const L of LANDMARKS) {
+    if (!NO_TREES.has(L.model) || !L.osm) continue;
+    const el = L.osm[0] === 'w' ? osm.ways.get(+L.osm.slice(1)) : osm.relations.get(+L.osm.slice(1));
+    if (el) for (const poly of polygonsOf(el)) noTreeRings.push(poly);
+  }
+  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings));
   const MAX = 40000;
   const sorted = [...areas].filter((a) => DENSITY[a.cls]).sort((a, b) => {
     const da = Math.hypot(...G.centroid(a.rings[0]));
@@ -658,7 +667,7 @@ function roofShape(t) {
         const jx = (G.hash01(seed++) - 0.5) * step * 0.85;
         const jz = (G.hash01(seed++) - 0.5) * step * 0.85;
         const p = [x + jx, z + jz];
-        if (!inRect(p) || !G.pointInPolygon(p, a.rings) || inBuilding(p)) continue;
+        if (!inRect(p) || !G.pointInPolygon(p, a.rings) || inBuilding(p) || excluded(p)) continue;
         if (pts.length >= MAX) break;
         push(p, kind);
       }
@@ -697,7 +706,40 @@ function roofShape(t) {
   };
   const r1 = (ring) => ring.map(([x, z]) => [+x.toFixed(2), +z.toFixed(2)]);
   for (const L of LANDMARKS) {
-    const item = { id: L.id, name: L.name, model: L.model, opts: L.opts || {} };
+    const item = { id: L.id, name: L.name, model: L.model, opts: L.opts || {}, rank: L.rank ?? 1 };
+    if (L.label === false) item.label = false;
+    if (L.group) item.group = L.group;
+    if (L.view) item.view = L.view;
+    if (L.inside) item.inside = true;
+    if (L.node) {
+      // точка (на пр. статуа): центар + подлога
+      const n = osm.nodes.get(+L.node.slice(1));
+      if (!n) throw new Error(`Знаменитост: не најдов ${L.node} во OSM`);
+      const [x, z] = proj.toXZ(n.lat, n.lon);
+      item.center = [+x.toFixed(2), +z.toFixed(2)];
+      const g = +hf.sample(x, z).toFixed(2);
+      item.ground = { min: g, max: g, mean: g };
+    }
+    if (L.roundabout) {
+      // кружен тек: сите делови (junction=roundabout) во близина → центар и радиус
+      const first = osm.ways.get(+L.roundabout.slice(1));
+      if (!first) throw new Error(`Знаменитост: не најдов ${L.roundabout} во OSM`);
+      const seed = wayXZ(first);
+      const sx = seed.reduce((a, p) => a + p[0], 0) / seed.length;
+      const sz = seed.reduce((a, p) => a + p[1], 0) / seed.length;
+      const pts = [];
+      for (const way of osm.ways.values()) {
+        if (way.tags?.junction !== 'roundabout') continue;
+        const line = wayXZ(way);
+        if (line && line.some(([x, z]) => Math.hypot(x - sx, z - sz) < 40)) pts.push(...line);
+      }
+      const cx = pts.reduce((a, p) => a + p[0], 0) / pts.length;
+      const cz = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+      item.center = [+cx.toFixed(2), +cz.toFixed(2)];
+      item.radius = +(pts.reduce((a, p) => a + Math.hypot(p[0] - cx, p[1] - cz), 0) / pts.length).toFixed(2);
+      const g = +hf.sample(cx, cz).toFixed(2);
+      item.ground = { min: g, max: g, mean: g };
+    }
     if (L.osm) {
       const { el, polys } = ringsOf(L.osm);
       // најголемиот полигон е основата
@@ -720,10 +762,24 @@ function roofShape(t) {
       const all = item.lines.flat();
       item.center = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length].map((v) => +v.toFixed(2));
     }
+    if (L.at) {
+      // рачна позиција (WGS84) — има предност пред OSM (на пр. точна локација од сопственикот)
+      const [x, z] = proj.toXZ(L.at.lat, L.at.lon);
+      if (item.polys) {
+        // помести ја основата заедно со центарот
+        const dx = x - item.center[0];
+        const dz = z - item.center[1];
+        item.polys = item.polys.map((p) => p.map((r) => r.map(([px, pz]) => [+(px + dx).toFixed(2), +(pz + dz).toFixed(2)])));
+      }
+      item.center = [+x.toFixed(2), +z.toFixed(2)];
+      const g = +hf.sample(x, z).toFixed(2);
+      item.ground = { min: g, max: g, mean: g };
+      item.at = L.at;
+    }
     for (const [k, ref] of Object.entries(L.parts || {})) {
-      const { polys } = ringsOf(ref);
+      const { el, polys } = ringsOf(ref);
       item.parts = item.parts || {};
-      item.parts[k] = { polys: polys.map((p) => p.map(r1)), center: G.centroid(polys[0][0]).map((v) => +v.toFixed(2)) };
+      item.parts[k] = { osmId: el.type === 'relation' ? -el.id : el.id, polys: polys.map((p) => p.map(r1)), center: G.centroid(polys[0][0]).map((v) => +v.toFixed(2)) };
     }
     out.push(item);
   }
