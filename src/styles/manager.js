@@ -3,7 +3,7 @@
 //  1. ако стилот бара друга геометрија (покриви, дрвја) — се пресоздаваат само тие слоеви;
 //     зградите потоа „растат“ од подлогата;
 //  2. нови материјали за сите слоеви (старите се ослободуваат) + ноќни додатоци
-//     (прозорци, светлечки улици, светилки на знаменитостите);
+//     (прозорци, светлечки улици, светилки на знаменитостите) + снег (временски услови);
 //  3. бои по теме (згради, знаменитости, дрвја, улици, пруга, вода) и ново цртање на подлогата;
 //  4. осветлување за тековното време од денот, tone mapping, пост-процесирање, тема на UI.
 //  Целата смена е покриена со кратко претопување (снимка од претходниот кадар).
@@ -14,7 +14,7 @@ import { colorBuildings } from '../world/buildings.js';
 import { colorRibbons } from '../world/ribbons.js';
 import { colorLandmarks } from '../world/landmarks/index.js';
 import { colorTrees, setTreeShape } from '../world/trees.js';
-import { withGrow, withWindows, withGlow, withStreetGlow } from './shared/materials.js';
+import { withGrow, withWindows, withGlow, withStreetGlow, withSnow } from './shared/materials.js';
 import { resolveLighting } from '../app/time.js';
 
 const DEG = Math.PI / 180;
@@ -39,6 +39,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     renderer: pipeline.renderer,
     profile,
     ground: world.ground,
+    world,
     env,
     get size() {
       return pipeline.size;
@@ -65,8 +66,15 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     withGrow(m.walls, grow);
     withWindows(m.walls, env, style.night?.windows);
     withGrow(m.roofs, grow);
-    withGlow(m.landmarks, env);
+    withGlow(m.landmarks, env, { fill: style.night?.landmarkFill || 0 });
     withStreetGlow(m.roads, env, style.night?.streets);
+    // снег (временски услови): ги бели површините свртени нагоре; улиците се погазени
+    withSnow(m.terrain, env, { lo: 0.62, hi: 0.86 });
+    withSnow(m.roofs, env, { lo: 0.3, hi: 0.55, patch: 0.25 });
+    withSnow(m.landmarks, env, { lo: 0.45, hi: 0.75, patch: 0.3 });
+    withSnow(m.trees, env, { lo: -0.15, hi: 0.45, amount: 0.85, patch: 0.6, scale: 0.6 });
+    withSnow(m.roads, env, { lo: 0.6, hi: 0.9, amount: 0.62, patch: 0.7, scale: 0.12 });
+    withSnow(m.rail, env, { lo: 0.6, hi: 0.9, amount: 0.75, patch: 0.5 });
     for (const mat of [m.roads, m.rail, m.water]) {
       mat.polygonOffset = true;
       mat.polygonOffsetFactor = -2;
@@ -132,6 +140,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     pipeline.renderer.toneMappingExposure = L.exposure;
     env.night.value = L.night;
     if (current.night?.lamp) env.lamp.value.set(current.night.lamp);
+    env.snowColor.value.set(current.snow?.color || '#f3f6fa');
     world.lamps.userData.update(L.night);
   }
 

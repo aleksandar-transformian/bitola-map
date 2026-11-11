@@ -20,6 +20,7 @@ npm run data                # сè погоре по ред
 npm run shot -- --views home,center,close,west,top   # screenshot-ови + мерења (dev серверот мора да работи)
 npm run shot -- --mobile --views home                 # мобилен профил (iPhone 13)
 npm run shot -- --style maketa --time night --views shirok-sokak,saat --clean # стил, време, погледи
+npm run shot -- --style bajka --time night --weather snowfall --views saat     # снег: clear|snow|snowfall
 npm run shot -- --time night --motion --views saat     # со треперење на светлата (стандардно: мирни)
 node scripts/dev/check-styles.mjs                     # проверка на интерфејсот (стил, време, погледи, тастатура, натписи)
 
@@ -35,15 +36,14 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 555X, Retina, Chrome). Буџети: `src/config/perf.js`; основа и резултати: `docs/perf/`;
 спецификација, план и анализа: `docs/specs/002-performance/`.
 
-Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, charshija,
-gradski-park, herakleja) + home, center, close, west, top, saat, dimitrija, filip, dom, dom-front,
-gimnazija, gimnazija-agol + `lm-<id>`
-за секоја знаменитост.
+Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
+charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
+filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa|crtan|lowpoly|nokna&time=day|sunset|night&view=<id>`.
+`#style=razglednica|maketa|crtan|lowpoly|nokna|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>`.
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
-Home = преглед, 1–9 = стил, ? = упатство.
+Home = преглед, 1–9 = стил, S = снег (без → снег → снежи), ? = упатство.
 
 Важно: слојот со натписите е преку цел екран и мора да има `pointer-events: none`, инаку ги
 „голта“ глувчето/допирот и мапата не може да се движи (`check-styles.mjs` го проверува ова).
@@ -69,22 +69,29 @@ src/world/ground.js      ← подлога во canvas; сликари 'flat' �
 src/world/landmarks/     ← kit.js (примитиви → една геометрија, „делови“ за боја), models.js и
                            extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …),
                            civic.js (Дом на културата, Горна гимназија — рачно, според фотографии)
+                           magnolija.js (детални згради на Магнолија/влезот на Широк Сокак по OSM id,
+                           од фотографии)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/traffic.js     ← „Живот на мапата“: автомобили и пешаци (инстанцирани, CPU), фарови ноќе
+src/world/snowfall.js    ← снегулки што паѓаат (точки околу камерата); lightpoints.js ← точки на
+                           светлата (прозорци, светилки) за боке-дисковите
 src/world/geom2d.js      ← 2Д геометрија (OBB, конвексна обвивка, точка во полигон)
 src/styles/index.js      ← регистар на стилови + ОПИС НА ИНТЕРФЕЈСОТ + памтење (localStorage, #style=)
-src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js, nokna.js)
+src/styles/<id>.js       ← еден стил = еден модул (razglednica.js, maketa.js, crtan.js, lowpoly.js, nokna.js, bajka.js)
 src/styles/manager.js    ← применува стил врз светот: геометрија, материјали, бои, светла, пост-процесирање
-src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ);
+src/styles/shared/       ← заеднички материјали (lambertSet, toonSet) и шејдер-додатоци (изохипси, слоеви, растење, ноќ,
+                           снег `withSnow`, „рачна изработка“ `withCraft`);
                            flicker.js — „живи“ светла ноќе (треперење, прозорци што се палат, телевизори)
 src/render/pipeline.js   ← WebGLRenderer + EffectComposer (пасови пред/по OutputPass); instrument() за
                            GPU време по пас (perfName), setPixelRatio()/setMsaa() во живо
 src/perf/                ← мерење: gpu-timer.js, perf.js (во живо), bench.js (?bench), report.js
 src/config/perf.js       ← буџети за изведба (референтен уред)
 src/render/passes/       ← сопствени пост-пасови (postcard.js — акварел/хартија, tiltshift.js — минијатура,
-                           ink.js — контури од длабочината; композиторот има depthTexture)
+                           ink.js — контури од длабочината; bokeh.js — длабочина на поле + боке-дискови;
+                           grade.js — тонирање/винета/зрно; композиторот има depthTexture)
 src/app/camera.js        ← камера, MapControls, погледи, лет до поглед, тастатура, динамички near/far
 src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
+src/app/weather.js       ← временски услови: без снег / снег / снежи (env.snow 0–1, премин)
 src/app/prefs.js         ← поставки во URL hash + localStorage
 src/data/loader.js       ← вчитување на public/data/*
 src/ui/                  ← интерфејс: наслов, атрибуција, мени горе десно (menu.js: „Оди до…“, време,
@@ -116,6 +123,10 @@ uniform `env.night` (0–1) ги пали прозорците (`withWindows`), 
 светилките на знаменитостите (`withGlow`, атрибут `aGlow`) и уличните светилки. Светлата благо
 треперат (`env.time`, `env.flicker`; атрибут `aSeed` = семе по светло); при
 `prefers-reduced-motion` се мирни. Големи површини (улиците) не треперат.
+
+Снег: временските услови се независни од стилот и од времето. `env.snow` (0–1) го користи
+`withSnow` (површини свртени нагоре; параметрите по слој се во менаџерот), а снегулките се
+посебен слој во светот што се пали само при „Снежи“ (може да се исклучат за изведба).
 
 Знаменитости: `build.mjs` ги извлекува основите во `landmarks.json`; моделите (`world/landmarks/
 models.js`) се градат од примитиви во рамка од OBB на основата. Обичните згради што ги заменуваат
