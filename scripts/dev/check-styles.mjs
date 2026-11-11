@@ -93,18 +93,30 @@ const s3 = await page.evaluate(() => {
 check('тастер 3 → Цртан филм (без сенки)', s3.style === 'crtan' && !s3.shadows, JSON.stringify(s3));
 
 // „Живот на мапата“: автомобили и пешаци се движат; копчето ги исклучува.
+// Софтверското рендерирање може да има ~1 кадар во секунди → чекај до 60 s и гледај ги сите автомобили.
 const life0 = await page.evaluate(() => {
   const t = window.__bitolaApp.world.traffic;
-  const cars = window.__bitolaApp.scene.getObjectByName('cars');
-  const m = new (cars.instanceMatrix.array.constructor)(cars.instanceMatrix.array.slice(0, 16));
-  return { on: t.enabled, counts: t.counts, first: Array.from(m) };
-});
-await page.waitForTimeout(2500);
-const moved = await page.evaluate((first) => {
   const a = window.__bitolaApp.scene.getObjectByName('cars').instanceMatrix.array;
-  return Math.hypot(a[12] - first[12], a[14] - first[14]);
-}, life0.first);
-check('автомобилите се движат', life0.on && life0.counts.cars > 0 && moved > 0.5, `${JSON.stringify(life0.counts)}, поместување ${moved.toFixed(1)} m`);
+  const xz = [];
+  for (let i = 0; i < a.length; i += 16) xz.push(a[i + 12], a[i + 14]);
+  window.__carsBefore = xz;
+  return { on: t.enabled, counts: t.counts };
+});
+const moved = await page
+  .waitForFunction(
+    () => {
+      const a = window.__bitolaApp.scene.getObjectByName('cars').instanceMatrix.array;
+      const b = window.__carsBefore;
+      let m = 0;
+      for (let i = 0, k = 0; i < a.length; i += 16, k += 2) m = Math.max(m, Math.hypot(a[i + 12] - b[k], a[i + 14] - b[k + 1]));
+      return m > 0.5 ? m : false;
+    },
+    null,
+    { timeout: 60000, polling: 500 },
+  )
+  .then((h) => h.jsonValue())
+  .catch(() => 0);
+check('автомобилите се движат', life0.on && life0.counts.cars > 0 && moved > 0.5, `${JSON.stringify(life0.counts)}, најголемо поместување ${Number(moved).toFixed(1)} m`);
 await tap(page, '.life-btn');
 const off = await page.evaluate(() => ({ on: window.__bitolaApp.world.traffic.enabled, visible: window.__bitolaApp.scene.getObjectByName('traffic').visible }));
 check('копчето „Живот на мапата“ ги исклучува', !off.on && !off.visible, JSON.stringify(off));
