@@ -82,6 +82,10 @@ export async function startBench(app) {
       });
     });
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  // дали тајмерот воопшто враќа резултати (SwiftShader ја нуди екстензијата, но не мери)
+  let gpuSeen = 0;
+  let measured = 0;
+  perf.subscribe({ gpu: (tag) => (gpuSeen = Math.max(gpuSeen, tag)) });
   const settle = () => framesOrTime(params.warmup, Math.min(1500, params.maxMs), 2);
 
   async function measure(id, meta, run) {
@@ -117,7 +121,8 @@ export async function startBench(app) {
     const calls = info.calls;
     const triangles = info.triangles;
     // GPU резултатите доаѓаат со задоцнување од неколку кадри
-    if (perf.gpu) await framesUntil(() => lastGpuTag >= end, 12);
+    if (perf.gpu && (gpuSeen || !measured)) await framesUntil(() => lastGpuTag >= end, 12);
+    measured++;
     off();
     const m = mean(interval);
     return {
@@ -281,7 +286,7 @@ export async function startBench(app) {
     suite: suiteId,
     params,
     profile: app.profile.name,
-    gpuTimer: !!perf.gpu,
+    gpuTimer: !!perf.gpu && scenarios.some((s) => s.gpu),
     env: describeEnv(renderer, pipeline),
     load: { dataMs: app.stats.dataMs, buildMs: app.stats.buildMs, styleMs: app.stats.styleMs, firstFrameMs: app.stats.firstFrameMs },
     memory: {
