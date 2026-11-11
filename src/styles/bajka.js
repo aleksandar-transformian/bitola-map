@@ -117,6 +117,8 @@ export default {
     peach: '#ddb89d',
     wood: '#7b3f2a',
   },
+  // играчки-возила: пригушени бои (минијатура)
+  traffic: { cars: ['#9a3b2e', '#3d5a6e', '#c9a25a', '#e4ddd0', '#56604a', '#7a4a3a'], people: ['#7a3b2e', '#3d4f62', '#b88a4a', '#5a5048', '#8a6a7a'] },
   trees: {
     crowns: ['#3f5a4c', '#46604f', '#3a5246', '#506a55'],
     forest: ['#34493f', '#3b5245', '#2f443a'],

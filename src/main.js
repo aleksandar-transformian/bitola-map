@@ -126,7 +126,29 @@ async function start() {
     onGo: (id) => goTo(id),
     onTime: (id) => setTime(id),
     onWeather: (id) => setWeather(id),
+    onLife: (on) => setLife(on),
   });
+  // „Живот на мапата“ (сообраќај и пешаци): вклучен, освен при ?bench и „намалено движење“
+  let life = !BENCH && !still?.matches;
+  try {
+    const saved = localStorage.getItem('bitola.life');
+    if (saved && !BENCH) life = saved === 'on';
+  } catch {
+    // без складирање
+  }
+  function setLife(on, remember = true) {
+    life = on;
+    world.traffic.setEnabled(on);
+    menu.setLife(on);
+    if (remember) {
+      try {
+        localStorage.setItem('bitola.life', on ? 'on' : 'off');
+      } catch {
+        // без складирање
+      }
+    }
+  }
+  setLife(life, false);
   syncTime();
   menu.setWeather(weather.mode);
   world.snowfall.userData.set(weather.falling);
@@ -245,6 +267,7 @@ async function start() {
     if (weather.update()) env.snow.value = weather.snow;
     world.snowfall.userData.update(dt, camera, d, { height: container.clientHeight, dpr: pipeline.size.dpr }, env.night.value);
     styles.update();
+    world.traffic.update(dt, d);
     const fl = styles.current?.night?.flicker;
     env.time.value = (now / 1000) % 3600;
     env.flicker.value = still?.matches ? 0 : (fl?.amount ?? 1);

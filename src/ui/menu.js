@@ -15,13 +15,15 @@ const ICONS = {
     '<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke-width="1.7" stroke-linecap="round"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.6 4.6 12 6.6l2.4-2M9.6 19.4l2.4-2 2.4 2M4.6 10.6l3-1-.7-3M19.4 13.4l-3 1 .7 3M4.6 13.4l3 1-.7 3M19.4 10.6l-3-1 .7-3"/></g></svg>',
 };
 
+const LIFE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11.5 6.6 7.3A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.3L19 11.5V17h-2.2v-1.6H7.2V17H5zM7.4 10.6h9.2l-1-2.7H8.4z"/><circle cx="8" cy="13.3" r="1.1" fill="#fff"/><circle cx="16" cy="13.3" r="1.1" fill="#fff"/></svg>';
+
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 /**
  * @param {HTMLElement} root
- * @param {{ views: object[], landmarks: object[], times: object[], weathers: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onWeather: (id:string)=>void }} o
+ * @param {{ views: object[], landmarks: object[], times: object[], weathers: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onWeather: (id:string)=>void, onLife?: (on:boolean)=>void }} o
  */
-export function createMenu(root, { views, landmarks, times, weathers, onGo, onTime, onWeather }) {
+export function createMenu(root, { views, landmarks, times, weathers, onGo, onTime, onWeather, onLife }) {
   const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места'];
   const viewIds = new Set(views.map((v) => v.id));
   const groups = new Map(GROUP_ORDER.map((g) => [g, []]));
@@ -52,6 +54,7 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
     <nav class="time-toggle weather-toggle" role="radiogroup" aria-label="Снег">
       ${weathers.map((t) => `<button type="button" role="radio" aria-checked="false" data-id="${t.id}" title="${t.name}" aria-label="${t.name}">${ICONS[t.id] || ''}</button>`).join('')}
     </nav>
+    <button type="button" class="help-btn life-btn" aria-pressed="true" title="Живот на мапата: сообраќај и пешаци" aria-label="Живот на мапата: сообраќај и пешаци">${LIFE_ICON}</button>
     <button type="button" class="help-btn" aria-expanded="false" aria-controls="help" title="Како се движи низ мапата">?</button>
   `;
   root.appendChild(el);
@@ -73,7 +76,9 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
       <dt>Тастатура</dt>
       <dd><kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> поместување · <kbd>Q</kbd> <kbd>E</kbd> ротација</dd>
       <dd><kbd>+</kbd> <kbd>−</kbd> зум · <kbd>PgUp</kbd> <kbd>PgDn</kbd> наклон · <kbd>Home</kbd> преглед</dd>
-      <dd><kbd>1</kbd>–<kbd>4</kbd> стил · <kbd>S</kbd> снег</dd>
+      <dd><kbd>1</kbd>–<kbd>6</kbd> стил · <kbd>S</kbd> снег (без → снег → снежи)</dd>
+      <dt>Живот на мапата</dt>
+      <dd>Копчето со автомобил ги вклучува/исклучува сообраќајот и пешаците.</dd>
     </dl>
     <p>Со „Оди до…“ камерата лета до знаменитоста. Изборот на стил, време и снег се памти и може да се сподели со линкот.</p>
     <button type="button" class="help-close">Во ред</button>
@@ -95,7 +100,9 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
     const b = e.target.closest('button[data-id]');
     if (b) onWeather(b.dataset.id);
   });
-  const btn = el.querySelector('.help-btn');
+  const lifeBtn = el.querySelector('.life-btn');
+  lifeBtn.addEventListener('click', () => onLife?.(lifeBtn.getAttribute('aria-pressed') !== 'true'));
+  const btn = el.querySelector('.help-btn:not(.life-btn)');
   const toggleHelp = (show = help.hidden) => {
     help.hidden = !show;
     btn.setAttribute('aria-expanded', String(show));
@@ -119,6 +126,9 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
         b.disabled = !!fixed;
         b.title = fixed ? 'Овој стил е секогаш ноќ' : b.getAttribute('aria-label');
       }
+    },
+    setLife(on) {
+      lifeBtn.setAttribute('aria-pressed', String(on));
     },
     setTime(id) {
       for (const b of timeNav.querySelectorAll('button')) b.setAttribute('aria-checked', String(b.dataset.id === id));

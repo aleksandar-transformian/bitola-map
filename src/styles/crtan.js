@@ -111,6 +111,7 @@ export default {
     peach: '#ffc9a8',
     wood: '#a5472b',
   },
+  traffic: { cars: ['#ef3b2d', '#ffd23f', '#2f8fe0', '#2bb673', '#ff8a1f', '#ffffff', '#8e44ad'], people: ['#ef3b2d', '#2f8fe0', '#ffd23f', '#2bb673', '#ff6fb1', '#ff8a1f'] },
   trees: {
     crowns: ['#5cbf4a', '#6fcd52', '#4caf45', '#86d45e'],
     forest: ['#3f9e45', '#4caf45', '#5bb34c'],

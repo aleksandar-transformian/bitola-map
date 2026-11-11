@@ -10,6 +10,7 @@ import { createTrees } from './trees.js';
 import { createLamps } from './lamps.js';
 import { createSnowfall } from './snowfall.js';
 import { buildLightPoints } from './lightpoints.js';
+import { createTraffic } from './traffic.js';
 
 const PLACEHOLDER = new THREE.MeshBasicMaterial({ color: 0xff00ff });
 
@@ -56,9 +57,10 @@ export function createWorld(data, profile, env) {
   const trees = createTrees(data.trees, hf, { every: profile.treeEvery, detail: profile.name !== 'mobile' });
   const lamps = createLamps(data.roads, hf, env, { density: profile.name === 'mobile' ? 0.6 : 1 });
 
+  const traffic = createTraffic(data.roads, hf, env, profile.traffic);
   const snowfall = createSnowfall({ count: profile.name === 'mobile' ? 1800 : 4000 });
 
-  group.add(terrain, skirt, water, rail, roads, buildings, landmarks, trees, lamps, snowfall);
+  group.add(terrain, skirt, water, rail, roads, buildings, landmarks, trees, lamps, traffic.group, snowfall);
 
   // Точки на светлата за боке-дисковите — се пресметуваат при прво барање (само некои стилови).
   let lights = null;
@@ -86,5 +88,5 @@ export function createWorld(data, profile, env) {
     return true;
   }
 
-  return { rect, hf, ground, group, terrain, skirt, water, rail, roads, buildings, landmarks, landmarkItems: lm.items, trees, lamps, snowfall, lightPoints, setBuildingRoofs };
+  return { rect, hf, ground, group, terrain, skirt, water, rail, roads, buildings, landmarks, landmarkItems: lm.items, trees, lamps, traffic, snowfall, lightPoints, setBuildingRoofs };
 }

@@ -18,6 +18,7 @@
 //                 shadow: јачина 0–1, shadows?: false (без сенки), toneMapping: 'neutral' | 'aces' | 'none', exposure }
 //   landmarks   { дел: боја } — делови на моделите на знаменитостите (world/landmarks/kit.js → PARTS)
 //   trees       { crowns: [бои], forest?: [бои] }; облик во geometry.trees: 'round'|'lollipop'|'cone'
+//   traffic?    { cars: [бои], people: [бои], flat? } — „Живот на мапата“ (world/traffic.js)
 //   night       { lamp, windows?: { ratio, cross?, halo?, fill? }, streets?: [јачина по класа на улица],
 //                 landmarkFill?, flicker?: { amount?: 0–1 (стандардно 1), broken?: true } } — ноќни светла;
 //               fill = топол одблесок врз ѕидовите; flicker = благо треперење (styles/shared/flicker.js),

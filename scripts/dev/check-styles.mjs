@@ -38,7 +38,7 @@ check('почеток со #style=razglednica', (await page.evaluate(() => docum
 check('упатството при првата посета', await page.isVisible('.help'));
 await tap(page, '.help-close');
 check('упатството се затвора', !(await page.isVisible('.help')));
-await tap(page, '.help-btn');
+await tap(page, '.help-btn:not(.life-btn)');
 check('копче ? го отвора упатството', await page.isVisible('.help'));
 await page.keyboard.press('Escape');
 
@@ -91,6 +91,36 @@ const s3 = await page.evaluate(() => {
   return { style: document.documentElement.dataset.style, shadows: sun.castShadow };
 });
 check('тастер 3 → Цртан филм (без сенки)', s3.style === 'crtan' && !s3.shadows, JSON.stringify(s3));
+
+// „Живот на мапата“: автомобили и пешаци се движат; копчето ги исклучува.
+// Софтверското рендерирање може да има ~1 кадар во секунди → чекај до 60 s и гледај ги сите автомобили.
+const life0 = await page.evaluate(() => {
+  const t = window.__bitolaApp.world.traffic;
+  const a = window.__bitolaApp.scene.getObjectByName('cars').instanceMatrix.array;
+  const xz = [];
+  for (let i = 0; i < a.length; i += 16) xz.push(a[i + 12], a[i + 14]);
+  window.__carsBefore = xz;
+  return { on: t.enabled, counts: t.counts };
+});
+const moved = await page
+  .waitForFunction(
+    () => {
+      const a = window.__bitolaApp.scene.getObjectByName('cars').instanceMatrix.array;
+      const b = window.__carsBefore;
+      let m = 0;
+      for (let i = 0, k = 0; i < a.length; i += 16, k += 2) m = Math.max(m, Math.hypot(a[i + 12] - b[k], a[i + 14] - b[k + 1]));
+      return m > 0.5 ? m : false;
+    },
+    null,
+    { timeout: 60000, polling: 500 },
+  )
+  .then((h) => h.jsonValue())
+  .catch(() => 0);
+check('автомобилите се движат', life0.on && life0.counts.cars > 0 && moved > 0.5, `${JSON.stringify(life0.counts)}, најголемо поместување ${Number(moved).toFixed(1)} m`);
+await tap(page, '.life-btn');
+const off = await page.evaluate(() => ({ on: window.__bitolaApp.world.traffic.enabled, visible: window.__bitolaApp.scene.getObjectByName('traffic').visible }));
+check('копчето „Живот на мапата“ ги исклучува', !off.on && !off.visible, JSON.stringify(off));
+await tap(page, '.life-btn');
 
 // Тастер 5 → „Ноќна Битола“: секогаш ноќ, копчињата за време се заклучени.
 await page.keyboard.press('5');
