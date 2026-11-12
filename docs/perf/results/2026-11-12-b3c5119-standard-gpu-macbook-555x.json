@@ -1,0 +1,5532 @@
+{
+ "schema": 1,
+ "app": "bitola-map",
+ "commit": "b3c5119",
+ "date": "2026-11-12T09:02:05.732Z",
+ "suite": "standard",
+ "params": {
+  "frames": 120,
+  "warmup": 45,
+  "maxMs": 4000
+ },
+ "profile": "desktop",
+ "gpuTimer": true,
+ "env": {
+  "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Safari/537.36",
+  "gpu": "ANGLE (AMD, ANGLE Metal Renderer: AMD Radeon Pro 555X, Unspecified Version)",
+  "vendor": "Google Inc. (AMD)",
+  "software": false,
+  "cores": 6,
+  "deviceMemory": 16,
+  "screen": {
+   "w": 1680,
+   "h": 1050,
+   "devicePixelRatio": 2
+  },
+  "canvas": {
+   "cssW": 1680,
+   "cssH": 824,
+   "dpr": 2,
+   "pxW": 3360,
+   "pxH": 1648,
+   "megapixels": 5.54
+  },
+  "msaa": 4,
+  "maxTextureSize": 16384
+ },
+ "load": {
+  "dataMs": 404,
+  "buildMs": 1121,
+  "styleMs": 477,
+  "firstFrameMs": 4654
+ },
+ "memory": {
+  "programs": 21,
+  "geometries": 13,
+  "textures": 10,
+  "jsHeapMB": 222
+ },
+ "scenarios": [
+  {
+   "id": "razglednica/day/pregled",
+   "style": "razglednica",
+   "time": "day",
+   "view": "pregled",
+   "frames": 59,
+   "seconds": 4.04,
+   "fps": 14.61,
+   "interval": {
+    "n": 59,
+    "mean": 68.44,
+    "p50": 68.4,
+    "p95": 68.93,
+    "p99": 70.28,
+    "max": 71.5
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 59,
+     "mean": 1.14,
+     "p50": 1.1,
+     "p95": 1.4,
+     "p99": 1.63,
+     "max": 1.8
+    },
+    "phases": {
+     "update": 0.12,
+     "render": 0.91,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 59,
+     "mean": 62.23,
+     "p50": 62.24,
+     "p95": 62.4,
+     "p99": 62.45,
+     "max": 62.45
+    },
+    "passes": {
+     "scene": {
+      "mean": 55.94,
+      "p95": 56.12
+     },
+     "shadow": {
+      "mean": 6.28,
+      "p95": 6.35
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 16,
+   "triangles": 4110828
+  },
+  {
+   "id": "razglednica/day/center",
+   "style": "razglednica",
+   "time": "day",
+   "view": "center",
+   "frames": 59,
+   "seconds": 4.01,
+   "fps": 14.7,
+   "interval": {
+    "n": 59,
+    "mean": 68.03,
+    "p50": 67.9,
+    "p95": 69.22,
+    "p99": 70.01,
+    "max": 70.3
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 59,
+     "mean": 1,
+     "p50": 1,
+     "p95": 1.1,
+     "p99": 1.24,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.12,
+     "render": 0.78,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 59,
+     "mean": 61.83,
+     "p50": 61.85,
+     "p95": 62.04,
+     "p99": 62.07,
+     "max": 62.1
+    },
+    "passes": {
+     "scene": {
+      "mean": 54.88,
+      "p95": 55.04
+     },
+     "shadow": {
+      "mean": 6.95,
+      "p95": 7.03
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 16,
+   "triangles": 4110828
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "style": "razglednica",
+   "time": "day",
+   "view": "shirok-sokak",
+   "frames": 61,
+   "seconds": 4.06,
+   "fps": 15.03,
+   "interval": {
+    "n": 61,
+    "mean": 66.53,
+    "p50": 66.5,
+    "p95": 66.9,
+    "p99": 68.28,
+    "max": 68.7
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 61,
+     "mean": 0.96,
+     "p50": 0.9,
+     "p95": 1.1,
+     "p99": 1.2,
+     "max": 1.2
+    },
+    "phases": {
+     "update": 0.1,
+     "render": 0.77,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 61,
+     "mean": 60.36,
+     "p50": 60.38,
+     "p95": 60.54,
+     "p99": 60.61,
+     "max": 60.63
+    },
+    "passes": {
+     "scene": {
+      "mean": 53.91,
+      "p95": 54.06
+     },
+     "shadow": {
+      "mean": 6.45,
+      "p95": 6.5
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 16,
+   "triangles": 4110828
+  },
+  {
+   "id": "razglednica/day/close",
+   "style": "razglednica",
+   "time": "day",
+   "view": "close",
+   "frames": 61,
+   "seconds": 4,
+   "fps": 15.24,
+   "interval": {
+    "n": 61,
+    "mean": 65.63,
+    "p50": 65.6,
+    "p95": 66.7,
+    "p99": 67.1,
+    "max": 67.4
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 61,
+     "mean": 0.88,
+     "p50": 0.9,
+     "p95": 1,
+     "p99": 1.1,
+     "max": 1.1
+    },
+    "phases": {
+     "update": 0.11,
+     "render": 0.68,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 61,
+     "mean": 59.52,
+     "p50": 59.53,
+     "p95": 59.74,
+     "p99": 59.8,
+     "max": 59.84
+    },
+    "passes": {
+     "scene": {
+      "mean": 53.13,
+      "p95": 53.3
+     },
+     "shadow": {
+      "mean": 6.39,
+      "p95": 6.46
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 16,
+   "triangles": 4110828
+  },
+  {
+   "id": "razglednica/day/top",
+   "style": "razglednica",
+   "time": "day",
+   "view": "top",
+   "frames": 60,
+   "seconds": 4.02,
+   "fps": 14.93,
+   "interval": {
+    "n": 60,
+    "mean": 66.97,
+    "p50": 66.9,
+    "p95": 67.61,
+    "p99": 69.34,
+    "max": 69.4
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 60,
+     "mean": 0.88,
+     "p50": 0.9,
+     "p95": 1,
+     "p99": 1.35,
+     "max": 1.7
+    },
+    "phases": {
+     "update": 0.1,
+     "render": 0.69,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 60,
+     "mean": 60.83,
+     "p50": 60.86,
+     "p95": 61.07,
+     "p99": 61.08,
+     "max": 61.09
+    },
+    "passes": {
+     "scene": {
+      "mean": 54.56,
+      "p95": 54.73
+     },
+     "shadow": {
+      "mean": 6.28,
+      "p95": 6.35
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 16,
+   "triangles": 4110828
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "style": "razglednica",
+   "time": "night",
+   "view": "pregled",
+   "frames": 49,
+   "seconds": 4,
+   "fps": 12.23,
+   "interval": {
+    "n": 49,
+    "mean": 81.73,
+    "p50": 89.4,
+    "p95": 90.26,
+    "p99": 93.59,
+    "max": 95.8
+   },
+   "jankPct": 89.8,
+   "cpu": {
+    "total": {
+     "n": 49,
+     "mean": 1.29,
+     "p50": 1.3,
+     "p95": 1.76,
+     "p99": 1.85,
+     "max": 1.9
+    },
+    "phases": {
+     "update": 0.12,
+     "render": 1.09,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 49,
+     "mean": 83.36,
+     "p50": 83.43,
+     "p95": 83.61,
+     "p99": 83.63,
+     "max": 83.63
+    },
+    "passes": {
+     "scene": {
+      "mean": 76.84,
+      "p95": 77.09
+     },
+     "shadow": {
+      "mean": 6.3,
+      "p95": 6.37
+     },
+     "bloom": {
+      "mean": 0.23,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 4110841
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "style": "razglednica",
+   "time": "night",
+   "view": "shirok-sokak",
+   "frames": 46,
+   "seconds": 4.06,
+   "fps": 11.32,
+   "interval": {
+    "n": 46,
+    "mean": 88.32,
+    "p50": 88.3,
+    "p95": 89.4,
+    "p99": 90.05,
+    "max": 90.1
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 46,
+     "mean": 1.15,
+     "p50": 1.2,
+     "p95": 1.3,
+     "p99": 1.3,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.09,
+     "render": 1,
+     "labels": 0.07
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 46,
+     "mean": 82.22,
+     "p50": 82.19,
+     "p95": 82.6,
+     "p99": 82.72,
+     "max": 82.73
+    },
+    "passes": {
+     "scene": {
+      "mean": 75.57,
+      "p95": 75.96
+     },
+     "shadow": {
+      "mean": 6.42,
+      "p95": 6.48
+     },
+     "bloom": {
+      "mean": 0.23,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 4110841
+  },
+  {
+   "id": "razglednica/day/let",
+   "style": "razglednica",
+   "time": "day",
+   "view": "let",
+   "frames": 113,
+   "seconds": 7.65,
+   "fps": 14.86,
+   "interval": {
+    "n": 113,
+    "mean": 67.3,
+    "p50": 68,
+    "p95": 70.82,
+    "p99": 72.78,
+    "max": 75
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 113,
+     "mean": 1.04,
+     "p50": 1,
+     "p95": 1.2,
+     "p99": 1.3,
+     "max": 1.8
+    },
+    "phases": {
+     "update": 0.2,
+     "render": 0.74,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 113,
+     "mean": 60.25,
+     "p50": 61.22,
+     "p95": 62.85,
+     "p99": 63.23,
+     "max": 63.35
+    },
+    "passes": {
+     "scene": {
+      "mean": 53.66,
+      "p95": 56.43
+     },
+     "shadow": {
+      "mean": 6.59,
+      "p95": 7.06
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "postcard": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 16,
+   "triangles": 4110828
+  },
+  {
+   "id": "maketa/day/pregled",
+   "style": "maketa",
+   "time": "day",
+   "view": "pregled",
+   "frames": 31,
+   "seconds": 4.06,
+   "fps": 7.64,
+   "interval": {
+    "n": 31,
+    "mean": 130.84,
+    "p50": 130.7,
+    "p95": 131.85,
+    "p99": 134.13,
+    "max": 135
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 31,
+     "mean": 1.49,
+     "p50": 1.5,
+     "p95": 1.65,
+     "p99": 1.7,
+     "max": 1.7
+    },
+    "phases": {
+     "update": 0.1,
+     "render": 1.27,
+     "labels": 0.12
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 31,
+     "mean": 124.87,
+     "p50": 124.93,
+     "p95": 125.13,
+     "p99": 125.16,
+     "max": 125.16
+    },
+    "passes": {
+     "scene": {
+      "mean": 115.05,
+      "p95": 115.24
+     },
+     "shadow": {
+      "mean": 9.02,
+      "p95": 9.11
+     },
+     "gtao": {
+      "mean": 0.8,
+      "p95": 0.82
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 35,
+   "triangles": 7806231
+  },
+  {
+   "id": "maketa/day/center",
+   "style": "maketa",
+   "time": "day",
+   "view": "center",
+   "frames": 30,
+   "seconds": 4.1,
+   "fps": 7.31,
+   "interval": {
+    "n": 30,
+    "mean": 136.76,
+    "p50": 136.8,
+    "p95": 138.01,
+    "p99": 139.14,
+    "max": 139.4
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 30,
+     "mean": 1.44,
+     "p50": 1.4,
+     "p95": 1.6,
+     "p99": 1.6,
+     "max": 1.6
+    },
+    "phases": {
+     "update": 0.07,
+     "render": 1.26,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 30,
+     "mean": 130.74,
+     "p50": 130.84,
+     "p95": 131.08,
+     "p99": 131.15,
+     "max": 131.18
+    },
+    "passes": {
+     "scene": {
+      "mean": 119.96,
+      "p95": 120.32
+     },
+     "shadow": {
+      "mean": 10,
+      "p95": 10.08
+     },
+     "gtao": {
+      "mean": 0.78,
+      "p95": 0.82
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 35,
+   "triangles": 7806231
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "style": "maketa",
+   "time": "day",
+   "view": "shirok-sokak",
+   "frames": 30,
+   "seconds": 4.05,
+   "fps": 7.41,
+   "interval": {
+    "n": 30,
+    "mean": 134.95,
+    "p50": 134.9,
+    "p95": 135.81,
+    "p99": 136.11,
+    "max": 136.2
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 30,
+     "mean": 1.43,
+     "p50": 1.4,
+     "p95": 1.5,
+     "p99": 1.64,
+     "max": 1.7
+    },
+    "phases": {
+     "update": 0.08,
+     "render": 1.25,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 30,
+     "mean": 129,
+     "p50": 129.04,
+     "p95": 129.23,
+     "p99": 129.29,
+     "max": 129.31
+    },
+    "passes": {
+     "scene": {
+      "mean": 118.96,
+      "p95": 119.18
+     },
+     "shadow": {
+      "mean": 9.25,
+      "p95": 9.34
+     },
+     "gtao": {
+      "mean": 0.8,
+      "p95": 0.82
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 35,
+   "triangles": 7806231
+  },
+  {
+   "id": "maketa/day/close",
+   "style": "maketa",
+   "time": "day",
+   "view": "close",
+   "frames": 30,
+   "seconds": 4.01,
+   "fps": 7.47,
+   "interval": {
+    "n": 30,
+    "mean": 133.8,
+    "p50": 133.7,
+    "p95": 134.92,
+    "p99": 135.31,
+    "max": 135.4
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 30,
+     "mean": 1.33,
+     "p50": 1.3,
+     "p95": 1.4,
+     "p99": 1.47,
+     "max": 1.5
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 1.17,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 30,
+     "mean": 127.8,
+     "p50": 127.78,
+     "p95": 128.06,
+     "p99": 128.16,
+     "max": 128.19
+    },
+    "passes": {
+     "scene": {
+      "mean": 117.89,
+      "p95": 118.08
+     },
+     "shadow": {
+      "mean": 9.12,
+      "p95": 9.21
+     },
+     "gtao": {
+      "mean": 0.79,
+      "p95": 0.82
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 35,
+   "triangles": 7806231
+  },
+  {
+   "id": "maketa/day/top",
+   "style": "maketa",
+   "time": "day",
+   "view": "top",
+   "frames": 33,
+   "seconds": 4.1,
+   "fps": 8.05,
+   "interval": {
+    "n": 33,
+    "mean": 124.25,
+    "p50": 124.3,
+    "p95": 124.92,
+    "p99": 125.51,
+    "max": 125.7
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 33,
+     "mean": 1.28,
+     "p50": 1.3,
+     "p95": 1.44,
+     "p99": 1.84,
+     "max": 2
+    },
+    "phases": {
+     "update": 0.1,
+     "render": 1.11,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 33,
+     "mean": 118.41,
+     "p50": 118.44,
+     "p95": 118.75,
+     "p99": 118.83,
+     "max": 118.87
+    },
+    "passes": {
+     "scene": {
+      "mean": 108.57,
+      "p95": 108.82
+     },
+     "shadow": {
+      "mean": 9.04,
+      "p95": 9.12
+     },
+     "gtao": {
+      "mean": 0.8,
+      "p95": 0.82
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 35,
+   "triangles": 7806231
+  },
+  {
+   "id": "maketa/night/pregled",
+   "style": "maketa",
+   "time": "night",
+   "view": "pregled",
+   "frames": 27,
+   "seconds": 4.1,
+   "fps": 6.58,
+   "interval": {
+    "n": 27,
+    "mean": 151.97,
+    "p50": 151.5,
+    "p95": 156.06,
+    "p99": 156.67,
+    "max": 156.8
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 27,
+     "mean": 1.39,
+     "p50": 1.4,
+     "p95": 1.57,
+     "p99": 1.6,
+     "max": 1.6
+    },
+    "phases": {
+     "update": 0.07,
+     "render": 1.23,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 27,
+     "mean": 145.53,
+     "p50": 145.49,
+     "p95": 145.84,
+     "p99": 145.88,
+     "max": 145.88
+    },
+    "passes": {
+     "scene": {
+      "mean": 135.45,
+      "p95": 135.68
+     },
+     "shadow": {
+      "mean": 9.06,
+      "p95": 9.18
+     },
+     "gtao": {
+      "mean": 0.8,
+      "p95": 0.82
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 49,
+   "triangles": 7806244
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "style": "maketa",
+   "time": "night",
+   "view": "shirok-sokak",
+   "frames": 26,
+   "seconds": 4.09,
+   "fps": 6.36,
+   "interval": {
+    "n": 26,
+    "mean": 157.34,
+    "p50": 157.15,
+    "p95": 158.95,
+    "p99": 159.95,
+    "max": 160.2
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 26,
+     "mean": 1.43,
+     "p50": 1.4,
+     "p95": 1.57,
+     "p99": 1.6,
+     "max": 1.6
+    },
+    "phases": {
+     "update": 0.09,
+     "render": 1.24,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 26,
+     "mean": 151.21,
+     "p50": 151.2,
+     "p95": 151.52,
+     "p99": 151.55,
+     "max": 151.56
+    },
+    "passes": {
+     "scene": {
+      "mean": 140.96,
+      "p95": 141.16
+     },
+     "shadow": {
+      "mean": 9.23,
+      "p95": 9.34
+     },
+     "gtao": {
+      "mean": 0.79,
+      "p95": 0.82
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 49,
+   "triangles": 7806244
+  },
+  {
+   "id": "maketa/day/let",
+   "style": "maketa",
+   "time": "day",
+   "view": "let",
+   "frames": 56,
+   "seconds": 7.65,
+   "fps": 7.39,
+   "interval": {
+    "n": 56,
+    "mean": 135.37,
+    "p50": 136.3,
+    "p95": 140.4,
+    "p99": 142.75,
+    "max": 144.4
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 56,
+     "mean": 1.26,
+     "p50": 1.2,
+     "p95": 1.4,
+     "p99": 1.5,
+     "max": 1.5
+    },
+    "phases": {
+     "update": 0.17,
+     "render": 0.99,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 56,
+     "mean": 128.22,
+     "p50": 129.35,
+     "p95": 132.38,
+     "p99": 133.21,
+     "max": 133.36
+    },
+    "passes": {
+     "scene": {
+      "mean": 117.93,
+      "p95": 121.34
+     },
+     "shadow": {
+      "mean": 9.51,
+      "p95": 10.37
+     },
+     "gtao": {
+      "mean": 0.79,
+      "p95": 0.82
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "tiltshift": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 35,
+   "triangles": 7806231
+  },
+  {
+   "id": "crtan/day/pregled",
+   "style": "crtan",
+   "time": "day",
+   "view": "pregled",
+   "frames": 46,
+   "seconds": 4.05,
+   "fps": 11.36,
+   "interval": {
+    "n": 46,
+    "mean": 88.07,
+    "p50": 60.55,
+    "p95": 161.55,
+    "p99": 686.4,
+    "max": 1050.9
+   },
+   "jankPct": 93.5,
+   "cpu": {
+    "total": {
+     "n": 46,
+     "mean": 1.31,
+     "p50": 1.3,
+     "p95": 2.07,
+     "p99": 2.49,
+     "max": 2.8
+    },
+    "phases": {
+     "update": 0.14,
+     "render": 0.98,
+     "labels": 0.18
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 46,
+     "mean": 45.01,
+     "p50": 44.61,
+     "p95": 45.63,
+     "p99": 53.17,
+     "max": 56.12
+    },
+    "passes": {
+     "scene": {
+      "mean": 45.01,
+      "p95": 45.63
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 12,
+   "triangles": 2550477
+  },
+  {
+   "id": "crtan/day/center",
+   "style": "crtan",
+   "time": "day",
+   "view": "center",
+   "frames": 75,
+   "seconds": 4.03,
+   "fps": 18.61,
+   "interval": {
+    "n": 75,
+    "mean": 53.74,
+    "p50": 53.1,
+    "p95": 59.66,
+    "p99": 60.3,
+    "max": 60.3
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 75,
+     "mean": 0.7,
+     "p50": 0.7,
+     "p95": 0.83,
+     "p99": 1.03,
+     "max": 1.1
+    },
+    "phases": {
+     "update": 0.08,
+     "render": 0.52,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 75,
+     "mean": 42.77,
+     "p50": 42.75,
+     "p95": 43.08,
+     "p99": 43.2,
+     "max": 43.21
+    },
+    "passes": {
+     "scene": {
+      "mean": 42.77,
+      "p95": 43.08
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 12,
+   "triangles": 2550477
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "style": "crtan",
+   "time": "day",
+   "view": "shirok-sokak",
+   "frames": 81,
+   "seconds": 4.01,
+   "fps": 20.18,
+   "interval": {
+    "n": 81,
+    "mean": 49.56,
+    "p50": 49.4,
+    "p95": 52.1,
+    "p99": 52.66,
+    "max": 52.9
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 81,
+     "mean": 0.64,
+     "p50": 0.6,
+     "p95": 0.8,
+     "p99": 0.8,
+     "max": 0.8
+    },
+    "phases": {
+     "update": 0.07,
+     "render": 0.48,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 81,
+     "mean": 41.86,
+     "p50": 41.84,
+     "p95": 42.09,
+     "p99": 42.13,
+     "max": 42.17
+    },
+    "passes": {
+     "scene": {
+      "mean": 41.86,
+      "p95": 42.09
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 12,
+   "triangles": 2550477
+  },
+  {
+   "id": "crtan/day/close",
+   "style": "crtan",
+   "time": "day",
+   "view": "close",
+   "frames": 82,
+   "seconds": 4,
+   "fps": 20.48,
+   "interval": {
+    "n": 82,
+    "mean": 48.83,
+    "p50": 48.6,
+    "p95": 50.7,
+    "p99": 50.84,
+    "max": 51
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 82,
+     "mean": 0.65,
+     "p50": 0.6,
+     "p95": 0.7,
+     "p99": 0.8,
+     "max": 0.8
+    },
+    "phases": {
+     "update": 0.07,
+     "render": 0.49,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 82,
+     "mean": 41.33,
+     "p50": 41.35,
+     "p95": 41.53,
+     "p99": 41.55,
+     "max": 41.59
+    },
+    "passes": {
+     "scene": {
+      "mean": 41.33,
+      "p95": 41.53
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 12,
+   "triangles": 2550477
+  },
+  {
+   "id": "crtan/day/top",
+   "style": "crtan",
+   "time": "day",
+   "view": "top",
+   "frames": 79,
+   "seconds": 4.02,
+   "fps": 19.65,
+   "interval": {
+    "n": 79,
+    "mean": 50.89,
+    "p50": 50.2,
+    "p95": 53.41,
+    "p99": 53.77,
+    "max": 54
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 79,
+     "mean": 0.62,
+     "p50": 0.6,
+     "p95": 0.7,
+     "p99": 0.8,
+     "max": 0.8
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 0.48,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 79,
+     "mean": 43.96,
+     "p50": 43.97,
+     "p95": 44.17,
+     "p99": 44.21,
+     "max": 44.24
+    },
+    "passes": {
+     "scene": {
+      "mean": 43.96,
+      "p95": 44.17
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 12,
+   "triangles": 2550477
+  },
+  {
+   "id": "crtan/night/pregled",
+   "style": "crtan",
+   "time": "night",
+   "view": "pregled",
+   "frames": 56,
+   "seconds": 4.02,
+   "fps": 13.93,
+   "interval": {
+    "n": 56,
+    "mean": 71.78,
+    "p50": 71.7,
+    "p95": 73,
+    "p99": 74.22,
+    "max": 74.6
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 56,
+     "mean": 0.88,
+     "p50": 0.9,
+     "p95": 1,
+     "p99": 1,
+     "max": 1
+    },
+    "phases": {
+     "update": 0.07,
+     "render": 0.72,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 56,
+     "mean": 65.59,
+     "p50": 65.54,
+     "p95": 66.02,
+     "p99": 66.19,
+     "max": 66.28
+    },
+    "passes": {
+     "scene": {
+      "mean": 65.36,
+      "p95": 65.77
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.23,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 26,
+   "triangles": 2550490
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "style": "crtan",
+   "time": "night",
+   "view": "shirok-sokak",
+   "frames": 58,
+   "seconds": 4.05,
+   "fps": 14.34,
+   "interval": {
+    "n": 58,
+    "mean": 69.75,
+    "p50": 69.7,
+    "p95": 70.8,
+    "p99": 71.43,
+    "max": 71.6
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 58,
+     "mean": 0.84,
+     "p50": 0.85,
+     "p95": 1,
+     "p99": 1,
+     "max": 1
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 0.7,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 58,
+     "mean": 63.55,
+     "p50": 63.55,
+     "p95": 63.74,
+     "p99": 63.9,
+     "max": 64.02
+    },
+    "passes": {
+     "scene": {
+      "mean": 63.34,
+      "p95": 63.53
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 26,
+   "triangles": 2550490
+  },
+  {
+   "id": "crtan/day/let",
+   "style": "crtan",
+   "time": "day",
+   "view": "let",
+   "frames": 156,
+   "seconds": 7.65,
+   "fps": 20.41,
+   "interval": {
+    "n": 156,
+    "mean": 49,
+    "p50": 49.2,
+    "p95": 51.8,
+    "p99": 53.06,
+    "max": 54.2
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 156,
+     "mean": 0.73,
+     "p50": 0.7,
+     "p95": 0.9,
+     "p99": 0.9,
+     "max": 0.9
+    },
+    "phases": {
+     "update": 0.17,
+     "render": 0.47,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 156,
+     "mean": 42.3,
+     "p50": 42.51,
+     "p95": 44.86,
+     "p99": 45.06,
+     "max": 45.15
+    },
+    "passes": {
+     "scene": {
+      "mean": 42.3,
+      "p95": 44.86
+     },
+     "shadow": {
+      "mean": 0,
+      "p95": 0
+     },
+     "ink": {
+      "mean": 0,
+      "p95": 0
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 12,
+   "triangles": 2550477
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "style": "lowpoly",
+   "time": "day",
+   "view": "pregled",
+   "frames": 85,
+   "seconds": 4.05,
+   "fps": 21.01,
+   "interval": {
+    "n": 85,
+    "mean": 47.6,
+    "p50": 47.6,
+    "p95": 48.8,
+    "p99": 49.58,
+    "max": 50.5
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 85,
+     "mean": 0.82,
+     "p50": 0.8,
+     "p95": 1,
+     "p99": 1,
+     "max": 1
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 0.66,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 85,
+     "mean": 41.39,
+     "p50": 41.38,
+     "p95": 41.52,
+     "p99": 41.65,
+     "max": 41.67
+    },
+    "passes": {
+     "scene": {
+      "mean": 35.19,
+      "p95": 35.3
+     },
+     "shadow": {
+      "mean": 6.2,
+      "p95": 6.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 15,
+   "triangles": 3943305
+  },
+  {
+   "id": "lowpoly/day/center",
+   "style": "lowpoly",
+   "time": "day",
+   "view": "center",
+   "frames": 85,
+   "seconds": 4.01,
+   "fps": 21.2,
+   "interval": {
+    "n": 85,
+    "mean": 47.18,
+    "p50": 47.2,
+    "p95": 48.2,
+    "p99": 49.43,
+    "max": 49.6
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 85,
+     "mean": 0.85,
+     "p50": 0.8,
+     "p95": 1,
+     "p99": 1.1,
+     "max": 1.1
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 0.68,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 85,
+     "mean": 40.98,
+     "p50": 40.98,
+     "p95": 41.15,
+     "p99": 41.18,
+     "max": 41.18
+    },
+    "passes": {
+     "scene": {
+      "mean": 34.28,
+      "p95": 34.43
+     },
+     "shadow": {
+      "mean": 6.71,
+      "p95": 6.75
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 15,
+   "triangles": 3943305
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "style": "lowpoly",
+   "time": "day",
+   "view": "shirok-sokak",
+   "frames": 88,
+   "seconds": 4.02,
+   "fps": 21.89,
+   "interval": {
+    "n": 88,
+    "mean": 45.68,
+    "p50": 45.6,
+    "p95": 46.5,
+    "p99": 47.08,
+    "max": 47.6
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 88,
+     "mean": 0.77,
+     "p50": 0.8,
+     "p95": 0.9,
+     "p99": 0.91,
+     "max": 1
+    },
+    "phases": {
+     "update": 0.05,
+     "render": 0.62,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 88,
+     "mean": 39.45,
+     "p50": 39.46,
+     "p95": 39.58,
+     "p99": 39.65,
+     "max": 39.65
+    },
+    "passes": {
+     "scene": {
+      "mean": 33.14,
+      "p95": 33.24
+     },
+     "shadow": {
+      "mean": 6.31,
+      "p95": 6.36
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 15,
+   "triangles": 3943305
+  },
+  {
+   "id": "lowpoly/day/close",
+   "style": "lowpoly",
+   "time": "day",
+   "view": "close",
+   "frames": 90,
+   "seconds": 4.03,
+   "fps": 22.33,
+   "interval": {
+    "n": 90,
+    "mean": 44.78,
+    "p50": 44.8,
+    "p95": 45.5,
+    "p99": 46.43,
+    "max": 46.7
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 90,
+     "mean": 0.75,
+     "p50": 0.8,
+     "p95": 0.85,
+     "p99": 0.9,
+     "max": 0.9
+    },
+    "phases": {
+     "update": 0.05,
+     "render": 0.61,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 90,
+     "mean": 38.66,
+     "p50": 38.67,
+     "p95": 38.76,
+     "p99": 38.78,
+     "max": 38.79
+    },
+    "passes": {
+     "scene": {
+      "mean": 32.35,
+      "p95": 32.43
+     },
+     "shadow": {
+      "mean": 6.32,
+      "p95": 6.37
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 15,
+   "triangles": 3943305
+  },
+  {
+   "id": "lowpoly/day/top",
+   "style": "lowpoly",
+   "time": "day",
+   "view": "top",
+   "frames": 88,
+   "seconds": 4.04,
+   "fps": 21.78,
+   "interval": {
+    "n": 88,
+    "mean": 45.91,
+    "p50": 45.9,
+    "p95": 46.63,
+    "p99": 47.48,
+    "max": 48
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 88,
+     "mean": 0.73,
+     "p50": 0.7,
+     "p95": 0.86,
+     "p99": 0.9,
+     "max": 0.9
+    },
+    "phases": {
+     "update": 0.05,
+     "render": 0.59,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 88,
+     "mean": 39.9,
+     "p50": 39.89,
+     "p95": 40.04,
+     "p99": 40.09,
+     "max": 40.13
+    },
+    "passes": {
+     "scene": {
+      "mean": 33.66,
+      "p95": 33.8
+     },
+     "shadow": {
+      "mean": 6.24,
+      "p95": 6.28
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 15,
+   "triangles": 3943305
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "style": "lowpoly",
+   "time": "night",
+   "view": "pregled",
+   "frames": 59,
+   "seconds": 4.04,
+   "fps": 14.59,
+   "interval": {
+    "n": 59,
+    "mean": 68.56,
+    "p50": 68.4,
+    "p95": 69.9,
+    "p99": 70.35,
+    "max": 70.7
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 59,
+     "mean": 1.12,
+     "p50": 1.1,
+     "p95": 1.21,
+     "p99": 1.3,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 0.95,
+     "labels": 0.11
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 59,
+     "mean": 62.17,
+     "p50": 62.1,
+     "p95": 62.67,
+     "p99": 62.84,
+     "max": 62.88
+    },
+    "passes": {
+     "scene": {
+      "mean": 55.78,
+      "p95": 56.31
+     },
+     "shadow": {
+      "mean": 6.18,
+      "p95": 6.23
+     },
+     "bloom": {
+      "mean": 0.21,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 29,
+   "triangles": 3943318
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "style": "lowpoly",
+   "time": "night",
+   "view": "shirok-sokak",
+   "frames": 60,
+   "seconds": 4.05,
+   "fps": 14.83,
+   "interval": {
+    "n": 60,
+    "mean": 67.45,
+    "p50": 67.3,
+    "p95": 68.51,
+    "p99": 69.29,
+    "max": 69.7
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 60,
+     "mean": 1.08,
+     "p50": 1.1,
+     "p95": 1.2,
+     "p99": 1.28,
+     "max": 1.4
+    },
+    "phases": {
+     "update": 0.05,
+     "render": 0.96,
+     "labels": 0.07
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 60,
+     "mean": 61.19,
+     "p50": 61.18,
+     "p95": 61.61,
+     "p99": 61.73,
+     "max": 61.76
+    },
+    "passes": {
+     "scene": {
+      "mean": 54.69,
+      "p95": 55.14
+     },
+     "shadow": {
+      "mean": 6.27,
+      "p95": 6.35
+     },
+     "bloom": {
+      "mean": 0.23,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 29,
+   "triangles": 3943318
+  },
+  {
+   "id": "lowpoly/day/let",
+   "style": "lowpoly",
+   "time": "day",
+   "view": "let",
+   "frames": 166,
+   "seconds": 7.65,
+   "fps": 21.77,
+   "interval": {
+    "n": 166,
+    "mean": 45.93,
+    "p50": 46.7,
+    "p95": 49.5,
+    "p99": 51.2,
+    "max": 54.1
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 166,
+     "mean": 0.97,
+     "p50": 1,
+     "p95": 1.2,
+     "p99": 1.24,
+     "max": 1.9
+    },
+    "phases": {
+     "update": 0.19,
+     "render": 0.68,
+     "labels": 0.1
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 166,
+     "mean": 39.18,
+     "p50": 40.29,
+     "p95": 41.92,
+     "p99": 42.17,
+     "max": 42.32
+    },
+    "passes": {
+     "scene": {
+      "mean": 32.77,
+      "p95": 35.34
+     },
+     "shadow": {
+      "mean": 6.41,
+      "p95": 6.76
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 15,
+   "triangles": 3943305
+  },
+  {
+   "id": "bajka/day/pregled",
+   "style": "bajka",
+   "time": "day",
+   "view": "pregled",
+   "frames": 36,
+   "seconds": 4.08,
+   "fps": 8.83,
+   "interval": {
+    "n": 36,
+    "mean": 113.24,
+    "p50": 113,
+    "p95": 114.17,
+    "p99": 116.81,
+    "max": 118.1
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 36,
+     "mean": 1.11,
+     "p50": 1.1,
+     "p95": 1.22,
+     "p99": 1.3,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.07,
+     "render": 0.97,
+     "labels": 0.07
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 36,
+     "mean": 106.9,
+     "p50": 106.87,
+     "p95": 107.14,
+     "p99": 107.22,
+     "max": 107.25
+    },
+    "passes": {
+     "scene": {
+      "mean": 100.68,
+      "p95": 100.94
+     },
+     "shadow": {
+      "mean": 6,
+      "p95": 6.07
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.23,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/day/center",
+   "style": "bajka",
+   "time": "day",
+   "view": "center",
+   "frames": 35,
+   "seconds": 4.12,
+   "fps": 8.5,
+   "interval": {
+    "n": 35,
+    "mean": 117.62,
+    "p50": 117.5,
+    "p95": 119.47,
+    "p99": 120.23,
+    "max": 120.3
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 35,
+     "mean": 1.17,
+     "p50": 1.2,
+     "p95": 1.3,
+     "p99": 1.37,
+     "max": 1.4
+    },
+    "phases": {
+     "update": 0.06,
+     "render": 0.97,
+     "labels": 0.13
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 35,
+     "mean": 111.32,
+     "p50": 111.32,
+     "p95": 111.61,
+     "p99": 111.63,
+     "max": 111.64
+    },
+    "passes": {
+     "scene": {
+      "mean": 104.46,
+      "p95": 104.68
+     },
+     "shadow": {
+      "mean": 6.64,
+      "p95": 6.74
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "style": "bajka",
+   "time": "day",
+   "view": "shirok-sokak",
+   "frames": 34,
+   "seconds": 4.08,
+   "fps": 8.34,
+   "interval": {
+    "n": 34,
+    "mean": 119.96,
+    "p50": 119.85,
+    "p95": 121.25,
+    "p99": 121.97,
+    "max": 122
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 34,
+     "mean": 1.11,
+     "p50": 1.1,
+     "p95": 1.2,
+     "p99": 1.27,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.08,
+     "render": 0.95,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 34,
+     "mean": 113.73,
+     "p50": 113.68,
+     "p95": 114.07,
+     "p99": 114.15,
+     "max": 114.16
+    },
+    "passes": {
+     "scene": {
+      "mean": 107.28,
+      "p95": 107.6
+     },
+     "shadow": {
+      "mean": 6.23,
+      "p95": 6.3
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/day/close",
+   "style": "bajka",
+   "time": "day",
+   "view": "close",
+   "frames": 34,
+   "seconds": 4.04,
+   "fps": 8.42,
+   "interval": {
+    "n": 34,
+    "mean": 118.81,
+    "p50": 118.8,
+    "p95": 119.9,
+    "p99": 119.97,
+    "max": 120
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 34,
+     "mean": 1.1,
+     "p50": 1.1,
+     "p95": 1.2,
+     "p99": 1.27,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.09,
+     "render": 0.92,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 34,
+     "mean": 112.58,
+     "p50": 112.59,
+     "p95": 112.84,
+     "p99": 112.93,
+     "max": 112.98
+    },
+    "passes": {
+     "scene": {
+      "mean": 106.22,
+      "p95": 106.44
+     },
+     "shadow": {
+      "mean": 6.14,
+      "p95": 6.23
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/day/top",
+   "style": "bajka",
+   "time": "day",
+   "view": "top",
+   "frames": 40,
+   "seconds": 4,
+   "fps": 9.99,
+   "interval": {
+    "n": 40,
+    "mean": 100.1,
+    "p50": 100.05,
+    "p95": 101.02,
+    "p99": 102.8,
+    "max": 103.7
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 40,
+     "mean": 1.1,
+     "p50": 1.1,
+     "p95": 1.21,
+     "p99": 1.3,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.09,
+     "render": 0.93,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 40,
+     "mean": 93.94,
+     "p50": 93.93,
+     "p95": 94.2,
+     "p99": 94.32,
+     "max": 94.35
+    },
+    "passes": {
+     "scene": {
+      "mean": 87.74,
+      "p95": 87.99
+     },
+     "shadow": {
+      "mean": 5.97,
+      "p95": 6.07
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.23,
+      "p95": 0.25
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/night/pregled",
+   "style": "bajka",
+   "time": "night",
+   "view": "pregled",
+   "frames": 33,
+   "seconds": 4.11,
+   "fps": 8.04,
+   "interval": {
+    "n": 33,
+    "mean": 124.45,
+    "p50": 124.3,
+    "p95": 125.72,
+    "p99": 128.21,
+    "max": 129.3
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 33,
+     "mean": 1.11,
+     "p50": 1.1,
+     "p95": 1.2,
+     "p99": 1.27,
+     "max": 1.3
+    },
+    "phases": {
+     "update": 0.08,
+     "render": 0.94,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 33,
+     "mean": 118.05,
+     "p50": 118.06,
+     "p95": 118.44,
+     "p99": 118.52,
+     "max": 118.54
+    },
+    "passes": {
+     "scene": {
+      "mean": 111.82,
+      "p95": 112.15
+     },
+     "shadow": {
+      "mean": 6.01,
+      "p95": 6.1
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 32,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "style": "bajka",
+   "time": "night",
+   "view": "shirok-sokak",
+   "frames": 31,
+   "seconds": 4.12,
+   "fps": 7.52,
+   "interval": {
+    "n": 31,
+    "mean": 132.9,
+    "p50": 132.9,
+    "p95": 134.8,
+    "p99": 135.81,
+    "max": 136.2
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 31,
+     "mean": 1.06,
+     "p50": 1.1,
+     "p95": 1.2,
+     "p99": 1.2,
+     "max": 1.2
+    },
+    "phases": {
+     "update": 0.08,
+     "render": 0.9,
+     "labels": 0.08
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 31,
+     "mean": 126.76,
+     "p50": 126.76,
+     "p95": 127.21,
+     "p99": 127.31,
+     "max": 127.36
+    },
+    "passes": {
+     "scene": {
+      "mean": 120.38,
+      "p95": 120.87
+     },
+     "shadow": {
+      "mean": 6.16,
+      "p95": 6.24
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 32,
+   "triangles": 3787466
+  },
+  {
+   "id": "bajka/day/let",
+   "style": "bajka",
+   "time": "day",
+   "view": "let",
+   "frames": 65,
+   "seconds": 7.65,
+   "fps": 8.56,
+   "interval": {
+    "n": 65,
+    "mean": 116.84,
+    "p50": 117.7,
+    "p95": 121.34,
+    "p99": 123.87,
+    "max": 124
+   },
+   "jankPct": 100,
+   "cpu": {
+    "total": {
+     "n": 65,
+     "mean": 1.14,
+     "p50": 1.1,
+     "p95": 1.3,
+     "p99": 1.34,
+     "max": 1.4
+    },
+    "phases": {
+     "update": 0.18,
+     "render": 0.87,
+     "labels": 0.09
+    }
+   },
+   "gpu": {
+    "total": {
+     "n": 65,
+     "mean": 109.62,
+     "p50": 111.17,
+     "p95": 113.67,
+     "p99": 114.06,
+     "max": 114.08
+    },
+    "passes": {
+     "scene": {
+      "mean": 103.1,
+      "p95": 107.23
+     },
+     "shadow": {
+      "mean": 6.3,
+      "p95": 6.76
+     },
+     "bokeh": {
+      "mean": 0,
+      "p95": 0
+     },
+     "bloom": {
+      "mean": 0.22,
+      "p95": 0.24
+     },
+     "output": {
+      "mean": 0,
+      "p95": 0
+     },
+     "grade": {
+      "mean": 0,
+      "p95": 0
+     }
+    }
+   },
+   "calls": 30,
+   "triangles": 3787466
+  }
+ ],
+ "ablation": [
+  {
+   "base": "razglednica/day/center",
+   "variant": "основа",
+   "ms": 61.81,
+   "delta": null,
+   "deltaPct": null,
+   "triangles": 4110828,
+   "calls": 16,
+   "interval": 67.9,
+   "cpu": 0.92
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без дрвја",
+   "ms": 58.1,
+   "delta": 3.71,
+   "deltaPct": 6,
+   "triangles": 1954988,
+   "calls": 14,
+   "interval": 64.2,
+   "cpu": 0.72
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без згради",
+   "ms": 55.99,
+   "delta": 5.82,
+   "deltaPct": 9.42,
+   "triangles": 3392012,
+   "calls": 12,
+   "interval": 62.1,
+   "cpu": 0.83
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без знаменитости",
+   "ms": 60.37,
+   "delta": 1.44,
+   "deltaPct": 2.33,
+   "triangles": 3864782,
+   "calls": 14,
+   "interval": 66.5,
+   "cpu": 0.72
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без релјеф",
+   "ms": 56.93,
+   "delta": 4.88,
+   "deltaPct": 7.9,
+   "triangles": 3263390,
+   "calls": 14,
+   "interval": 63,
+   "cpu": 0.83
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без улици и вода",
+   "ms": 60.92,
+   "delta": 0.89,
+   "deltaPct": 1.44,
+   "triangles": 3970350,
+   "calls": 13,
+   "interval": 67,
+   "cpu": 0.81
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без сенки",
+   "ms": 52.32,
+   "delta": 9.49,
+   "deltaPct": 15.35,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 58.5,
+   "cpu": 0.64
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без пост-ефекти",
+   "ms": 41.03,
+   "delta": 20.78,
+   "deltaPct": 33.62,
+   "triangles": 4110827,
+   "calls": 15,
+   "interval": 47.3,
+   "cpu": 0.89
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без bloom",
+   "ms": 61.84,
+   "delta": -0.03,
+   "deltaPct": -0.05,
+   "triangles": 4110828,
+   "calls": 16,
+   "interval": 68,
+   "cpu": 0.91
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без postcard",
+   "ms": 40.99,
+   "delta": 20.82,
+   "deltaPct": 33.68,
+   "triangles": 4110827,
+   "calls": 15,
+   "interval": 47.2,
+   "cpu": 0.86
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "DPR 1.5",
+   "ms": 38.4,
+   "delta": 23.41,
+   "deltaPct": 37.87,
+   "triangles": 4110828,
+   "calls": 16,
+   "interval": 43.4,
+   "cpu": 0.87
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "DPR 1",
+   "ms": 21.76,
+   "delta": 40.05,
+   "deltaPct": 64.8,
+   "triangles": 4110828,
+   "calls": 16,
+   "interval": 25.8,
+   "cpu": 0.92
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без MSAA",
+   "ms": 34.41,
+   "delta": 27.4,
+   "deltaPct": 44.33,
+   "triangles": 4110828,
+   "calls": 16,
+   "interval": 40.6,
+   "cpu": 0.85
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "без blur зад панелите",
+   "ms": 61.69,
+   "delta": 0.12,
+   "deltaPct": 0.19,
+   "triangles": 4110828,
+   "calls": 16,
+   "interval": 64.75,
+   "cpu": 0.8
+  },
+  {
+   "base": "razglednica/day/center",
+   "variant": "минимум (без сенки, пост, MSAA; DPR 1)",
+   "ms": 6.35,
+   "delta": 55.46,
+   "deltaPct": 89.73,
+   "triangles": 2550476,
+   "calls": 11,
+   "interval": 16.5,
+   "cpu": 0.62
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "основа",
+   "ms": 130.96,
+   "delta": null,
+   "deltaPct": null,
+   "triangles": 7806231,
+   "calls": 35,
+   "interval": 136.95,
+   "cpu": 1.19
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без дрвја",
+   "ms": 123.45,
+   "delta": 7.51,
+   "deltaPct": 5.73,
+   "triangles": 3494551,
+   "calls": 31,
+   "interval": 129.3,
+   "cpu": 0.92
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без згради",
+   "ms": 122.61,
+   "delta": 8.35,
+   "deltaPct": 6.38,
+   "triangles": 6784027,
+   "calls": 27,
+   "interval": 128.5,
+   "cpu": 1.05
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без знаменитости",
+   "ms": 128.76,
+   "delta": 2.2,
+   "deltaPct": 1.68,
+   "triangles": 7314139,
+   "calls": 31,
+   "interval": 134.6,
+   "cpu": 0.98
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без релјеф",
+   "ms": 118.22,
+   "delta": 12.74,
+   "deltaPct": 9.73,
+   "triangles": 6111355,
+   "calls": 31,
+   "interval": 124.1,
+   "cpu": 1.08
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без улици и вода",
+   "ms": 129.68,
+   "delta": 1.28,
+   "deltaPct": 0.98,
+   "triangles": 7525275,
+   "calls": 29,
+   "interval": 135.6,
+   "cpu": 1.06
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без сенки",
+   "ms": 118.54,
+   "delta": 12.42,
+   "deltaPct": 9.48,
+   "triangles": 4893243,
+   "calls": 27,
+   "interval": 124.7,
+   "cpu": 0.94
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без пост-ефекти",
+   "ms": 40.53,
+   "delta": 90.43,
+   "deltaPct": 69.05,
+   "triangles": 3903113,
+   "calls": 15,
+   "interval": 46.7,
+   "cpu": 0.8
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без gtao",
+   "ms": 62.93,
+   "delta": 68.03,
+   "deltaPct": 51.95,
+   "triangles": 3903115,
+   "calls": 17,
+   "interval": 69.1,
+   "cpu": 0.86
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без bloom",
+   "ms": 130.74,
+   "delta": 0.22,
+   "deltaPct": 0.17,
+   "triangles": 7806231,
+   "calls": 35,
+   "interval": 136.7,
+   "cpu": 1.24
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без tiltshift",
+   "ms": 108.58,
+   "delta": 22.38,
+   "deltaPct": 17.09,
+   "triangles": 7806229,
+   "calls": 33,
+   "interval": 114.6,
+   "cpu": 1.18
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "DPR 1.5",
+   "ms": 79.13,
+   "delta": 51.83,
+   "deltaPct": 39.58,
+   "triangles": 7806231,
+   "calls": 35,
+   "interval": 83.8,
+   "cpu": 1.19
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "DPR 1",
+   "ms": 43.12,
+   "delta": 87.84,
+   "deltaPct": 67.07,
+   "triangles": 7806231,
+   "calls": 35,
+   "interval": 47.1,
+   "cpu": 1.22
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без MSAA",
+   "ms": 72.64,
+   "delta": 58.32,
+   "deltaPct": 44.53,
+   "triangles": 7806231,
+   "calls": 35,
+   "interval": 78.6,
+   "cpu": 1.19
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "без blur зад панелите",
+   "ms": 129.53,
+   "delta": 1.43,
+   "deltaPct": 1.09,
+   "triangles": 7806231,
+   "calls": 35,
+   "interval": 132.4,
+   "cpu": 1.17
+  },
+  {
+   "base": "maketa/day/center",
+   "variant": "минимум (без сенки, пост, MSAA; DPR 1)",
+   "ms": 6.29,
+   "delta": 124.67,
+   "deltaPct": 95.2,
+   "triangles": 2446619,
+   "calls": 11,
+   "interval": 16.65,
+   "cpu": 0.61
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "основа",
+   "ms": 42.89,
+   "delta": null,
+   "deltaPct": null,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 49.05,
+   "cpu": 0.6
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без дрвја",
+   "ms": 41,
+   "delta": 1.89,
+   "deltaPct": 4.41,
+   "triangles": 1472557,
+   "calls": 11,
+   "interval": 47.1,
+   "cpu": 0.59
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без згради",
+   "ms": 39.75,
+   "delta": 3.14,
+   "deltaPct": 7.32,
+   "triangles": 2191069,
+   "calls": 10,
+   "interval": 45.85,
+   "cpu": 0.57
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без знаменитости",
+   "ms": 42.3,
+   "delta": 0.59,
+   "deltaPct": 1.38,
+   "triangles": 2427454,
+   "calls": 11,
+   "interval": 48.5,
+   "cpu": 0.59
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без релјеф",
+   "ms": 40.68,
+   "delta": 2.21,
+   "deltaPct": 5.15,
+   "triangles": 1703039,
+   "calls": 10,
+   "interval": 46.8,
+   "cpu": 0.59
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без улици и вода",
+   "ms": 42.25,
+   "delta": 0.64,
+   "deltaPct": 1.49,
+   "triangles": 2409999,
+   "calls": 9,
+   "interval": 48.25,
+   "cpu": 0.54
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без пост-ефекти",
+   "ms": 31.59,
+   "delta": 11.3,
+   "deltaPct": 26.35,
+   "triangles": 2550476,
+   "calls": 11,
+   "interval": 37.7,
+   "cpu": 0.55
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без ink",
+   "ms": 31.58,
+   "delta": 11.31,
+   "deltaPct": 26.37,
+   "triangles": 2550476,
+   "calls": 11,
+   "interval": 37.7,
+   "cpu": 0.56
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без bloom",
+   "ms": 42.88,
+   "delta": 0.01,
+   "deltaPct": 0.02,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 49.1,
+   "cpu": 0.59
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "DPR 1.5",
+   "ms": 25.84,
+   "delta": 17.05,
+   "deltaPct": 39.75,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 30.6,
+   "cpu": 0.64
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "DPR 1",
+   "ms": 13.89,
+   "delta": 29,
+   "deltaPct": 67.61,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 17.9,
+   "cpu": 0.83
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без MSAA",
+   "ms": 17.12,
+   "delta": 25.77,
+   "deltaPct": 60.08,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 23.8,
+   "cpu": 0.83
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "без blur зад панелите",
+   "ms": 42.6,
+   "delta": 0.29,
+   "deltaPct": 0.68,
+   "triangles": 2550477,
+   "calls": 12,
+   "interval": 46,
+   "cpu": 0.61
+  },
+  {
+   "base": "crtan/day/center",
+   "variant": "минимум (без сенки, пост, MSAA; DPR 1)",
+   "ms": 6.22,
+   "delta": 36.67,
+   "deltaPct": 85.5,
+   "triangles": 2550476,
+   "calls": 11,
+   "interval": 16.7,
+   "cpu": 0.58
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "основа",
+   "ms": 40.95,
+   "delta": null,
+   "deltaPct": null,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 47.2,
+   "cpu": 0.79
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без дрвја",
+   "ms": 37.72,
+   "delta": 3.23,
+   "deltaPct": 7.89,
+   "triangles": 2110841,
+   "calls": 13,
+   "interval": 44,
+   "cpu": 0.69
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без згради",
+   "ms": 34.8,
+   "delta": 6.15,
+   "deltaPct": 15.02,
+   "triangles": 3068635,
+   "calls": 11,
+   "interval": 41,
+   "cpu": 0.76
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без знаменитости",
+   "ms": 39.31,
+   "delta": 1.64,
+   "deltaPct": 4,
+   "triangles": 3697259,
+   "calls": 13,
+   "interval": 45.6,
+   "cpu": 0.71
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без релјеф",
+   "ms": 35.84,
+   "delta": 5.11,
+   "deltaPct": 12.48,
+   "triangles": 3095867,
+   "calls": 13,
+   "interval": 42.1,
+   "cpu": 0.8
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без улици и вода",
+   "ms": 39.93,
+   "delta": 1.02,
+   "deltaPct": 2.49,
+   "triangles": 3802827,
+   "calls": 12,
+   "interval": 46.2,
+   "cpu": 0.77
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без сенки",
+   "ms": 31.42,
+   "delta": 9.53,
+   "deltaPct": 23.27,
+   "triangles": 2466715,
+   "calls": 11,
+   "interval": 37.5,
+   "cpu": 0.59
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без пост-ефекти",
+   "ms": 40.99,
+   "delta": -0.04,
+   "deltaPct": -0.1,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 47.1,
+   "cpu": 0.79
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без bloom",
+   "ms": 40.99,
+   "delta": -0.04,
+   "deltaPct": -0.1,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 47.2,
+   "cpu": 0.8
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "DPR 1.5",
+   "ms": 26.66,
+   "delta": 14.29,
+   "deltaPct": 34.9,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 31.5,
+   "cpu": 0.86
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "DPR 1",
+   "ms": 16.18,
+   "delta": 24.77,
+   "deltaPct": 60.49,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 21.1,
+   "cpu": 1.15
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без MSAA",
+   "ms": 23.22,
+   "delta": 17.73,
+   "deltaPct": 43.3,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 29.5,
+   "cpu": 0.84
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "без blur зад панелите",
+   "ms": 40.83,
+   "delta": 0.12,
+   "deltaPct": 0.29,
+   "triangles": 3943305,
+   "calls": 15,
+   "interval": 44,
+   "cpu": 0.74
+  },
+  {
+   "base": "lowpoly/day/center",
+   "variant": "минимум (без сенки, пост, MSAA; DPR 1)",
+   "ms": 6.12,
+   "delta": 34.83,
+   "deltaPct": 85.05,
+   "triangles": 2466715,
+   "calls": 11,
+   "interval": 16.7,
+   "cpu": 0.66
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "основа",
+   "ms": 111.36,
+   "delta": null,
+   "deltaPct": null,
+   "triangles": 3787466,
+   "calls": 30,
+   "interval": 117.6,
+   "cpu": 1.05
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без дрвја",
+   "ms": 108.28,
+   "delta": 3.08,
+   "deltaPct": 2.77,
+   "triangles": 1955002,
+   "calls": 28,
+   "interval": 114.4,
+   "cpu": 0.93
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без згради",
+   "ms": 103.74,
+   "delta": 7.62,
+   "deltaPct": 6.84,
+   "triangles": 3068650,
+   "calls": 26,
+   "interval": 109.9,
+   "cpu": 1.01
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без знаменитости",
+   "ms": 109.34,
+   "delta": 2.02,
+   "deltaPct": 1.81,
+   "triangles": 3541420,
+   "calls": 28,
+   "interval": 115.5,
+   "cpu": 0.95
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без релјеф",
+   "ms": 108.27,
+   "delta": 3.09,
+   "deltaPct": 2.77,
+   "triangles": 2940028,
+   "calls": 28,
+   "interval": 114.3,
+   "cpu": 1.02
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без улици и вода",
+   "ms": 110.28,
+   "delta": 1.08,
+   "deltaPct": 0.97,
+   "triangles": 3646988,
+   "calls": 27,
+   "interval": 116.5,
+   "cpu": 1.01
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без сенки",
+   "ms": 102.68,
+   "delta": 8.68,
+   "deltaPct": 7.79,
+   "triangles": 2388803,
+   "calls": 26,
+   "interval": 108.9,
+   "cpu": 0.91
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без пост-ефекти",
+   "ms": 43.72,
+   "delta": 67.64,
+   "deltaPct": 60.74,
+   "triangles": 3787451,
+   "calls": 15,
+   "interval": 50,
+   "cpu": 0.84
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без bokeh",
+   "ms": 74.48,
+   "delta": 36.88,
+   "deltaPct": 33.12,
+   "triangles": 3787465,
+   "calls": 29,
+   "interval": 80.6,
+   "cpu": 1.08
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без bloom",
+   "ms": 91.17,
+   "delta": 20.19,
+   "deltaPct": 18.13,
+   "triangles": 3787453,
+   "calls": 17,
+   "interval": 97.3,
+   "cpu": 0.86
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без grade",
+   "ms": 100.61,
+   "delta": 10.75,
+   "deltaPct": 9.65,
+   "triangles": 3787465,
+   "calls": 29,
+   "interval": 106.8,
+   "cpu": 1.06
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "DPR 1.5",
+   "ms": 65.27,
+   "delta": 46.09,
+   "deltaPct": 41.39,
+   "triangles": 3787466,
+   "calls": 30,
+   "interval": 70.1,
+   "cpu": 1.09
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "DPR 1",
+   "ms": 33.36,
+   "delta": 78,
+   "deltaPct": 70.04,
+   "triangles": 3787466,
+   "calls": 30,
+   "interval": 37.3,
+   "cpu": 1.07
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без MSAA",
+   "ms": 61.12,
+   "delta": 50.24,
+   "deltaPct": 45.11,
+   "triangles": 3787466,
+   "calls": 30,
+   "interval": 67.2,
+   "cpu": 1.06
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "без blur зад панелите",
+   "ms": 111.11,
+   "delta": 0.25,
+   "deltaPct": 0.22,
+   "triangles": 3787466,
+   "calls": 30,
+   "interval": 114.25,
+   "cpu": 1.08
+  },
+  {
+   "base": "bajka/day/center",
+   "variant": "минимум (без сенки, пост, MSAA; DPR 1)",
+   "ms": 6.89,
+   "delta": 104.47,
+   "deltaPct": 93.81,
+   "triangles": 2388788,
+   "calls": 11,
+   "interval": 16.7,
+   "cpu": 0.61
+  }
+ ],
+ "switches": [
+  {
+   "to": "razglednica",
+   "applyMs": 63,
+   "hitchMs": 2690
+  },
+  {
+   "to": "maketa",
+   "applyMs": 288,
+   "hitchMs": 898
+  },
+  {
+   "to": "crtan",
+   "applyMs": 58,
+   "hitchMs": 319
+  },
+  {
+   "to": "lowpoly",
+   "applyMs": 803,
+   "hitchMs": 3412
+  },
+  {
+   "to": "bajka",
+   "applyMs": 131,
+   "hitchMs": 2012
+  }
+ ],
+ "budgets": [
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "calls",
+   "value": 16,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "triangles",
+   "value": 4110828,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "interval p50",
+   "value": 68.4,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "interval p95",
+   "value": 68.93,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "cpu p95",
+   "value": 1.4,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/pregled",
+   "metric": "gpu p95",
+   "value": 62.4,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "calls",
+   "value": 16,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "triangles",
+   "value": 4110828,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "interval p50",
+   "value": 67.9,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "interval p95",
+   "value": 69.22,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "cpu p95",
+   "value": 1.1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/center",
+   "metric": "gpu p95",
+   "value": 62.04,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "calls",
+   "value": 16,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "triangles",
+   "value": 4110828,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "interval p50",
+   "value": 66.5,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "interval p95",
+   "value": 66.9,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 60.54,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "calls",
+   "value": 16,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "triangles",
+   "value": 4110828,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "interval p50",
+   "value": 65.6,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "interval p95",
+   "value": 66.7,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "cpu p95",
+   "value": 1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/close",
+   "metric": "gpu p95",
+   "value": 59.74,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "calls",
+   "value": 16,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "triangles",
+   "value": 4110828,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "interval p50",
+   "value": 66.9,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "interval p95",
+   "value": 67.61,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "cpu p95",
+   "value": 1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/top",
+   "metric": "gpu p95",
+   "value": 61.07,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "triangles",
+   "value": 4110841,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "interval p50",
+   "value": 89.4,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "interval p95",
+   "value": 90.26,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "jank %",
+   "value": 89.8,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "cpu p95",
+   "value": 1.76,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/night/pregled",
+   "metric": "gpu p95",
+   "value": 83.61,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "triangles",
+   "value": 4110841,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "interval p50",
+   "value": 88.3,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "interval p95",
+   "value": 89.4,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.3,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/night/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 82.6,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "calls",
+   "value": 16,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "triangles",
+   "value": 4110828,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "interval p50",
+   "value": 68,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "interval p95",
+   "value": 70.82,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "razglednica/day/let",
+   "metric": "gpu p95",
+   "value": 62.85,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "calls",
+   "value": 35,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "triangles",
+   "value": 7806231,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "interval p50",
+   "value": 130.7,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "interval p95",
+   "value": 131.85,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "cpu p95",
+   "value": 1.65,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/pregled",
+   "metric": "gpu p95",
+   "value": 125.13,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "calls",
+   "value": 35,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "triangles",
+   "value": 7806231,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "interval p50",
+   "value": 136.8,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "interval p95",
+   "value": 138.01,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "cpu p95",
+   "value": 1.6,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/center",
+   "metric": "gpu p95",
+   "value": 131.08,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "calls",
+   "value": 35,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "triangles",
+   "value": 7806231,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "interval p50",
+   "value": 134.9,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "interval p95",
+   "value": 135.81,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.5,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 129.23,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "calls",
+   "value": 35,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "triangles",
+   "value": 7806231,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "interval p50",
+   "value": 133.7,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "interval p95",
+   "value": 134.92,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "cpu p95",
+   "value": 1.4,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/close",
+   "metric": "gpu p95",
+   "value": 128.06,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "calls",
+   "value": 35,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "triangles",
+   "value": 7806231,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "interval p50",
+   "value": 124.3,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "interval p95",
+   "value": 124.92,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "cpu p95",
+   "value": 1.44,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/top",
+   "metric": "gpu p95",
+   "value": 118.75,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "calls",
+   "value": 49,
+   "limit": 40,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "triangles",
+   "value": 7806244,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "interval p50",
+   "value": 151.5,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "interval p95",
+   "value": 156.06,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "cpu p95",
+   "value": 1.57,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/night/pregled",
+   "metric": "gpu p95",
+   "value": 145.84,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "calls",
+   "value": 49,
+   "limit": 40,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "triangles",
+   "value": 7806244,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "interval p50",
+   "value": 157.15,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "interval p95",
+   "value": 158.95,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.57,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/night/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 151.52,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "calls",
+   "value": 35,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "triangles",
+   "value": 7806231,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "interval p50",
+   "value": 136.3,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "interval p95",
+   "value": 140.4,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "cpu p95",
+   "value": 1.4,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "maketa/day/let",
+   "metric": "gpu p95",
+   "value": 132.38,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "calls",
+   "value": 12,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "triangles",
+   "value": 2550477,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "interval p50",
+   "value": 60.55,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "interval p95",
+   "value": 161.55,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "jank %",
+   "value": 93.5,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "cpu p95",
+   "value": 2.07,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/pregled",
+   "metric": "gpu p95",
+   "value": 45.63,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "calls",
+   "value": 12,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "triangles",
+   "value": 2550477,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "interval p50",
+   "value": 53.1,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "interval p95",
+   "value": 59.66,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "cpu p95",
+   "value": 0.83,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/center",
+   "metric": "gpu p95",
+   "value": 43.08,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "calls",
+   "value": 12,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "triangles",
+   "value": 2550477,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "interval p50",
+   "value": 49.4,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "interval p95",
+   "value": 52.1,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 0.8,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 42.09,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "calls",
+   "value": 12,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "triangles",
+   "value": 2550477,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "interval p50",
+   "value": 48.6,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "interval p95",
+   "value": 50.7,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "cpu p95",
+   "value": 0.7,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/close",
+   "metric": "gpu p95",
+   "value": 41.53,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "calls",
+   "value": 12,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "triangles",
+   "value": 2550477,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "interval p50",
+   "value": 50.2,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "interval p95",
+   "value": 53.41,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "cpu p95",
+   "value": 0.7,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/top",
+   "metric": "gpu p95",
+   "value": 44.17,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "calls",
+   "value": 26,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "triangles",
+   "value": 2550490,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "interval p50",
+   "value": 71.7,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "interval p95",
+   "value": 73,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "cpu p95",
+   "value": 1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/night/pregled",
+   "metric": "gpu p95",
+   "value": 66.02,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "calls",
+   "value": 26,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "triangles",
+   "value": 2550490,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "interval p50",
+   "value": 69.7,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "interval p95",
+   "value": 70.8,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/night/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 63.74,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "calls",
+   "value": 12,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "triangles",
+   "value": 2550477,
+   "limit": 3000000,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "interval p50",
+   "value": 49.2,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "interval p95",
+   "value": 51.8,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "cpu p95",
+   "value": 0.9,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "crtan/day/let",
+   "metric": "gpu p95",
+   "value": 44.86,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "calls",
+   "value": 15,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "triangles",
+   "value": 3943305,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "interval p50",
+   "value": 47.6,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "interval p95",
+   "value": 48.8,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "cpu p95",
+   "value": 1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/pregled",
+   "metric": "gpu p95",
+   "value": 41.52,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "calls",
+   "value": 15,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "triangles",
+   "value": 3943305,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "interval p50",
+   "value": 47.2,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "interval p95",
+   "value": 48.2,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "cpu p95",
+   "value": 1,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/center",
+   "metric": "gpu p95",
+   "value": 41.15,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "calls",
+   "value": 15,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "triangles",
+   "value": 3943305,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "interval p50",
+   "value": 45.6,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "interval p95",
+   "value": 46.5,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 0.9,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 39.58,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "calls",
+   "value": 15,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "triangles",
+   "value": 3943305,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "interval p50",
+   "value": 44.8,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "interval p95",
+   "value": 45.5,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "cpu p95",
+   "value": 0.85,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/close",
+   "metric": "gpu p95",
+   "value": 38.76,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "calls",
+   "value": 15,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "triangles",
+   "value": 3943305,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "interval p50",
+   "value": 45.9,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "interval p95",
+   "value": 46.63,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "cpu p95",
+   "value": 0.86,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/top",
+   "metric": "gpu p95",
+   "value": 40.04,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "calls",
+   "value": 29,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "triangles",
+   "value": 3943318,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "interval p50",
+   "value": 68.4,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "interval p95",
+   "value": 69.9,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "cpu p95",
+   "value": 1.21,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/night/pregled",
+   "metric": "gpu p95",
+   "value": 62.67,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "calls",
+   "value": 29,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "triangles",
+   "value": 3943318,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "interval p50",
+   "value": 67.3,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "interval p95",
+   "value": 68.51,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/night/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 61.61,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "calls",
+   "value": 15,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "triangles",
+   "value": 3943305,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "interval p50",
+   "value": 46.7,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "interval p95",
+   "value": 49.5,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "lowpoly/day/let",
+   "metric": "gpu p95",
+   "value": 41.92,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "interval p50",
+   "value": 113,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "interval p95",
+   "value": 114.17,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "cpu p95",
+   "value": 1.22,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/pregled",
+   "metric": "gpu p95",
+   "value": 107.14,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "interval p50",
+   "value": 117.5,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "interval p95",
+   "value": 119.47,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "cpu p95",
+   "value": 1.3,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/center",
+   "metric": "gpu p95",
+   "value": 111.61,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "interval p50",
+   "value": 119.85,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "interval p95",
+   "value": 121.25,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 114.07,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "interval p50",
+   "value": 118.8,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "interval p95",
+   "value": 119.9,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/close",
+   "metric": "gpu p95",
+   "value": 112.84,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "interval p50",
+   "value": 100.05,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "interval p95",
+   "value": 101.02,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "cpu p95",
+   "value": 1.21,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/top",
+   "metric": "gpu p95",
+   "value": 94.2,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "calls",
+   "value": 32,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "interval p50",
+   "value": 124.3,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "interval p95",
+   "value": 125.72,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/night/pregled",
+   "metric": "gpu p95",
+   "value": 118.44,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "calls",
+   "value": 32,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "interval p50",
+   "value": 132.9,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "interval p95",
+   "value": 134.8,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "cpu p95",
+   "value": 1.2,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/night/shirok-sokak",
+   "metric": "gpu p95",
+   "value": 127.21,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "calls",
+   "value": 30,
+   "limit": 40,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "triangles",
+   "value": 3787466,
+   "limit": 3000000,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "interval p50",
+   "value": 117.7,
+   "limit": 17.5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "interval p95",
+   "value": 121.34,
+   "limit": 25,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "jank %",
+   "value": 100,
+   "limit": 5,
+   "ok": false
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "cpu p95",
+   "value": 1.3,
+   "limit": 8,
+   "ok": true
+  },
+  {
+   "id": "bajka/day/let",
+   "metric": "gpu p95",
+   "value": 113.67,
+   "limit": 13,
+   "ok": false
+  },
+  {
+   "id": "сцена",
+   "metric": "programs",
+   "value": 21,
+   "limit": 30,
+   "ok": true
+  },
+  {
+   "id": "вчитување",
+   "metric": "first frame ms",
+   "value": 4654,
+   "limit": 3000,
+   "ok": false
+  },
+  {
+   "id": "смена → razglednica",
+   "metric": "hitch ms",
+   "value": 2690,
+   "limit": 250,
+   "ok": false
+  },
+  {
+   "id": "смена → maketa",
+   "metric": "hitch ms",
+   "value": 898,
+   "limit": 250,
+   "ok": false
+  },
+  {
+   "id": "смена → crtan",
+   "metric": "hitch ms",
+   "value": 319,
+   "limit": 250,
+   "ok": false
+  },
+  {
+   "id": "смена → lowpoly",
+   "metric": "hitch ms",
+   "value": 3412,
+   "limit": 250,
+   "ok": false
+  },
+  {
+   "id": "смена → bajka",
+   "metric": "hitch ms",
+   "value": 2012,
+   "limit": 250,
+   "ok": false
+  }
+ ]
+}
