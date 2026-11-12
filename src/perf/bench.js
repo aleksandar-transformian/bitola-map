@@ -91,8 +91,12 @@ export async function startBench(app) {
   perf.subscribe({ gpu: (tag) => (gpuSeen = Math.max(gpuSeen, tag)) });
   const settle = () => framesOrTime(params.warmup, Math.min(1500, params.maxMs), 2);
 
+  const quality = app.quality;
+  const auto = quality.mode === 'auto';
   async function measure(id, meta, run) {
     await settle();
+    // „авто“: почекај нивото да се смири (инаку се мери преминот, не состојбата)
+    if (auto) await framesUntil(() => quality.stable, 1200);
     const interval = [];
     const cpu = [];
     const phases = {};
@@ -142,6 +146,7 @@ export async function startBench(app) {
         : null,
       calls,
       triangles,
+      quality: quality.level,
     };
   }
 
@@ -220,7 +225,8 @@ export async function startBench(app) {
     for (const v of suite.day) plan.push({ style, time: 'day', view: v });
     for (const v of suite.night) plan.push({ style, time: 'night', view: v });
     if (suite.fly) plan.push({ style, time: 'day', view: 'let', fly: true });
-    if (suite.ablation) plan.push({ style, time: 'day', view: ABLATION_VIEW, ablation: true });
+    // аблацијата бара фиксен квалитет (во „авто“ нивото би се менувало под неа)
+    if (suite.ablation && !auto) plan.push({ style, time: 'day', view: ABLATION_VIEW, ablation: true });
   }
   const total = plan.reduce((n, p) => n + (p.ablation ? variants().length + 1 : 1), 0);
   let doneSteps = 0;
@@ -291,6 +297,7 @@ export async function startBench(app) {
     params,
     profile: app.profile.name,
     gpuTimer: !!perf.gpu && scenarios.some((s) => s.gpu),
+    quality: { mode: quality.mode, ladder: quality.ladder },
     env: describeEnv(renderer, pipeline),
     load: { dataMs: app.stats.dataMs, buildMs: app.stats.buildMs, styleMs: app.stats.styleMs, firstFrameMs: app.stats.firstFrameMs },
     memory: {

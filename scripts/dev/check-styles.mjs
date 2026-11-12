@@ -219,6 +219,37 @@ const snap = await page.evaluate(async () => {
 });
 check('Зачувај слика → PNG 2×', snap.png && snap.w === snap.cssW * 2 && /^bitola-[a-z]+-(day|sunset|night)\.png$/.test(snap.name), `${snap.name} ${snap.w}×${snap.h}`);
 
+// Квалитет: во автоматизиран прелистувач стандардно „високо“; копчето ги врти режимите;
+// #quality= во URL; „авто“ се спушта кога цртањето е бавно (SwiftShader) и го памти нивото по стил.
+const q = () =>
+  page.evaluate(() => {
+    const a = window.__bitolaApp;
+    const heavy = a.pipeline.stylePasses.filter((p) => ['gtao', 'bokeh'].includes(p.perfName));
+    return { mode: a.quality.mode, level: a.quality.level, levels: a.quality.ladder.length, msaa: a.pipeline.msaa, shadow: a.sun.castShadow, heavyOn: heavy.every((p) => p.enabled), hash: location.hash };
+  });
+const q0 = await q();
+check('квалитет: стандардно „високо“ во тестови', q0.mode === 'high' && q0.level === 0 && q0.msaa === 4 && q0.shadow, JSON.stringify(q0));
+await page.evaluate(() => document.querySelector('.quality-btn').click());
+const q1 = await q();
+check('копче Квалитет → средно', q1.mode === 'medium' && q1.level > 0 && q1.msaa < 4 && q1.hash.includes('quality=medium'), JSON.stringify(q1));
+await page.evaluate(() => (location.hash = 'style=maketa&time=sunset&quality=low'));
+await page.waitForFunction(() => window.__bitolaApp.quality.mode === 'low', null, { timeout: 30000 }).catch(() => {});
+const q2 = await q();
+check('#quality=low: без сенки, MSAA и тешки ефекти', q2.level === q2.levels - 1 && !q2.shadow && q2.msaa === 0 && !q2.heavyOn, JSON.stringify(q2));
+await page.evaluate(() => window.__bitolaApp.setQuality('high'));
+await page.evaluate(() => window.__bitolaApp.setQuality('auto'));
+await page.waitForFunction(() => window.__bitolaApp.quality.level > 0, null, { timeout: 120000, polling: 500 }).catch(() => {});
+const q3 = await q();
+const savedLevels = await page.evaluate(() => localStorage.getItem('bitola.qlevels'));
+check('авто се спушта кога е бавно и го памти нивото', q3.mode === 'auto' && q3.level > 0 && /"maketa":\d/.test(savedLevels || ''), `ниво ${q3.levels - q3.level}/${q3.levels}; ${savedLevels}`);
+const best = await page.evaluate(async () => {
+  const a = window.__bitolaApp;
+  const before = a.quality.level;
+  const during = await a.quality.withBest(async () => a.quality.level);
+  return { before, during, after: a.quality.level };
+});
+check('слика: привремено највисок квалитет', best.during === 0 && best.after === best.before, JSON.stringify(best));
+
 // „Превчитување“ без hash → од localStorage (нова страница во истиот контекст;
 // старата се затвора за софтверското рендерирање да не ја блокира навигацијата).
 await page.close();
