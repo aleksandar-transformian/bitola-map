@@ -24,7 +24,7 @@
   "maxZ": 4519.5713262066565
  },
  "osmTimestamp": "2026-11-11T10:55:17Z",
- "generatedAt": "2026-11-12T13:00:08.308Z",
+ "generatedAt": "2026-11-12T13:30:43.491Z",
  "stats": {
   "terrain": {
    "cols": 757,
@@ -51,9 +51,9 @@
    "extraSource": "Overture Maps 2026-10-21.0 (buildings), без извор OpenStreetMap"
   },
   "trees": {
-   "total": 26948,
+   "total": 26936,
    "osm": 412,
-   "sampled": 26536
+   "sampled": 26524
   },
   "landmarks": 32,
   "pois": 87

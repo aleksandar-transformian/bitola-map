@@ -669,6 +669,11 @@ function roofShape(t) {
     const el = L.osm[0] === 'w' ? osm.ways.get(+L.osm.slice(1)) : osm.relations.get(+L.osm.slice(1));
     if (el) for (const poly of polygonsOf(el)) noTreeRings.push(poly);
   }
+  // ниту на поплочените пешачки површини (плоштади во паркови — на пр. пред Офицерскиот дом)
+  for (const way of osm.ways.values()) {
+    if (way.tags?.highway !== 'pedestrian' || way.tags?.area !== 'yes') continue;
+    for (const poly of polygonsOf(way)) noTreeRings.push(poly);
+  }
   const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings));
   const MAX = 40000;
   const sorted = [...areas].filter((a) => DENSITY[a.cls]).sort((a, b) => {

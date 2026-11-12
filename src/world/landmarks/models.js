@@ -4,6 +4,7 @@
 
 import { obb, longestEdge, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geom2d.js';
 import { buildingShape, shell, wantsPitch, Writer } from '../buildings.js';
+import { officersHome } from './oficerski.js';
 import { BUILDING_ID } from '../../config/classes.js';
 import { magnoliaHouses } from './magnolija.js';
 
@@ -187,9 +188,7 @@ export function publicBuilding(kit, item, ctx, defaults = {}) {
   if (o.flag) kit.cylinder(0, o.attic ? 3 : 1.2, 0, 0.06, 5, 'metal', { seg: 5 });
 }
 
-function officersHome(kit, item, ctx) {
-  publicBuilding(kit, item, ctx, { height: 13.5, floors: 3, part: 'wall2', roof: 'hip', attic: true, flag: true });
-}
+// (Офицерскиот дом е во oficerski.js)
 
 /** Зградата (од buildings.bin) што ја содржи точката, или најблиската (до 40 m). */
 export function buildingAt(ctx, [px, pz]) {
