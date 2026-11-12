@@ -10,10 +10,14 @@
 import * as THREE from 'three';
 import { Kit } from './kit.js';
 import { buildingShape, shell, Writer } from '../buildings.js';
-import { pointInRing, ringCentroid } from '../geom2d.js';
+import { obb, pointInRing, ringCentroid } from '../geom2d.js';
 
 // Споменикот на Филип II (локални метри) — кон него гледаат главните фасади.
 const FOCUS = [-10.1, 45.5];
+
+// Летната тераса пред ресторанот „Грне“ (јужно од зградата, источно од споменикот). Overture/ML ја
+// препознава тендата како зграда (≈ 9.6 × 7 m, 10 m висока „куќичка“) — таа се заменува со тераса.
+const TERRACE = [11.1, 47.3];
 
 // ─────────────────────────── примитиви за фасада ───────────────────────────
 
@@ -420,6 +424,245 @@ function eastYellow(kit, s, edges, gm) {
   }
 }
 
+/**
+ * Летна тераса (според фотографиите): дрвен под, жардињери со чемпресчиња и цвеќе по рабовите,
+ * маси со столчиња. Покривка: 'awning' — бела тенда на дрвен столб (со буре во подножјето) и
+ * аголни столбови (пред „Грне“); 'umbrellas' — редови квадратни бели чадори со врв (пред Стаклена).
+ */
+function terrace(kit, ring, gm, cover = 'awning') {
+  const f = obb(ring);
+  const L = f.L;
+  const W = f.W;
+  kit.setFrame(f.cx, gm, f.cz, f.ax, f.az);
+  kit.box(0, -0.3, 0, L, 0.45, W, 'wood');
+  // жардињери по рабовите; отвор (влез) на средината на двете долги страни
+  const gap = 1.8;
+  const planter = (u, v, len, alongU) => {
+    if (len < 0.4) return;
+    kit.box(u, 0.15, v, alongU ? len : 0.5, 0.55, alongU ? 0.5 : len, 'wood');
+    const n = Math.max(1, Math.round(len / 0.9));
+    for (let k = 0; k < n; k++) {
+      const t = -len / 2 + (len * (k + 0.5)) / n;
+      const [pu, pv] = alongU ? [u + t, v] : [u, v + t];
+      if (k % 2 === 0) kit.cone(pu, 0.7, pv, 0.3, 1.1 + rnd(pu, pv) * 0.5, 'green', { seg: 6 });
+      else kit.sphere(pu, 0.8, pv, 0.24, 'blossom', { seg: 6, sy: 0.8 });
+    }
+  };
+  const half = (L - gap) / 2;
+  for (const sv of [-1, 1]) {
+    for (const su of [-1, 1]) planter(su * (gap / 2 + half / 2), sv * (W / 2 - 0.25), half, true);
+  }
+  for (const su of [-1, 1]) planter(su * (L / 2 - 0.25), 0, W - 1, false);
+  // маси (портокалови плочи) со по две столчиња
+  const table = (u, v) => {
+    kit.cylinder(u, 0.15, v, 0.05, 0.6, 'metal', { seg: 5 });
+    kit.box(u, 0.75, v, 0.85, 0.06, 0.85, 'ochre');
+    for (const s of [-1, 1]) {
+      kit.box(u + s * 0.7, 0.15, v, 0.45, 0.45, 0.45, 'trunk');
+      kit.box(u + s * 0.9, 0.6, v, 0.08, 0.45, 0.45, 'trunk');
+    }
+  };
+  if (cover === 'umbrellas') {
+    // квадратни чадори (≈ 4 m) во мрежа; под секој по две маси
+    const nu = Math.max(1, Math.round((L - 1) / 4.2));
+    const nv = Math.max(1, Math.round((W - 1) / 4.2));
+    const a = Math.min((L - 1) / nu, (W - 1) / nv) - 0.15;
+    for (let i = 0; i < nu; i++) {
+      for (let j = 0; j < nv; j++) {
+        const u = -(L - 1) / 2 + ((L - 1) * (i + 0.5)) / nu;
+        const v = -(W - 1) / 2 + ((W - 1) * (j + 0.5)) / nv;
+        kit.cylinder(u, 0.15, v, 0.05, 2.6, 'metal', { seg: 5 });
+        kit.hip(u, 2.35, v, a, 0.95, a, 'plaster');
+        kit.box(u, 2.15, v, a, 0.22, a, 'plaster');
+        kit.cone(u, 3.25, v, 0.28, 0.45, 'plaster', { seg: 4 });
+        for (const s of [-1, 1]) table(u + s * a * 0.24, v - s * a * 0.22);
+      }
+    }
+    return;
+  }
+  for (let u = -L / 2 + 1.6; u <= L / 2 - 1.5; u += 2.1) {
+    for (let v = -W / 2 + 1.5; v <= W / 2 - 1.4; v += 2.0) {
+      if (Math.abs(u) < 1.1 && Math.abs(v) < 1.1) continue;
+      table(u, v);
+    }
+  }
+  // средишен столб на буре, аголни столбови, бела тенда со раб
+  kit.cylinder(0, 0.15, 0, 0.42, 0.9, 'wood', { seg: 10 });
+  kit.cylinder(0, 1.05, 0, 0.17, 2.3, 'wood', { seg: 8 });
+  const TL = L - 0.8;
+  const TW = W - 0.8;
+  for (const [su, sv] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) kit.cylinder((su * TL) / 2, 0.15, (sv * TW) / 2, 0.08, 2.75, 'wood', { seg: 6 });
+  kit.hip(0, 2.9, 0, TL + 0.4, 0.75, TW + 0.4, 'accent');
+  kit.box(0, 2.6, (TW + 0.4) / 2, TL + 0.4, 0.3, 0.04, 'accent');
+  kit.box(0, 2.6, -(TW + 0.4) / 2, TL + 0.4, 0.3, 0.04, 'accent');
+  kit.box((TL + 0.4) / 2, 2.6, 0, 0.04, 0.3, TW + 0.4, 'accent');
+  kit.box(-(TL + 0.4) / 2, 2.6, 0, 0.04, 0.3, TW + 0.4, 'accent');
+  // светилки под тендата (ноќе)
+  for (const [su, sv] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) kit.box((su * TL) / 4, 2.55, (sv * TW) / 4, 0.25, 0.2, 0.25, 'light');
+}
+
+// ─────────────────────────── Трговски центар „Стаклена“ ───────────────────────────
+// OSM w38573441 („ГП Пелистер“), источно од „Грне“. Според фотографиите: висок западен дел
+// (5 ката стаклена фасада со метална мрежа, повлечено приземје со дуќани, закосен горен раб,
+// конзолна стаклена кутија на северната фасада, пентхаус со надстрешница), стаклен цилиндар
+// (скали) на северниот агол со камена облога горе и пониско источно крило со закосена стаклена
+// „круна“. Пред северната фасада — гранитни жардињери со зеленило.
+
+/** Отсечи прстен со полурамнина x ≤ x0 (keep = -1) или x ≥ x0 (keep = 1). */
+function clipX(ring, x0, keep) {
+  const out = [];
+  const inside = (p) => (p[0] - x0) * keep >= 0;
+  for (let i = 0; i < ring.length; i++) {
+    const a = ring[i];
+    const b = ring[(i + 1) % ring.length];
+    if (inside(a)) out.push(a);
+    if (inside(a) !== inside(b)) {
+      const t = (x0 - a[0]) / (b[0] - a[0]);
+      out.push([x0, a[1] + (b[1] - a[1]) * t]);
+    }
+  }
+  // отстрани двојни точки и точки на права (по сечењето по вертикален раб на основата)
+  let r = out.filter((p, i) => {
+    const q = out[(i + 1) % out.length];
+    return Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.05;
+  });
+  for (let changed = true; changed && r.length > 3; ) {
+    changed = false;
+    for (let i = 0; i < r.length; i++) {
+      const a = r[(i - 1 + r.length) % r.length];
+      const p = r[i];
+      const b = r[(i + 1) % r.length];
+      if (Math.abs((p[0] - a[0]) * (b[1] - p[1]) - (p[1] - a[1]) * (b[0] - p[0])) < 0.05) {
+        r = r.filter((_, k) => k !== i);
+        changed = true;
+        break;
+      }
+    }
+  }
+  return r;
+}
+
+/** Закосен раб: од прстенот на y0 до прстенот вовлечен за inset на y0 + h, со капак горе. */
+function chamfer(kit, ring, y0, h, inset, part) {
+  const inner = grow(ring, -inset);
+  const pos = [];
+  const nor = [];
+  for (let i = 0; i < ring.length; i++) {
+    const j = (i + 1) % ring.length;
+    const a = ring[i];
+    const b = ring[j];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 1e-3) continue;
+    const nx = (b[1] - a[1]) / len;
+    const nz = -(b[0] - a[0]) / len;
+    const l = Math.hypot(h, inset);
+    const n = [(nx * h) / l, inset / l, (nz * h) / l];
+    const A = [a[0], y0, a[1]];
+    const B = [b[0], y0, b[1]];
+    const C = [inner[j][0], y0 + h, inner[j][1]];
+    const D = [inner[i][0], y0 + h, inner[i][1]];
+    for (const p of [A, B, C, A, C, D]) {
+      pos.push(...p);
+      nor.push(...n);
+    }
+  }
+  kit.raw(pos, nor, part);
+  kit.slab([inner], y0 + h - 0.05, y0 + h, 'stone');
+}
+
+/** Стаклена фасада: стакло, хоризонтални појаси по кат, вертикални профили, „канцеларии“ ноќе. */
+function curtainWall(kit, ring, edges, gm, y0, y1, { module = 1.6, floor = 3.3 } = {}) {
+  kit.slab([ring], gm + y0, gm + y1, 'glass');
+  for (let y = y0; y < y1 - 0.5; y += floor) band(kit, ring, gm + y, gm + y + 0.14, 0.05, 'metal');
+  band(kit, ring, gm + y1 - 0.18, gm + y1, 0.06, 'metal');
+  for (const e of edges) {
+    if (e.len < 1.2) continue;
+    frameOn(kit, e, gm);
+    const n = Math.max(1, Math.round(e.len / module));
+    for (let k = 0; k <= n; k++) kit.box(-e.len / 2 + (e.len * k) / n, y0, 0.03, 0.09, y1 - y0, 0.07, 'metal');
+    // осветлени полиња (ноќе): иста боја како стаклото — дење не се разликуваат
+    for (let k = 0; k < n; k++) {
+      for (let y = y0 + 0.4; y < y1 - 2.4; y += floor) {
+        const u = -e.len / 2 + (e.len * (k + 0.5)) / n;
+        if (rnd(u + e.m[0], y + e.m[1]) < 0.3) kit.box(u, y, 0.02, e.len / n - 0.15, floor - 0.6, 0.02, 'glass', 0, 0.65);
+      }
+    }
+  }
+}
+
+function staklena(kit, s, _edges, gm, others) {
+  const ring = s.rings[0];
+  // поделба: висок западен дел (до цилиндерот на северниот агол) и пониско источно крило
+  const xs = ring.map((p) => p[0]);
+  const SPLIT = Math.min(...xs) + 24;
+  const west = clipX(ring, SPLIT, -1);
+  const east = clipX(ring, SPLIT, 1);
+  const H = 17.6; // 5 ката
+  const H2 = 10.6; // источното крило: 3 ката
+  for (const [part, h, other] of [[west, H, east], [east, H2, west]]) {
+    if (part.length < 3) continue;
+    const ed = openEdges(part, [...others, other]);
+    // приземје: темно повлечено стакло (дуќани — светат ноќе) и гранитен сокл
+    kit.slab([grow(part, -0.9)], gm - 0.3, gm + 4.0, 'window', 0.45);
+    kit.slab([part], gm + 3.7, gm + 4.0, 'metal');
+    curtainWall(kit, part, ed, gm, 4.0, h);
+    // закосен горен раб (западниот дел — низок, источното крило — стаклена „круна“)
+    if (h === H) chamfer(kit, part, gm + h, 1.0, 0.7, 'glass');
+    else chamfer(kit, part, gm + h, 2.2, 2.0, 'glass');
+  }
+  // северен агол: стаклен цилиндар со темни прстени и камена облога горе
+  const north = openEdges(ring, others).filter((e) => e.len > 2 && e.len < 6 && e.nz < -0.3 && e.nx > 0.3);
+  if (north.length) {
+    const e = north[0];
+    const cx = e.m[0] + e.nx * 0.6;
+    const cz = e.m[1] + e.nz * 0.6;
+    kit.setFrame(cx, gm, cz);
+    kit.cylinder(0, -0.3, 0, 2.3, H + 0.3 - 2.6, 'glass', { seg: 24 });
+    for (let y = 1.6; y < H - 2.6; y += 1.6) kit.cylinder(0, y, 0, 2.36, 0.16, 'metal', { seg: 24 });
+    for (let k = 0; k < 8; k++) {
+      const a = (k / 8) * Math.PI * 2;
+      kit.box(Math.cos(a) * 2.3, 0, Math.sin(a) * 2.3, 0.1, H - 2.6, 0.1, 'metal', -a);
+    }
+    kit.cylinder(0, H - 2.6, 0, 2.4, 5.2, 'plinth', { seg: 24 });
+    kit.cylinder(0, H + 2.6, 0, 2.5, 0.25, 'stone', { seg: 24 });
+  }
+  // северна фасада на високиот дел: конзолна стаклена кутија до цилиндерот (на 4–5 кат) и
+  // гранитни жардињери со зеленило на најдолгиот раб
+  const westEdges = openEdges(west, [...others, east]).filter((e) => e.nz < -0.8 && e.len > 4);
+  const nearCyl = westEdges.reduce((best, e) => (e.m[0] > (best?.m[0] ?? -Infinity) ? e : best), null);
+  if (nearCyl) {
+    frameOn(kit, nearCyl, gm);
+    // u расте кон запад; кутијата почнува кај цилиндерот и оди ≈ 12 m на запад
+    const bw = 12;
+    const bu = -nearCyl.len / 2 + bw / 2;
+    kit.box(bu, 10.6, 1.2, bw, 4.6, 2.6, 'glass');
+    kit.box(bu, 10.45, 1.2, bw + 0.1, 0.18, 2.7, 'metal');
+    kit.box(bu, 15.2, 1.2, bw + 0.1, 0.18, 2.7, 'metal');
+    for (let k = 0; k <= 8; k++) kit.box(bu - bw / 2 + (bw * k) / 8, 10.6, 2.5, 0.08, 4.6, 0.06, 'metal');
+  }
+  const longN = westEdges.reduce((best, e) => (e.len > (best?.len ?? 0) ? e : best), null);
+  if (longN) {
+    frameOn(kit, longN, gm);
+    for (let u = -longN.len / 2 + 1.5; u < longN.len / 2 - 1; u += 3.2) {
+      kit.box(u, -0.3, 2.6, 2.8, 1.0, 1.4, 'granite');
+      kit.sphere(u - 0.6, 1.0, 2.6, 0.7, 'green', { seg: 7, sy: 0.6 });
+      kit.sphere(u + 0.6, 1.1, 2.6, 0.6, 'green', { seg: 7, sy: 0.7 });
+    }
+  }
+  // пентхаус на западниот крај: повлечен стаклен кат со надстрешница на столбови
+  const f = obb(west);
+  kit.setFrame(f.cx, gm + H, f.cz, f.ax, f.az);
+  const pu = -f.L / 2 + 6.5;
+  kit.box(pu, 0, 0, 9, 3.0, Math.min(10, f.W - 4), 'glass');
+  kit.box(pu, 2.9, 0, 9.2, 0.12, Math.min(10, f.W - 4) + 0.2, 'metal');
+  const cw = Math.min(13, f.W - 1);
+  kit.add(new THREE.BoxGeometry(11.5, 0.22, cw), Kit.atE(pu - 0.5, 4.1, 0, 0, 0, 0.12), 'metal');
+  for (const [du, dv] of [[-5.2, 1], [-5.2, -1], [4.6, 1], [4.6, -1]]) kit.box(pu + du, 0, (dv * (cw - 0.6)) / 2, 0.16, 4.3 - du * 0.06, 0.16, 'metal');
+  // ограда на покривот
+  kit.box(pu, 0, (cw - 0.2) / 2, 11, 1.0, 0.05, 'metal');
+  kit.box(pu, 0, -(cw - 0.2) / 2, 11, 1.0, 0.05, 'metal');
+}
+
 // OSM id → рецепт
 const HOUSES = [
   { osm: 1464455357, build: whiteCorner },
@@ -428,6 +671,9 @@ const HOUSES = [
   { osm: 1070708421, build: lowYellow },
   { osm: 1463976005, build: cornerOchre },
   { osm: 1070708439, build: eastYellow },
+  { osm: 38573441, build: staklena },
+  // кафулето пред Стаклена (OSM „building“, 6.8 m) е всушност тераса со бели чадори
+  { osm: 1464455360, build: (kit, s) => terrace(kit, s.rings[0], s.gmean, 'umbrellas') },
 ];
 
 /**
@@ -452,12 +698,26 @@ export function magnoliaHouses(kit, ctx) {
     if (Math.abs(x - cx) < 150 && Math.abs(z - cz) < 150) near.push(b);
   }
   const done = new Set();
+  // летната тераса: ML-основата (без OSM id) на местото на тендата
+  for (const b of near) {
+    if (ids[b]) continue;
+    const s = buildingShape(pack, b);
+    if (!pointInRing(TERRACE, s.rings[0])) continue;
+    try {
+      terrace(kit, s.rings[0], s.gmean);
+      ctx.skip.add(b);
+      done.add(b);
+    } catch (err) {
+      console.warn('[magnolija] тераса:', err);
+    }
+    kit.setFrame(0, 0, 0);
+  }
   for (const [b, h] of found) {
     const s = buildingShape(pack, b);
     const others = near.filter((o) => o !== b).map((o) => buildingShape(pack, o).rings[0]);
     const edges = openEdges(s.rings[0], others);
     try {
-      h.build(kit, s, edges, s.gmean);
+      h.build(kit, s, edges, s.gmean, others);
       ctx.skip.add(b);
       done.add(b);
     } catch (err) {

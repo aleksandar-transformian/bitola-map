@@ -33,4 +33,9 @@ export const CHECK_VIEWS = [
   // камерата е на плоштадот источно од споменикот (не во ресторанот „Грне“)
   { id: 'mag-red', target: { x: -25, z: 73 }, bearing: 43, polar: 77, distance: 41 },
   { id: 'mag-plostad', target: { x: 10, z: 58 }, bearing: 300, polar: 68, distance: 90 },
+  // штитот-фонтана и споменикот одозгора, кон Широк Сокак (како фотографијата од дрон)
+  // Трговски центар Стаклена: од Магнолија (запад) и од улицата Добривое Радосављевиќ (север)
+  { id: 'staklena', target: { x: 48, z: 30 }, bearing: 250, polar: 60, distance: 72 },
+  { id: 'staklena-sever', target: { x: 52, z: 28 }, bearing: 15, polar: 68, distance: 62 },
+  { id: 'mag-fontana', target: { x: -15, z: 42 }, bearing: 315, polar: 52, distance: 48 },
 ];

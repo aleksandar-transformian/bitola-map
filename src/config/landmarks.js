@@ -31,7 +31,8 @@ export const LANDMARKS = [
   { id: 'magnolija', group: 'Центар', name: 'Плоштад Магнолија', osm: 'r20052087', model: 'square', rank: 0 },
   // коњаничка статуа на висок постамент (n4411126494 „Статуа Филип II“); точна позиција од
   // сопственикот (Google Maps). Коњаникот е свртен кон Магнолија и влезот на Широк Сокак —
-  // со грбот кон Саат Кула (backTo).
+  // со грбот кон Саат Кула (backTo). scale: целиот споменик ×0.7 (моделот
+  // беше премногу доминантен на плоштадот — сега ≈ 12 m наместо ≈ 17.5 m).
   {
     id: 'filip-vtori', group: 'Центар',
     name: 'Споменик на Филип II Македонски',
@@ -39,11 +40,12 @@ export const LANDMARKS = [
     at: { lat: 41.0301915, lon: 21.3347793 },
     model: 'equestrian',
     rank: 0,
-    opts: { pedestal: 9, backTo: 'saat-kula' },
+    opts: { pedestal: 9, scale: 0.7, backTo: 'saat-kula' },
     view: { bearing: 135, polar: 64, distance: 85 },
   },
-  // фонтаната на Магнолија (кружна, w1464455372) — посебно од споменикот; точна позиција од сопственикот
-  { id: 'magnolija-fontana', name: 'Фонтана', osm: 'w1464455372', at: { lat: 41.0302792, lon: 21.3346646 }, model: 'fountain', rank: 2, label: false },
+  // фонтаната на Магнолија (кружна, w1464455372) — посебно од споменикот; точна позиција од сопственикот.
+  // Позлатен штит со Сонцето од Кутлеш (фотографија од дрон од сопственикот)
+  { id: 'magnolija-fontana', name: 'Фонтана', osm: 'w1464455372', at: { lat: 41.0302792, lon: 21.3346646 }, model: 'shieldFountain', rank: 2, label: false },
   { id: 'shirok-sokak', group: 'Центар', name: 'Широк Сокак', street: 'Широк Сокак', model: 'promenade', buffer: 26, rank: 0 },
   { id: 'herakleja', group: 'Историја и спомен-места', name: 'Хераклеа Линкестис', osm: 'w37956139', model: 'heraclea', parts: { theater: 'w226160304' }, rank: 0 },
 

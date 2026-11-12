@@ -110,6 +110,10 @@ export default {
     plaster: '#f8f1e4',
     peach: '#f0cfb6',
     wood: '#8e4a33',
+    // штитот-фонтана и постаментот на Филип II (Магнолија)
+    gold: '#b8893e',
+    granite: '#4a4744',
+    glass: '#82aeb4', // Стаклена
   },
   trees: {
     crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],

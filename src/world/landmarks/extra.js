@@ -74,22 +74,28 @@ function equestrian(kit, item, ctx) {
     ax = cx - back.center[0];
     az = cz - back.center[1];
   }
+  // opts.scale — целиот споменик (постамент + статуа) помал/поголем од „природниот“ модел
+  const S = o.scale ?? 1;
   kit.setFrame(cx, y, cz, ax, az);
   if (o.fountain) {
     basin(kit, 0, 0, o.fountain);
   }
-  // рефлектори во аглите на постаментот (светат ноќе)
-  for (const [su, sv] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) kit.box(su * 4.4, 0, sv * 4.4, 0.4, 0.3, 0.4, 'light');
-  // постамент: скали, тело, корниз
+  kit.frame.scale(new THREE.Vector3(S, S, S));
+  // постамент од темен гранит на кружни скали (како на Магнолија): скали, тело, корниз
   const P = o.pedestal;
-  kit.box(0, 0, 0, 7.5, 1, 7.5, 'stone');
-  kit.box(0, 1, 0, 6.2, 0.8, 6.2, 'stone');
-  kit.box(0, 1.8, 0, 4.6, P - 3, 4.6, 'stone');
-  kit.box(0, P - 1.2, 0, 5.2, 0.6, 5.2, 'accent');
-  kit.box(0, P - 0.6, 0, 4.8, 0.6, 4.8, 'stone');
+  for (const [r, y0, h] of [[6.2, -0.5, 0.9], [5.4, 0.4, 0.4], [4.6, 0.8, 0.4]]) kit.cylinder(0, y0, 0, r, h, 'granite', { seg: 40 });
+  // рефлектори во работ на скалите (светат ноќе)
+  for (let i = 0; i < 4; i++) {
+    const a = Math.PI / 4 + (i * Math.PI) / 2;
+    kit.box(Math.cos(a) * 5.0, 0.8, Math.sin(a) * 5.0, 0.4, 0.3, 0.4, 'light');
+  }
+  kit.box(0, 1.2, 0, 4.4, 0.7, 4.4, 'granite');
+  kit.box(0, 1.9, 0, 3.6, P - 3.1, 3.6, 'granite');
+  kit.box(0, P - 1.2, 0, 4.2, 0.6, 4.2, 'granite');
+  kit.box(0, P - 0.6, 0, 3.9, 0.6, 3.9, 'granite');
   // статуата е во природна големина × ~1.6 — посебна рамка на врвот на постаментот
-  kit.setFrame(cx, y + P, cz, ax, az);
-  kit.frame.scale(new THREE.Vector3(1.6, 1.6, 1.6));
+  kit.setFrame(cx, y + P * S, cz, ax, az);
+  kit.frame.scale(new THREE.Vector3(1.6 * S, 1.6 * S, 1.6 * S));
   // коњ (по u): труп, нозе (предните во скок), врат, глава, опашка
   const H = 0;
   const B = 'bronze';
@@ -128,6 +134,66 @@ function fountain(kit, item, ctx) {
     const a = (i / n) * TAU;
     kit.add(new THREE.CylinderGeometry(0.05, 0.09, 1.4, 5).translate(0, 0.7, 0), Kit.atE(Math.cos(a) * (R - 1), 0.25, Math.sin(a) * (R - 1), Math.sin(a) * 0.5, 0, -Math.cos(a) * 0.5), 'water');
     kit.box(Math.cos(a) * (R - 0.25), 0.55, Math.sin(a) * (R - 0.25), 0.25, 0.15, 0.25, 'light', -a);
+  }
+}
+
+// ───────────────────────── Фонтана „Штит“ (Магнолија) ─────────────────────────
+// Според фотографијата од дрон: ниска позлатена купола (штит) со Сонцето од Кутлеш — 16 краци,
+// наизменично долги и кратки, топче во средината — и дупчиња за млазовите меѓу краците;
+// низок камен раб, тенок слој вода околу штитот и поплочен круг околу фонтаната.
+function shieldFountain(kit, item, ctx) {
+  const ring = item.polys[0][0];
+  const [ox, oz] = ringCentroid(ring);
+  const R = Math.max(3, ring.reduce((a, [x, z]) => a + Math.hypot(x - ox, z - oz), 0) / ring.length);
+  const [cx, cz] = item.center;
+  kit.setFrame(cx, ctx.hf.sample(cx, cz), cz);
+  // поплочен круг (темна лента) околу фонтаната
+  kit.add(new THREE.TorusGeometry(R + 2.6, 0.22, 4, 64), Kit.atE(0, 0.02, 0, Math.PI / 2, 0, 0, 1, 1, 0.15), 'plinth');
+  // камен раб и вода
+  kit.cylinder(0, -0.3, 0, R, 0.65, 'stone', { seg: 48 });
+  kit.add(new THREE.TorusGeometry(R - 0.2, 0.25, 6, 56), Kit.atE(0, 0.35, 0, Math.PI / 2), 'stone');
+  kit.cylinder(0, 0.3, 0, R - 0.4, 0.04, 'water', { seg: 48 });
+  // штит: сферна калота (висина Hd) со пречник 2·Rd
+  const Rd = R - 0.75;
+  const Hd = Math.min(1.1, Rd * 0.24);
+  const sr = (Rd * Rd + Hd * Hd) / (2 * Hd); // радиус на сферата
+  const y0 = 0.3; // дното на штитот (површината на водата)
+  const capY = (r) => y0 + Math.sqrt(Math.max(0, sr * sr - r * r)) - (sr - Hd);
+  const cap = new THREE.SphereGeometry(sr, 40, 10, 0, TAU, 0, Math.asin(Rd / sr));
+  kit.add(cap, Kit.at(0, y0 - (sr - Hd), 0), 'gold');
+  // 16 краци: тесни триаголни призми по површината на штитот
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * TAU;
+    const long = i % 2 === 0;
+    const r1 = Rd * (long ? 0.97 : 0.78);
+    const w0 = long ? 0.55 : 0.4;
+    const N = 5;
+    for (let k = 0; k < N; k++) {
+      const ra = 0.35 + ((r1 - 0.35) * k) / N;
+      const rb = 0.35 + ((r1 - 0.35) * (k + 1)) / N;
+      const len = Math.hypot(rb - ra, capY(rb) - capY(ra));
+      const slope = Math.atan2(capY(ra) - capY(rb), rb - ra);
+      const w = w0 * (1 - (k + 0.5) / N) + 0.04;
+      const g = new THREE.BoxGeometry(len, 0.16, w);
+      const rm = (ra + rb) / 2;
+      // по зракот: ротација околу y (-a), па наклон по површината
+      // краците се посветли од штитот (сјајна позлата наспроти потемнета подлога)
+      kit.add(g, Kit.atE(Math.cos(a) * rm, capY(rm) + 0.05, Math.sin(a) * rm, 0, -a, -slope), 'ochre');
+    }
+    // дупчиња за млазовите меѓу краците (на две растојанија)
+    const b = a + TAU / 32;
+    for (const t of [0.5, 0.8]) {
+      const r = Rd * t;
+      kit.cylinder(Math.cos(b) * r, capY(r) - 0.02, Math.sin(b) * r, 0.09, 0.06, 'metal', { seg: 5 });
+    }
+  }
+  // топче во средината
+  kit.sphere(0, capY(0) + 0.05, 0, 0.42, 'ochre', { seg: 14, sy: 0.6 });
+  // светилки во работ (ноќе)
+  const n = 12;
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * TAU;
+    kit.box(Math.cos(a) * (R - 0.2), 0.58, Math.sin(a) * (R - 0.2), 0.22, 0.1, 0.22, 'light', -a);
   }
 }
 
@@ -458,4 +524,4 @@ function jets(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };
+export const EXTRA_MODELS = { equestrian, fountain, shieldFountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };
