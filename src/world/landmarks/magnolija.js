@@ -501,6 +501,98 @@ function terrace(kit, ring, gm, cover = 'awning') {
   for (const [su, sv] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) kit.box((su * TL) / 4, 2.55, (sv * TW) / 4, 0.25, 0.2, 0.25, 'light');
 }
 
+// ─────────────────────────── Ресторан „Грне“ ───────────────────────────
+// OSM w38572955, североисточно од споменикот. Според фотографиите: стара двокатна градска куќа —
+// камено приземје (варовник) над низок сокл со отвори за подрумот, бел кат, широки кафени рамки
+// околу прозорците со „веѓи“, кафен појас меѓу катовите и пиластри на аглите, плиток четиристрешен
+// покрив со стреа, соларни панели и оџак. Јужната фасада (кон летната тераса): балкон со метална
+// ограда над влезот, скали, надстрешница, зелени натписи („Грне“, „Restaurant“) и знаменца.
+
+/** Прозорец на „Грне“: широка кафена рамка, бела рамка, стакло; opt. решетка и веѓа. */
+function grneWindow(kit, u, y, w, h, { grille = false, hood = true, lit = 0.7 } = {}) {
+  kit.box(u, y - 0.28, 0.0, w + 0.62, h + 0.5, 0.07, 'wood');
+  windowAt(kit, u, y, w, h, { frame: 'plaster', v: 0.07, sill: false, lit });
+  kit.box(u, y - 0.38, 0.1, w + 0.8, 0.1, 0.22, 'wood');
+  if (hood) kit.box(u, y + h + 0.26, 0.1, w + 0.9, 0.16, 0.24, 'wood');
+  if (grille) for (let k = -2; k <= 2; k++) kit.box(u + (k * w) / 5.2, y, 0.24, 0.035, h, 0.035, 'metal');
+}
+
+function grne(kit, s0, _edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = 9.0;
+  const G = 4.4; // висина на каменото приземје
+  body(kit, s, H, 'plaster', { pitched: 'hip' });
+  band(kit, ring, gm - 0.3, gm + 1.0, 0.1, 'plinth');
+  band(kit, ring, gm + 1.0, gm + G, 0.06, 'stone');
+  for (let y = 1.6; y < G - 0.2; y += 0.6) band(kit, ring, gm + y, gm + y + 0.04, 0.08, 'plinth');
+  band(kit, ring, gm + G, gm + G + 0.3, 0.14, 'wood');
+  band(kit, ring, gm + H - 0.4, gm + H - 0.15, 0.12, 'wood');
+  band(kit, ring, gm + H - 0.15, gm + H + 0.05, 0.6, 'wood'); // стреа
+  const edges = openEdges(ring, others);
+  // главна фасада: кон летната тераса
+  const main = edges.reduce((best, e) => {
+    const d = (TERRACE[0] - e.m[0]) * e.nx + (TERRACE[1] - e.m[1]) * e.nz;
+    return e.len > 8 && d > (best?.d ?? 0) ? { e, d } : best;
+  }, null)?.e;
+  for (const e of edges) {
+    if (e.len < 3) continue;
+    frameOn(kit, e, gm);
+    const L = e.len;
+    // пиластри на аглите (катот) и камени квадери (приземјето)
+    for (const sg of [-1, 1]) {
+      kit.box(sg * (L / 2 - 0.35), G + 0.3, 0.02, 0.7, H - G - 0.7, 0.12, 'wood');
+      for (let y = 1.0; y < G; y += 0.6) kit.box(sg * (L / 2 - (y % 1.2 < 0.6 ? 0.35 : 0.55)), y, 0.03, y % 1.2 < 0.6 ? 0.7 : 1.1, 0.52, 0.1, 'stone');
+    }
+    const n = Math.max(1, Math.round((L - 1.4) / 2.35));
+    for (let k = 0; k < n; k++) {
+      const u = -(L - 1.4) / 2 + ((L - 1.4) * (k + 0.5)) / n;
+      const centre = e === main && Math.abs(u) < (L - 1.4) / n / 2 + 0.01;
+      if (centre) continue; // влез и балкон
+      grneWindow(kit, u, 5.35, 1.05, 2.05);
+      grneWindow(kit, u, 1.65, 1.05, 1.95, { grille: true, hood: false, lit: 0.85 });
+      kit.box(u, 0.25, 0.04, 0.7, 0.35, 0.05, 'metal'); // отвор за подрумот
+    }
+    if (e !== main) continue;
+    // ── главна фасада: влез, скали, надстрешница, натписи, балкон, знаменца ──
+    windowAt(kit, 0, 1.0, 1.5, 2.9, { frame: 'wood', bars: false, sill: false, lit: 0.9 });
+    kit.box(0, 0.72, 0.0, 2.3, 3.6, 0.07, 'wood');
+    for (let k = 0; k < 4; k++) kit.box(0, -0.3 + k * 0.25, 0.4 + (3 - k) * 0.3, 3.0, 0.3, 0.32, 'stone');
+    kit.add(new THREE.BoxGeometry(3.2, 0.08, 1.3), Kit.atE(0, 4.05, 0.65, 0.18, 0, 0), 'green');
+    kit.box(0, 3.95, 0.08, 3.0, 0.42, 0.08, 'green'); // „Грне на Широк Сокак“
+    kit.box(-L / 4, 3.75, 0.08, 3.4, 0.38, 0.06, 'green'); // „Restaurant“
+    wallLamp(kit, 1.7, 3.6);
+    wallLamp(kit, -1.7, 3.6);
+    // балкон со француска врата
+    windowAt(kit, 0, 4.85, 1.3, 2.75, { frame: 'plaster', v: 0.07, bars: true, sill: false, lit: 0.8 });
+    kit.box(0, 4.6, 0.0, 1.95, 3.4, 0.07, 'wood');
+    kit.box(0, 7.85, 0.1, 2.2, 0.16, 0.24, 'wood');
+    balcony(kit, 0, 4.85, 3.4, 0.95, { slab: 'stone', rail: 'metal', h: 1.0, step: 0.14 });
+    // знаменца (коси копја од катот)
+    for (const sg of [-1, 1]) {
+      const fu = sg * ((L - 1.4) / n) * 1.0;
+      kit.add(new THREE.CylinderGeometry(0.03, 0.03, 2.2, 5).translate(0, 1.1, 0), Kit.atE(fu, 7.6, 0.15, 0.6, 0, 0), 'metal');
+      kit.add(new THREE.BoxGeometry(0.04, 0.75, 1.1), Kit.atE(fu, 8.35, 1.25, 0.6, 0, 0), 'roof');
+    }
+  }
+  // соларни панели на јужната падина на покривот (покрај слемето) и оџак
+  if (main) {
+    const W = Math.min(...edges.filter((e) => e !== main && e.len > 3).map((e) => e.len), 20);
+    const hw = W / 2;
+    const rise = Math.min(4.5, hw * Math.tan(Math.PI / 6), Math.max(1.2, H * 0.45));
+    const th = Math.atan2(rise, hw);
+    frameOn(kit, main, gm);
+    const count = Math.max(4, Math.floor((main.len - 2 * (hw * 0.7)) / 1.08));
+    const d = hw * 0.62;
+    for (let k = 0; k < count; k++) {
+      const u = (k - (count - 1) / 2) * 1.08;
+      kit.add(new THREE.BoxGeometry(1.0, 0.07, 1.6), Kit.atE(u, H + d * Math.tan(th) + 0.12, -d, th, 0, 0), 'metal');
+    }
+    kit.box(main.len / 4, H + rise * 0.55, -hw * 0.6, 0.7, rise * 0.45 + 1.4, 0.7, 'plaster');
+    kit.box(main.len / 4, H + rise + 0.85, -hw * 0.6, 0.9, 0.15, 0.9, 'wood');
+  }
+}
+
 // ─────────────────────────── Трговски центар „Стаклена“ ───────────────────────────
 // OSM w38573441 („ГП Пелистер“), источно од „Грне“. Според фотографиите: висок западен дел
 // (5 ката стаклена фасада со метална мрежа, повлечено приземје со дуќани, закосен горен раб,
@@ -526,13 +618,22 @@ function clipX(ring, x0, keep) {
     const q = out[(i + 1) % out.length];
     return Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.05;
   });
+  return simplify(r);
+}
+
+/** Отстрани точки што се (речиси) на права меѓу соседите (sin на аголот < tol). */
+function simplify(ring, tol = 0.02) {
+  let r = ring;
   for (let changed = true; changed && r.length > 3; ) {
     changed = false;
     for (let i = 0; i < r.length; i++) {
       const a = r[(i - 1 + r.length) % r.length];
       const p = r[i];
       const b = r[(i + 1) % r.length];
-      if (Math.abs((p[0] - a[0]) * (b[1] - p[1]) - (p[1] - a[1]) * (b[0] - p[0])) < 0.05) {
+      const l1 = Math.hypot(p[0] - a[0], p[1] - a[1]);
+      const l2 = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      const cross = (p[0] - a[0]) * (b[1] - p[1]) - (p[1] - a[1]) * (b[0] - p[0]);
+      if (l1 < 1e-6 || l2 < 1e-6 || Math.abs(cross) / (l1 * l2) < tol) {
         r = r.filter((_, k) => k !== i);
         changed = true;
         break;
@@ -672,6 +773,7 @@ const HOUSES = [
   { osm: 1463976005, build: cornerOchre },
   { osm: 1070708439, build: eastYellow },
   { osm: 38573441, build: staklena },
+  { osm: 38572955, build: grne },
   // кафулето пред Стаклена (OSM „building“, 6.8 m) е всушност тераса со бели чадори
   { osm: 1464455360, build: (kit, s) => terrace(kit, s.rings[0], s.gmean, 'umbrellas') },
 ];
