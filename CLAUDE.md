@@ -39,7 +39,7 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
 charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
 filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad, mag-fontana, grne,
-staklena, staklena-sever, mag-zapad, oktomvri, banka) + `lm-<id>` за секоја знаменитост.
+staklena, staklena-sever, mag-zapad, oktomvri, banka, osmano, osmano-agol) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>&quality=auto|high|medium|low`

@@ -40,6 +40,9 @@ export const CHECK_VIEWS = [
   { id: 'mag-zapad', target: { x: -40, z: 52 }, bearing: 33, polar: 76, distance: 46 },
   { id: 'oktomvri', target: { x: -50, z: 46 }, bearing: 11, polar: 76, distance: 30 },
   { id: 'banka', target: { x: -78, z: 32 }, bearing: 343, polar: 74, distance: 38 },
+  // Јорго Османо од банката кон Саат Кула (книжарница, дуќани, бр. 8, coffee house на аголот)
+  { id: 'osmano', target: { x: -100, z: 6 }, bearing: 62, polar: 70, distance: 34 },
+  { id: 'osmano-agol', target: { x: -116, z: -22 }, bearing: 20, polar: 72, distance: 32 },
   // Трговски центар Стаклена: од Магнолија (запад) и од улицата Добривое Радосављевиќ (север)
   { id: 'staklena', target: { x: 48, z: 30 }, bearing: 250, polar: 60, distance: 72 },
   { id: 'staklena-sever', target: { x: 52, z: 28 }, bearing: 15, polar: 68, distance: 62 },
