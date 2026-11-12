@@ -419,6 +419,157 @@ function grne(kit, s0, _edges, gm, others) {
   }
 }
 
+// ─────────────────────────── Магаза ───────────────────────────
+// OSM w38580676 („Магаза“, галерија), јужно од плоштадот, меѓу „Zegin“ и жолтата зграда со „vip“. Според фотографиите: стара отоманска
+// камена зграда на два ката — ѕидарски редови од варовник, хоризонтален венец меѓу катовите,
+// прозорци со камени рамки, решетки во ромбови и лачни ниши (лунети) над нив, лачна дрвена врата
+// и мала сива лачна врата; плиток четиристрешен покрив од камени плочи. Пред неа двор со калдрма
+// од кршен камен и фонтана на два ката; кон плоштадот низок камен ѕид со бели столбови, железна
+// ограда и порта; смрча во аголот.
+
+// дворот пред Магаза (ограден со OSM w1463976008 и соседните згради)
+const MAGAZA_COURT = [[21.6, 65.8], [30.7, 62.7], [35.7, 76.7], [25.4, 80.8], [25.5, 77.5], [23, 69.8]];
+
+/** Решетка во ромбови: две групи коси прачки, отсечени на правоаголникот w×h (центар долу u, y). */
+function lattice(kit, u, y, w, h, v, step = 0.32) {
+  const x0 = -w / 2;
+  const x1 = w / 2;
+  for (const sg of [1, -1]) {
+    // линии y' = sg·x + c (во локални координати, y' од 0 до h)
+    for (let c = -w - h; c <= w + h; c += step) {
+      const pts = [];
+      const add = (x, yy) => {
+        if (x >= x0 - 1e-6 && x <= x1 + 1e-6 && yy >= -1e-6 && yy <= h + 1e-6) pts.push([x, yy]);
+      };
+      add(x0, sg * x0 + c);
+      add(x1, sg * x1 + c);
+      add((0 - c) / sg, 0);
+      add((h - c) / sg, h);
+      if (pts.length < 2) continue;
+      pts.sort((a, b) => a[0] - b[0]);
+      const [a, b] = [pts[0], pts[pts.length - 1]];
+      const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+      if (len < 0.05) continue;
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      kit.add(new THREE.BoxGeometry(len, 0.03, 0.03), Kit.atE(u + (a[0] + b[0]) / 2, y + (a[1] + b[1]) / 2, v, 0, 0, ang), 'metal');
+    }
+  }
+}
+
+/** Прозорец на Магаза: камена рамка, темно стакло, решетка во ромбови, лунета над него. */
+function magazaWindow(kit, u, y, w, h) {
+  kit.box(u, y - 0.2, 0.0, w + 0.5, h + 0.4, 0.08, 'accent');
+  kit.box(u, y, 0.06, w, h, 0.04, 'window', 0, 0.35);
+  lattice(kit, u, y, w, h, 0.12);
+  kit.box(u, y + h + 0.32, 0.06, w + 1.0, 0.1, 0.1, 'accent'); // праг на лунетата
+  kit.add(new THREE.TorusGeometry(w / 2 + 0.38, 0.07, 4, 14, Math.PI), Kit.at(u, y + h + 0.37, 0.07), 'accent');
+}
+
+/** Лачна врата: камена рамка + крила. */
+function archDoor(kit, u, w, h, part) {
+  plate(kit, openingShape(w + 0.45, h + 0.25, 'round'), u, 0, 0.0, 0.08, 'accent');
+  plate(kit, openingShape(w, h, 'round'), u, 0, 0.06, 0.05, part);
+  kit.box(u, 0, 0.12, 0.04, h - w / 2, 0.02, 'metal');
+}
+
+function magaza(kit, s0, edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = 8.0;
+  const F = 4.2; // венец меѓу катовите
+  body(kit, s, H, 'stone', { pitched: 'hip', roof: 'dome' });
+  for (let y = 0.5; y < H - 0.3; y += 0.48) band(kit, ring, gm + y, gm + y + 0.025, 0.012, 'plinth'); // ѕидарски редови
+  band(kit, ring, gm - 0.3, gm + 0.35, 0.06, 'plinth');
+  band(kit, ring, gm + F, gm + F + 0.14, 0.1, 'accent');
+  band(kit, ring, gm + H - 0.35, gm + H - 0.15, 0.1, 'accent');
+  band(kit, ring, gm + H - 0.15, gm + H + 0.02, 0.5, 'dome'); // стреа од камени плочи
+  const main = edges.reduce((best, e) => (e.len > 6 && e.face > (best?.face ?? 0) ? e : best), null);
+  for (const e of edges) {
+    if (e.len < 4 || e === main) continue;
+    frameOn(kit, e, gm);
+    const n = Math.max(1, Math.round(e.len / 4.5));
+    for (let k = 0; k < n; k++) magazaWindow(kit, -e.len / 2 + (e.len * (k + 0.5)) / n, F + 1.3, 0.85, 1.25);
+  }
+  if (!main) return;
+  frameOn(kit, main, gm);
+  // u по фасадата: t = 0 на источниот агол, 1 на западниот. Фасадата гледа на север (кон плоштадот),
+  // па од дворот лево е исток: прозорец, голема врата, прозорец, мала сива врата (како на фотографијата)
+  const X = [main.nz, -main.nx];
+  const uOf = (p) => (p[0] - main.m[0]) * X[0] + (p[1] - main.m[1]) * X[1];
+  const uA = uOf(main.a);
+  const uB = uOf(main.b);
+  const [uE, uW] = main.a[0] > main.b[0] ? [uA, uB] : [uB, uA];
+  const at = (t) => uE + (uW - uE) * t;
+  // рамка на горниот дел (пиластри во аглите)
+  for (const t of [0.03, 0.97]) kit.box(at(t), F + 0.14, 0.02, 0.35, H - F - 0.5, 0.06, 'accent');
+  magazaWindow(kit, at(0.25), F + 1.25, 0.95, 1.35);
+  magazaWindow(kit, at(0.6), F + 1.25, 0.95, 1.35);
+  magazaWindow(kit, at(0.24), 1.05, 1.0, 1.65);
+  magazaWindow(kit, at(0.62), 1.05, 1.0, 1.65);
+  archDoor(kit, at(0.43), 1.35, 2.75, 'wood');
+  archDoor(kit, at(0.86), 0.95, 2.3, 'metal');
+  // ── двор ──
+  kit.setFrame(0, 0, 0);
+  kit.slab([MAGAZA_COURT], gm - 0.25, gm + 0.06, 'paving');
+  // фонтана на два ката пред лачната врата
+  const du = at(0.43);
+  const fx = main.m[0] + X[0] * du + main.nx * 5.2;
+  const fz = main.m[1] + X[1] * du + main.nz * 5.2;
+  kit.setFrame(fx, gm, fz);
+  kit.cylinder(0, 0, 0, 1.35, 0.8, 'dome', { seg: 28 });
+  for (let k = 0; k < 20; k++) {
+    const a = (k / 20) * Math.PI * 2;
+    kit.box(Math.cos(a) * 1.36, 0.02, Math.sin(a) * 1.36, 0.08, 0.74, 0.08, 'stone', -a);
+  }
+  kit.cylinder(0, 0.62, 0, 1.15, 0.05, 'water', { seg: 28 });
+  kit.cylinder(0, 0.6, 0, 0.22, 0.6, 'dome', { seg: 10 });
+  kit.cylinder(0, 1.15, 0, 0.35, 0.2, 'dome', { top: 0.75, seg: 18 });
+  kit.cylinder(0, 1.36, 0, 0.68, 0.03, 'water', { seg: 18 });
+  kit.cylinder(0, 1.35, 0, 0.12, 0.45, 'dome', { seg: 8 });
+  kit.cylinder(0, 1.75, 0, 0.22, 0.15, 'dome', { top: 0.48, seg: 14 });
+  kit.cylinder(0, 1.91, 0, 0.44, 0.03, 'water', { seg: 14 });
+  // смрча во западниот агол на дворот (до жолтата зграда со „vip“)
+  kit.setFrame(25.7, gm, 75.6);
+  kit.cylinder(0, 0, 0, 0.25, 2.2, 'trunk', { seg: 6 });
+  for (const [y, r, h] of [[1.4, 1.8, 3.6], [3.4, 1.5, 3.3], [5.4, 1.1, 3.0], [7.3, 0.7, 2.6]]) kit.cone(0, y, 0, r, h, 'green', { seg: 8 });
+  // ограда кон плоштадот: камен ѕид, бели столбови, железни прачки, порта
+  const fence = [[21.6, 65.8], [30.7, 62.7], [35.7, 76.7]];
+  for (let i = 0; i + 1 < fence.length; i++) {
+    const [ax, az] = fence[i];
+    const [bx, bz] = fence[i + 1];
+    const len = Math.hypot(bx - ax, bz - az);
+    kit.setFrame((ax + bx) / 2, gm, (az + bz) / 2, (bx - ax) / len, (bz - az) / len);
+    const gate = i === 0 ? [0.4, 3.0] : null; // порта на јужната страна (u-центар, ширина)
+    const n = Math.max(1, Math.round(len / 3.2));
+    const posts = [];
+    for (let k = 0; k <= n; k++) posts.push(-len / 2 + (len * k) / n);
+    if (gate) posts.push(gate[0] - gate[1] / 2, gate[0] + gate[1] / 2);
+    posts.sort((a, b) => a - b);
+    for (const u of posts) {
+      kit.box(u, -0.2, 0, 0.55, 1.95, 0.55, 'plaster');
+      kit.box(u, 1.75, 0, 0.7, 0.14, 0.7, 'accent');
+    }
+    for (let k = 0; k + 1 < posts.length; k++) {
+      const u0 = posts[k] + 0.3;
+      const u1 = posts[k + 1] - 0.3;
+      if (u1 - u0 < 0.3) continue;
+      const mid = (u0 + u1) / 2;
+      const isGate = gate && Math.abs(mid - gate[0]) < 0.2;
+      const base = isGate ? 0.05 : 0.65;
+      const top = isGate ? 1.85 : 1.45;
+      if (!isGate) kit.box(mid, -0.2, 0, u1 - u0, 0.85, 0.45, 'stone');
+      kit.box(mid, base, 0, u1 - u0, 0.04, 0.04, 'metal');
+      kit.box(mid, top, 0, u1 - u0, 0.04, 0.04, 'metal');
+      for (let x = u0 + 0.06; x < u1; x += 0.13) kit.box(x, base, 0, 0.025, top - base + (isGate ? 0.12 : 0.06), 0.025, 'metal');
+      // табла со натпис на ѕидот лево од портата
+      if (gate && !isGate && Math.abs(posts[k + 1] - (gate[0] - gate[1] / 2)) < 0.01) {
+        kit.box(mid, 0.65, -0.05, Math.min(2.4, u1 - u0 - 0.2), 1.0, 0.06, 'wood');
+        kit.box(mid, 0.72, -0.09, Math.min(2.2, u1 - u0 - 0.4), 0.86, 0.02, 'plaster');
+      }
+    }
+  }
+}
+
 // ─────────────────────────── Трговски центар „Стаклена“ ───────────────────────────
 // OSM w38573441 („ГП Пелистер“), источно од „Грне“. Според фотографиите: висок западен дел
 // (5 ката стаклена фасада со метална мрежа, повлечено приземје со дуќани, закосен горен раб,
@@ -528,6 +679,8 @@ const HOUSES = [
   { osm: 1463976005, build: cornerOchre },
   { osm: 1070708439, build: eastYellow },
   { osm: 38573441, build: staklena },
+  // Магаза: главната фасада гледа кон својот двор (не кон споменикот)
+  { osm: 38580676, build: magaza, focus: [29.5, 70.5] },
   { osm: 38572955, build: grne },
   // кафулето пред Стаклена (OSM „building“, 6.8 m) е всушност тераса со бели чадори
   { osm: 1464455360, build: (kit, s) => terrace(kit, s.rings[0], s.gmean, 'umbrellas') },

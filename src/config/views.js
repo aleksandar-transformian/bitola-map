@@ -52,5 +52,7 @@ export const CHECK_VIEWS = [
   // Трговски центар Стаклена: од Магнолија (запад) и од улицата Добривое Радосављевиќ (север)
   { id: 'staklena', target: { x: 48, z: 30 }, bearing: 250, polar: 60, distance: 72 },
   { id: 'staklena-sever', target: { x: 52, z: 28 }, bearing: 15, polar: 68, distance: 62 },
+  // Магаза и нејзиниот двор од плоштадот (југ)
+  { id: 'magaza', target: { x: 31, z: 77 }, bearing: 345, polar: 72, distance: 24 },
   { id: 'mag-fontana', target: { x: -15, z: 42 }, bearing: 315, polar: 52, distance: 48 },
 ];
