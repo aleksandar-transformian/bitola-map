@@ -96,7 +96,7 @@ export function collectLabels({ pois, landmarks, hf, rect, placeRank, placeSkip,
   const H = {
     clockTower: 36, mosque: 30, church: 30, officersHome: 22, publicBuilding: 22, bezisten: 14, square: 10, promenade: 16,
     heraclea: 10, equestrian: 17, stoneTower: 18, station: 16, stadium: 36, fortress: 14, totenburg: 14, warCemetery: 18,
-    monastery: 22, fildzan: 9, jets: 10,
+    monastery: 22, fildzan: 9, jets: 10, zoo: 14, smolevoChurch: 18, motocross: 10,
   };
   for (const lm of landmarks) {
     if (lm.label === false) continue;

@@ -253,7 +253,7 @@ function areaClass(t) {
   if (t.highway === 'pedestrian' || t.place === 'square' || (t.highway && t.area === 'yes' && t.highway !== 'service')) return 'plaza';
   if (am === 'parking' || t.parking) return 'parking';
   if (['pitch', 'stadium', 'sports_centre', 'track', 'swimming_pool'].includes(le)) return 'sports';
-  if (['park', 'garden', 'recreation_ground', 'playground', 'dog_park'].includes(le) || lu === 'recreation_ground') return 'park';
+  if (['park', 'garden', 'recreation_ground', 'playground', 'dog_park'].includes(le) || lu === 'recreation_ground' || t.tourism === 'zoo') return 'park';
   if (lu === 'grass' || lu === 'village_green' || lu === 'flowerbed') return 'grass';
   if (lu === 'cemetery' || am === 'grave_yard') return 'cemetery';
   if (['school', 'university', 'college', 'kindergarten', 'hospital', 'clinic'].includes(am) || lu === 'education') return 'education';
@@ -809,6 +809,17 @@ function roofShape(t) {
         item.parts = item.parts || {};
         item.parts[k] = { osmId: n.id, center: [+x.toFixed(2), +z.toFixed(2)], ground: +hf.sample(x, z).toFixed(2) };
         continue;
+      }
+      if (ref[0] === 'w') {
+        // дел-линија (отворена OSM линија, на пр. патека): точките по редослед од OSM
+        const way = osm.ways.get(+ref.slice(1));
+        if (way && !isClosed(way)) {
+          const line = wayXZ(way);
+          if (!line) throw new Error(`Знаменитост: ${ref} нема точки`);
+          item.parts = item.parts || {};
+          item.parts[k] = { osmId: way.id, line: r1(line), center: G.centroid(line).map((v) => +v.toFixed(2)) };
+          continue;
+        }
       }
       const { el, polys } = ringsOf(ref);
       item.parts = item.parts || {};

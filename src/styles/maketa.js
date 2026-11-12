@@ -107,6 +107,12 @@ export default {
     plaster: '#f8f7f3',
     peach: '#f1e8dc',
     wood: '#c9ae82',
+    // Хераклеа (world/landmarks/heraclea.js)
+    brick: '#d9b48c',
+    marble: '#f6f0e4',
+    sand: '#efe2c6',
+    rubble: '#dcc6a2',
+    slate: '#c3ab84',
   },
   traffic: { cars: ['#f6f5f1', '#e6cc9f', '#ecebe6', '#d8be8f'], people: ['#f4f3ef', '#e2c697', '#d6d3cb'] },
   trees: {

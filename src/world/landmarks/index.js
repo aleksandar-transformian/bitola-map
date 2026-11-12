@@ -5,8 +5,11 @@ import { Kit, PARTS } from './kit.js';
 import { MODELS } from './models.js';
 import { EXTRA_MODELS } from './extra.js';
 import { CIVIC_MODELS } from './civic.js';
+import { heraclea } from './heraclea.js';
+import { zoo } from './zoo.js';
+import { SMOLEVO_MODELS } from './smolevo.js';
 
-const ALL = { ...MODELS, ...EXTRA_MODELS, ...CIVIC_MODELS };
+const ALL = { ...MODELS, ...EXTRA_MODELS, ...CIVIC_MODELS, ...SMOLEVO_MODELS, heraclea, zoo };
 
 /**
  * @param {object[]} items  landmarks.json
