@@ -206,6 +206,41 @@ function lowYellow(kit, s, edges, gm) {
   }
 }
 
+/** Раб што гледа во дворот на Магаза (таму ѕидовите се слепи). */
+function facesMagazaCourt(e) {
+  return pointInRing([e.m[0] + e.nx * 1.5, e.m[1] + e.nz * 1.5], MAGAZA_COURT);
+}
+
+/** Слеп ѕид кон дворот на Магаза: само бршлен долу кон плоштадот (како на фотографијата). */
+function courtWall(kit, e) {
+  // крајот на работ поблиску до плоштадот (помал z = север)
+  const X = [e.nz, -e.nx];
+  const uA = (e.a[0] - e.m[0]) * X[0] + (e.a[1] - e.m[1]) * X[1];
+  const north = e.a[1] < e.b[1] ? uA : -uA;
+  const sg = Math.sign(north) || 1;
+  const u = north - sg * Math.min(2.2, e.len * 0.3);
+  kit.box(u, 0, 0.12, Math.min(3.2, e.len * 0.5), 4.6, 0.25, 'green');
+  kit.sphere(u, 4.6, 0.15, 1.2, 'green', { seg: 7, sy: 0.6 });
+}
+
+/** Зграда до аголната „vip“ (w1463976006): жолт малтер, слеп ѕид кон дворот на Магаза. */
+function besideMagaza(kit, s, edges, gm) {
+  body(kit, s, 8.4, 'ochre', { pitched: true });
+  const ring = s.rings[0];
+  band(kit, ring, gm + 4.2, gm + 4.5, 0.15, 'plaster');
+  band(kit, ring, gm + 8.1, gm + 8.4, 0.4, 'plaster');
+  for (const e of edges) {
+    if (e.len < 2.2) continue;
+    frameOn(kit, e, gm);
+    if (facesMagazaCourt(e)) continue;
+    const n = Math.max(1, Math.round(e.len / 2.6));
+    for (let k = 0; k < n; k++) {
+      const u = -e.len / 2 + (e.len * (k + 0.5)) / n;
+      for (const y of [1.2, 5.2]) windowAt(kit, u, y, 0.95, 1.8, { frame: 'plaster', sillPart: 'plaster' });
+    }
+  }
+}
+
 /** Аголна окер зграда („vip“): три ката, заоблен агол, натпрозорници, балкони, мансарда. */
 function cornerOchre(kit, s, edges, gm) {
   body(kit, s, 11.2, 'ochre', { pitched: true });
@@ -217,6 +252,10 @@ function cornerOchre(kit, s, edges, gm) {
   for (const e of edges) {
     if (e.len < 2.0) continue;
     frameOn(kit, e, gm);
+    if (facesMagazaCourt(e)) {
+      courtWall(kit, e);
+      continue;
+    }
     const n = Math.max(1, Math.round(e.len / 2.4));
     for (let k = 0; k < n; k++) {
       const u = -e.len / 2 + (e.len * (k + 0.5)) / n;
@@ -427,8 +466,11 @@ function grne(kit, s0, _edges, gm, others) {
 // од кршен камен и фонтана на два ката; кон плоштадот низок камен ѕид со бели столбови, железна
 // ограда и порта; смрча во аголот.
 
-// дворот пред Магаза (ограден со OSM w1463976008 и соседните згради)
-const MAGAZA_COURT = [[21.6, 65.8], [30.7, 62.7], [35.7, 76.7], [25.4, 80.8], [25.5, 77.5], [23, 69.8]];
+// оградата на дворот: јужно по OSM w1463976008, источно — на продолжението на источниот ѕид на
+// Магаза (рамно со него; во OSM е ≈ 1.6 m навнатре — сопственикот ја поправи по фотографијата)
+const MAGAZA_FENCE = [[21.6, 65.8], [32.3, 62.15], [37.3, 76.3]];
+// дворот пред Магаза (оградата + соседните згради)
+const MAGAZA_COURT = [...MAGAZA_FENCE, [25.4, 80.8], [25.5, 77.5], [23, 69.8]];
 
 /** Решетка во ромбови: две групи коси прачки, отсечени на правоаголникот w×h (центар долу u, y). */
 function lattice(kit, u, y, w, h, v, step = 0.32) {
@@ -533,7 +575,7 @@ function magaza(kit, s0, edges, gm, others) {
   kit.cylinder(0, 0, 0, 0.25, 2.2, 'trunk', { seg: 6 });
   for (const [y, r, h] of [[1.4, 1.8, 3.6], [3.4, 1.5, 3.3], [5.4, 1.1, 3.0], [7.3, 0.7, 2.6]]) kit.cone(0, y, 0, r, h, 'green', { seg: 8 });
   // ограда кон плоштадот: камен ѕид, бели столбови, железни прачки, порта
-  const fence = [[21.6, 65.8], [30.7, 62.7], [35.7, 76.7]];
+  const fence = MAGAZA_FENCE;
   for (let i = 0; i + 1 < fence.length; i++) {
     const [ax, az] = fence[i];
     const [bx, bz] = fence[i + 1];
@@ -541,9 +583,15 @@ function magaza(kit, s0, edges, gm, others) {
     kit.setFrame((ax + bx) / 2, gm, (az + bz) / 2, (bx - ax) / len, (bz - az) / len);
     const gate = i === 0 ? [0.4, 3.0] : null; // порта на јужната страна (u-центар, ширина)
     const n = Math.max(1, Math.round(len / 3.2));
-    const posts = [];
+    let posts = [];
     for (let k = 0; k <= n; k++) posts.push(-len / 2 + (len * k) / n);
-    if (gate) posts.push(gate[0] - gate[1] / 2, gate[0] + gate[1] / 2);
+    if (gate) {
+      // столбовите на портата; редовните што се преблиску до нив (освен крајните) се тргаат
+      const g0 = gate[0] - gate[1] / 2;
+      const g1 = gate[0] + gate[1] / 2;
+      posts = posts.filter((u, k) => k === 0 || k === n || (u < g0 - 1.5 || u > g1 + 1.5));
+      posts.push(g0, g1);
+    }
     posts.sort((a, b) => a - b);
     for (const u of posts) {
       kit.box(u, -0.2, 0, 0.55, 1.95, 0.55, 'plaster');
@@ -561,8 +609,8 @@ function magaza(kit, s0, edges, gm, others) {
       kit.box(mid, base, 0, u1 - u0, 0.04, 0.04, 'metal');
       kit.box(mid, top, 0, u1 - u0, 0.04, 0.04, 'metal');
       for (let x = u0 + 0.06; x < u1; x += 0.13) kit.box(x, base, 0, 0.025, top - base + (isGate ? 0.12 : 0.06), 0.025, 'metal');
-      // табла со натпис на ѕидот лево од портата
-      if (gate && !isGate && Math.abs(posts[k + 1] - (gate[0] - gate[1] / 2)) < 0.01) {
+      // табла со натпис на ѕидот источно од портата (од плоштадот — лево)
+      if (gate && !isGate && Math.abs(posts[k] - (gate[0] + gate[1] / 2)) < 0.01) {
         kit.box(mid, 0.65, -0.05, Math.min(2.4, u1 - u0 - 0.2), 1.0, 0.06, 'wood');
         kit.box(mid, 0.72, -0.09, Math.min(2.2, u1 - u0 - 0.4), 0.86, 0.02, 'plaster');
       }
@@ -678,6 +726,7 @@ const HOUSES = [
   { osm: 1070708421, build: lowYellow },
   { osm: 1463976005, build: cornerOchre },
   { osm: 1070708439, build: eastYellow },
+  { osm: 1463976006, build: besideMagaza },
   { osm: 38573441, build: staklena },
   // Магаза: главната фасада гледа кон својот двор (не кон споменикот)
   { osm: 38580676, build: magaza, focus: [29.5, 70.5] },
