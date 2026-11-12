@@ -9,6 +9,7 @@ import { churchOn, largestInside, lamp } from './models.js';
 import { fildzan } from './fildzan.js';
 import { dimitrija } from './dimitrija.js';
 import { bezisten } from './bezisten.js';
+import { bogorodica } from './bogorodica.js';
 
 const TAU = Math.PI * 2;
 
@@ -426,4 +427,4 @@ function jets(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, dimitrija, bezisten, jets };
+export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, dimitrija, bezisten, bogorodica, jets };

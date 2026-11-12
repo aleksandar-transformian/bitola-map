@@ -63,7 +63,11 @@ export const LANDMARKS = [
 
   // ── цркви и манастири ──
   { id: 'presveto-srce', group: 'Цркви и џамии', name: 'Пресвето Срце Исусово', osm: 'w1070850326', model: 'church', rank: 1, opts: { tower: 'front', spire: true, dome: false, wallH: 11 } },
-  { id: 'presveta-bogorodica', group: 'Цркви и џамии', name: 'Пресвета Богородица', osm: 'w210252893', model: 'church', rank: 1, opts: { towerH: 24 } },
+  // Пресвета Богородица: рачен модел (world/landmarks/bogorodica.js) — камбанарија и чешма од OSM
+  {
+    id: 'presveta-bogorodica', group: 'Цркви и џамии', name: 'Пресвета Богородица', osm: 'w210252893', model: 'bogorodica', rank: 1,
+    parts: { tower: 'w961565085', fountain: 'n8894698515' },
+  },
   { id: 'sv-nedela', group: 'Цркви и џамии', name: 'Св. Недела', osm: 'w210253741', model: 'church', rank: 1, opts: { towerH: 20, wallH: 8 } },
   { id: 'star-manastir', group: 'Цркви и џамии', name: 'Стар Битолски Манастир', osm: 'w1134050922', model: 'monastery', rank: 1 },
   { id: 'nov-manastir', group: 'Цркви и џамии', name: 'Нов Битолски Манастир', osm: 'w1331445406', model: 'monastery', rank: 1 },
