@@ -91,6 +91,11 @@ export const LANDMARKS = [
   { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'publicBuilding', rank: 1, opts: { height: 10, roof: 'tiles', part: 'wall2', floors: 2 } },
   { id: 'zandan-kule', group: 'Историја и спомен-места', name: 'Зандан Куле', osm: 'w992188624', model: 'stoneTower', rank: 1 },
   { id: 'stanica', group: 'Јавни згради', name: 'Железничка станица', osm: 'w333585687', model: 'station', rank: 1 },
+  // Спортската сала „Боро Чурлевски“ („Младост“): рачен модел (world/landmarks/sportska-sala.js)
+  { id: 'sportska-sala', group: 'Јавни згради', name: 'Спортска сала „Боро Чурлевски“', osm: 'w38006427', model: 'sportsHall', rank: 1 },
+  // „Ракометното игралиште“: отворен простор со трибини, повремено за концерти (world/landmarks/arena.js);
+  // во OSM е building=public — обичната зграда се заменува со моделот; kiosks = бутките на западната страна
+  { id: 'rakometno', group: 'Јавни згради', name: 'Ракометно игралиште', osm: 'w38165657', model: 'openArena', rank: 1, parts: { kiosks: 'w1470238682' } },
   { id: 'stadion', group: 'Јавни згради', name: 'Стадион „Тумбе Кафе“', osm: 'w38006058', model: 'stadium', rank: 1 },
   { id: 'tvrdina', group: 'Историја и спомен-места', name: 'Битолска тврдина', osm: 'w1127758201', model: 'fortress', rank: 1 },
 
