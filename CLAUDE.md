@@ -39,7 +39,7 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
 charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
 filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad, her-teatar, her-bazilika,
-her-gore, zoo, zoo-blisku, jug) + `lm-<id>` за секоја знаменитост.
+her-gore, zoo, zoo-blisku, jug, smolevo, smolevo-dvor, motokros) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>&quality=auto|high|medium|low`
@@ -56,7 +56,7 @@ Home = преглед, 1–5 = стил, S = снег (без → снег → �
 src/config/region.js     ← ЕДИНСТВЕНОТО место за опфатот (bbox), почетна точка, зум на релјефот
 src/config/classes.js    ← enum класи (улици, површини, згради) — дел од форматот на податоците
 src/config/zones.js      ← зони за проценка на висини (чаршија, Широк Сокак, центар)
-src/config/landmarks.js  ← знаменитости (32): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
+src/config/landmarks.js  ← знаменитости (34): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
                            group (мени „Оди до…“), view, rank, label, parts (и OSM точки и линии),
                            flatten (израмнување на релјефот во обработката)
 src/config/views.js      ← брзи погледи
@@ -76,6 +76,7 @@ src/world/landmarks/     ← kit.js (примитиви → една геоме�
                            heraclea.js (Хераклеа: театар со аркада, базилики, мозаици, урнатини —
                            рамка регистрирана на сателитска снимка, од фотографии)
                            zoo.js (Зоолошка градина: огради за животни покрај OSM патеките),
+                           smolevo.js (манастирот Св. Атанасиј Велики, мотокрос патеката),
                            fence.js (ограда по релјефот)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/traffic.js     ← „Живот на мапата“: автомобили и пешаци (инстанцирани, CPU), фарови ноќе

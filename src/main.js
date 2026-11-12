@@ -137,7 +137,7 @@ async function start() {
     collectLabels({ pois: data.pois, landmarks: data.landmarks, hf: world.hf, rect: world.rect, placeRank: PLACE_RANK, placeSkip: PLACE_SKIP, extra: EXTRA_PLACES }),
   );
   // Погледи кон знаменитостите: свој `view` или стандарден според големината на моделот.
-  const SIZE = { stadium: 420, warCemetery: 380, fortress: 320, monastery: 300, totenburg: 220, heraclea: 380, zoo: 420, promenade: 430, square: 200, fildzan: 140, publicBuilding: 220, station: 220 };
+  const SIZE = { stadium: 420, warCemetery: 380, fortress: 320, monastery: 300, totenburg: 220, heraclea: 380, zoo: 420, motocross: 420, promenade: 430, square: 200, fildzan: 140, publicBuilding: 220, station: 220 };
   const places = new Map(VIEWS.map((v) => [v.id, v]));
   for (const l of data.landmarks) {
     if (!l.group || places.has(l.id)) continue; // брзиот поглед со истото име има предност

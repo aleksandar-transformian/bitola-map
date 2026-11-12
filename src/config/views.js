@@ -41,4 +41,8 @@ export const CHECK_VIEWS = [
   { id: 'zoo', target: { x: 560, z: 1740 }, bearing: 140, polar: 55, distance: 330 },
   { id: 'zoo-blisku', target: { x: 600, z: 1720 }, bearing: 150, polar: 62, distance: 130 },
   { id: 'jug', target: { x: 800, z: 2400 }, bearing: 20, polar: 50, distance: 1600 },
+  // Смолево: манастирот од патот (како фотографијата) и мотокрос патеката
+  { id: 'smolevo', target: { x: -1385, z: 2482 }, bearing: 255, polar: 72, distance: 60 },
+  { id: 'smolevo-dvor', target: { x: -1375, z: 2475 }, bearing: 200, polar: 55, distance: 110 },
+  { id: 'motokros', target: { x: -1280, z: 2460 }, bearing: 190, polar: 50, distance: 420 },
 ];
