@@ -88,7 +88,8 @@ export const LANDMARKS = [
   // „Горна гимназија“ — СОУ „Јосип Броз Тито“: главната зграда во дворот на училиштето
   // главната зграда е до главната улица (точка од сопственикот); најголемата во дворот е спортската сала
   { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, at: { lat: 41.0321394, lon: 21.3284611 }, model: 'gymnasium', rank: 1, opts: { front: [0, 1] } }, // фасадата кон Драгор (на југ од зградата)
-  { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'publicBuilding', rank: 1, opts: { height: 10, roof: 'tiles', part: 'wall2', floors: 2 } },
+  // Музејот на Битола: рачен модел (world/landmarks/muzej.js); bust = бистата на Даме Груев во градината
+  { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'museum', rank: 1, parts: { bust: 'n12329728344' } },
   { id: 'zandan-kule', group: 'Историја и спомен-места', name: 'Зандан Куле', osm: 'w992188624', model: 'stoneTower', rank: 1 },
   { id: 'stanica', group: 'Јавни згради', name: 'Железничка станица', osm: 'w333585687', model: 'station', rank: 1 },
   // Спортската сала „Боро Чурлевски“ („Младост“): рачен модел (world/landmarks/sportska-sala.js)

@@ -14,6 +14,7 @@ import { mitropolija } from './mitropolija.js';
 import { stivMonument } from './stiv.js';
 import { sportsHall } from './sportska-sala.js';
 import { openArena } from './arena.js';
+import { museum } from './muzej.js';
 
 const TAU = Math.PI * 2;
 
@@ -431,4 +432,4 @@ function jets(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, dimitrija, bezisten, bogorodica, mitropolija, stivMonument, sportsHall, openArena, jets };
+export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, dimitrija, bezisten, bogorodica, mitropolija, stivMonument, sportsHall, openArena, museum, jets };
