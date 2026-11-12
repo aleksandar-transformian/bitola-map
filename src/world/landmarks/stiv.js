@@ -67,7 +67,7 @@ export function stivMonument(kit, item, ctx) {
   kit.box(0, -0.3, 0, 10, 0.36, 10, 'paving'); // поплочен простор
   kit.frame.scale(new THREE.Vector3(SCALE, SCALE, SCALE));
   // постамент од црвен гранит: долен дел со корниз, горен дел со корниз
-  const R = 'mosaic1';
+  const R = 'granite';
   kit.box(0, 0, 0, 1.25, 1.0, 1.25, R);
   kit.box(0, 1.0, 0, 1.4, 0.1, 1.4, R);
   kit.box(0, 1.1, 0, 1.05, 0.62, 1.05, R);

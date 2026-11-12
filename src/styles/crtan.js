@@ -114,6 +114,7 @@ export default {
     crestRed: '#e4362b',
     crestGold: '#ffc93c',
     crestBlue: '#2b59c3',
+    granite: '#d0857a', // постаменти (споменик на Стив)
   },
   traffic: { cars: ['#ef3b2d', '#ffd23f', '#2f8fe0', '#2bb673', '#ff8a1f', '#ffffff', '#8e44ad'], people: ['#ef3b2d', '#2f8fe0', '#ffd23f', '#2bb673', '#ff6fb1', '#ff8a1f'] },
   trees: {

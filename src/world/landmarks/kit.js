@@ -41,6 +41,7 @@ export const PARTS = [
   'crestRed', // 31 грбот на Битола: црвено поле (Филџанот)
   'crestGold', //32 грбот: златни триаголници, раб, меандар; кадифе во леите
   'crestBlue', //33 грбот: сина лента
+  'granite', //  34 розово-црвен гранит (постаменти)
 ];
 export const PART_ID = Object.fromEntries(PARTS.map((p, i) => [p, i]));
 
