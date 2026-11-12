@@ -116,6 +116,11 @@ export default {
     sand: '#e8d6ae',
     rubble: '#c2ab8c',
     slate: '#6b7178',
+    // грбот на Битола (Филџанот)
+    crestRed: '#c44a3a',
+    crestGold: '#e8b84c',
+    crestBlue: '#3e5c9c',
+    granite: '#bf8a80', // постаменти (споменик на Стив)
   },
   trees: {
     crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],

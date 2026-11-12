@@ -669,7 +669,19 @@ function roofShape(t) {
     const el = L.osm[0] === 'w' ? osm.ways.get(+L.osm.slice(1)) : osm.relations.get(+L.osm.slice(1));
     if (el) for (const poly of polygonsOf(el)) noTreeRings.push(poly);
   }
-  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings));
+  // ниту на поплочените пешачки површини (плоштади во паркови — на пр. пред Офицерскиот дом)
+  for (const way of osm.ways.values()) {
+    if (way.tags?.highway !== 'pedestrian' || way.tags?.area !== 'yes') continue;
+    for (const poly of polygonsOf(way)) noTreeRings.push(poly);
+  }
+  // ниту околу рачно поставените чешми на знаменитостите (opts.fountain = { lat, lon }, 11 m)
+  const noTreeDiscs = LANDMARKS.filter((L) => L.opts?.fountain?.lat).map((L) => [...proj.toXZ(L.opts.fountain.lat, L.opts.fountain.lon), 11]);
+  // и околу знаменитостите-точки со clearTrees (радиус во m)
+  for (const L of LANDMARKS) {
+    const n = L.node && L.clearTrees && osm.nodes.get(+L.node.slice(1));
+    if (n) noTreeDiscs.push([...proj.toXZ(n.lat, n.lon), L.clearTrees]);
+  }
+  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings)) || noTreeDiscs.some(([x, z, r]) => Math.hypot(p[0] - x, p[1] - z) < r);
   const MAX = 40000;
   const sorted = [...areas].filter((a) => DENSITY[a.cls]).sort((a, b) => {
     const da = Math.hypot(...G.centroid(a.rings[0]));
@@ -782,6 +794,11 @@ function roofShape(t) {
       item.buffer = L.buffer;
       const all = item.lines.flat();
       item.center = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length].map((v) => +v.toFixed(2));
+    }
+    if (L.opts?.fountain?.lat) {
+      // рачна чешма (WGS84) → локални метри
+      const [x, z] = proj.toXZ(L.opts.fountain.lat, L.opts.fountain.lon);
+      item.opts = { ...item.opts, fountain: [+x.toFixed(2), +z.toFixed(2)] };
     }
     if (L.at) {
       // рачна позиција (WGS84) — има предност пред OSM (на пр. точна локација од сопственикот)
