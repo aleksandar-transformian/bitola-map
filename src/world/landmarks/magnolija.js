@@ -9,8 +9,12 @@
 
 import * as THREE from 'three';
 import { Kit } from './kit.js';
-import { buildingShape, shell, Writer } from '../buildings.js';
-import { obb, pointInRing, ringCentroid } from '../geom2d.js';
+import { buildingShape } from '../buildings.js';
+import { obb, pointInRing } from '../geom2d.js';
+import {
+  plate, rnd, windowAt, balcony, wallLamp, band, grow, openingShape, openEdges, frameOn, body,
+  plainWindows, clipX, simplify, chamfer, buildHouses,
+} from './facade.js';
 
 // Споменикот на Филип II (локални метри) — кон него гледаат главните фасади.
 const FOCUS = [-10.1, 45.5];
@@ -18,184 +22,6 @@ const FOCUS = [-10.1, 45.5];
 // Летната тераса пред ресторанот „Грне“ (јужно од зградата, источно од споменикот). Overture/ML ја
 // препознава тендата како зграда (≈ 9.6 × 7 m, 10 m висока „куќичка“) — таа се заменува со тераса.
 const TERRACE = [11.1, 47.3];
-
-// ─────────────────────────── примитиви за фасада ───────────────────────────
-
-/** Профил на прозорец/отвор: правоаголник со (опционален) лак горе. */
-function openingShape(w, h, arch) {
-  const hw = w / 2;
-  const s = new THREE.Shape();
-  if (arch === 'round') {
-    const sp = h - hw;
-    s.moveTo(-hw, 0);
-    s.lineTo(hw, 0);
-    s.lineTo(hw, sp);
-    s.absarc(0, sp, hw, 0, Math.PI, false);
-    s.lineTo(-hw, 0);
-  } else if (arch === 'pointed') {
-    // зашилен (готски) лак: два лака со радиус w, центри на спротивните почетоци
-    const sp = h - w * 0.866;
-    s.moveTo(-hw, 0);
-    s.lineTo(hw, 0);
-    s.lineTo(hw, sp);
-    const n = 8;
-    for (let i = 1; i <= n; i++) {
-      const a = (i / n) * (Math.PI / 3);
-      s.lineTo(-hw + w * Math.cos(a), sp + w * Math.sin(a));
-    }
-    for (let i = n - 1; i >= 0; i--) {
-      const a = (i / n) * (Math.PI / 3);
-      s.lineTo(hw - w * Math.cos(a), sp + w * Math.sin(a));
-    }
-    s.lineTo(-hw, 0);
-  } else {
-    s.moveTo(-hw, 0);
-    s.lineTo(hw, 0);
-    s.lineTo(hw, h);
-    s.lineTo(-hw, h);
-    s.lineTo(-hw, 0);
-  }
-  return s;
-}
-
-/** Плоча по профил, истисната нанадвор (v од v0 до v0 + d). */
-function plate(kit, shape, u, y, v0, d, part, glow) {
-  const g = new THREE.ExtrudeGeometry(shape, { depth: d, bevelEnabled: false, curveSegments: 8 });
-  kit.add(g, Kit.at(u, y, v0), part, glow);
-}
-
-/** Детерминистички „случај“ (0–1). */
-function rnd(a, b) {
-  const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
-  return x - Math.floor(x);
-}
-
-/**
- * Прозорец: рамка + стакло (свети ноќе) + крст од пречки + подпрозорник.
- * o: { arch, frame, sill, bars, shutter (дел за ролетна горе), hood (дел за натпрозорник) }
- */
-function windowAt(kit, u, y, w, h, o = {}) {
-  const frame = o.frame || 'accent';
-  const v = o.v || 0;
-  const lit = rnd(u * 3.1 + y, w) < (o.lit ?? 0.7);
-  plate(kit, openingShape(w + 0.26, h + 0.2, o.arch), u, y - 0.1, v, 0.1, frame);
-  // големите излози светат помеко (инаку се рамни светли плочи ноќе)
-  const glow = lit ? (w * h > 4 ? 0.45 : 0.8) : 0;
-  plate(kit, openingShape(w, h, o.arch), u, y, v + 0.1, 0.03, 'window', glow);
-  if (o.shutter) kit.box(u, y + h * 0.62, v + 0.135, w, h * 0.38 - (o.arch ? w / 2 : 0.02), 0.02, o.shutter);
-  if (o.bars !== false) {
-    kit.box(u, y, v + 0.14, 0.06, h - (o.arch ? w * 0.4 : 0), 0.03, frame);
-    kit.box(u, y + h * 0.58, v + 0.14, w, 0.06, 0.03, frame);
-  }
-  if (o.sill !== false) kit.box(u, y - 0.16, v + 0.12, w + 0.5, 0.1, 0.25, o.sillPart || frame);
-  if (o.hood) kit.box(u, y + h + 0.12, v + 0.14, w + 0.6, 0.18, 0.28, o.hood);
-}
-
-/** Балкон: плоча, конзоли, огради (столбчиња) со рачка. */
-function balcony(kit, u, y, w, d, { slab = 'stone', rail = 'metal', h = 1.0, step = 0.16, solid = false } = {}) {
-  kit.box(u, y - 0.18, d / 2, w, 0.18, d, slab);
-  for (const s of [-1, 1]) kit.box(u + s * (w / 2 - 0.2), y - 0.6, 0.2, 0.14, 0.42, 0.4, slab);
-  if (solid) {
-    // зидана балустрада: ниски столбчиња + плоча горе
-    for (let x = -w / 2 + 0.12; x <= w / 2 - 0.1; x += 0.24) kit.cylinder(u + x, y, d - 0.12, 0.06, h - 0.12, rail, { seg: 6, top: 0.045 });
-    kit.box(u, y + h - 0.12, d - 0.12, w, 0.12, 0.2, rail);
-    return;
-  }
-  kit.box(u, y + h - 0.05, d - 0.04, w, 0.05, 0.05, rail);
-  kit.box(u, y + 0.08, d - 0.04, w, 0.04, 0.04, rail);
-  for (let x = -w / 2; x <= w / 2 + 1e-3; x += step) kit.box(u + x, y, d - 0.04, 0.025, h, 0.025, rail);
-  for (const s of [-1, 1]) {
-    kit.box(u + s * (w / 2), y + h - 0.05, d / 2, 0.05, 0.05, d, rail);
-    for (let z = 0.15; z < d; z += step) kit.box(u + s * (w / 2), y, z, 0.025, h, 0.025, rail);
-  }
-}
-
-/** Ѕидна светилка (фенер) со конзола — свети ноќе. */
-function wallLamp(kit, u, y) {
-  kit.box(u, y, 0.2, 0.06, 0.06, 0.4, 'metal');
-  kit.box(u, y - 0.42, 0.42, 0.24, 0.36, 0.24, 'light');
-  kit.box(u, y - 0.06, 0.42, 0.3, 0.08, 0.3, 'metal');
-}
-
-/** Хоризонтален венец по целиот прстен (корниз, појас) — ги следи и заоблените агли. */
-function band(kit, ring, y0, y1, out, part) {
-  kit.slab([grow(ring, out)], y0, y1, part);
-}
-
-/** Прстен поместен нанадвор за d (отсечки по нормалите, спојување на аглите). */
-function grow(ring, d) {
-  const n = ring.length;
-  const out = [];
-  for (let i = 0; i < n; i++) {
-    const p = ring[(i - 1 + n) % n];
-    const c = ring[i];
-    const q = ring[(i + 1) % n];
-    const n1 = norm(c[0] - p[0], c[1] - p[1]);
-    const n2 = norm(q[0] - c[0], q[1] - c[1]);
-    let mx = n1[1] + n2[1];
-    let mz = -n1[0] - n2[0];
-    const l = Math.hypot(mx, mz) || 1;
-    mx /= l;
-    mz /= l;
-    const k = Math.max(0.5, mx * n2[1] - mz * n2[0]);
-    out.push([c[0] + (mx * d) / k, c[1] + (mz * d) / k]);
-  }
-  return out;
-}
-function norm(x, z) {
-  const l = Math.hypot(x, z) || 1;
-  return [x / l, z / l];
-}
-
-// ─────────────────────────── рабови на основата ───────────────────────────
-
-/** Отворени рабови (без заеднички ѕид): рамка, должина, колку гледаат кон споменикот. */
-function openEdges(ring, others) {
-  const out = [];
-  for (let i = 0; i < ring.length; i++) {
-    const a = ring[i];
-    const b = ring[(i + 1) % ring.length];
-    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    if (len < 0.5) continue;
-    const tx = (b[0] - a[0]) / len;
-    const tz = (b[1] - a[1]) / len;
-    const nx = tz;
-    const nz = -tx;
-    const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-    const probe = [m[0] + nx * 1.2, m[1] + nz * 1.2];
-    if (others.some((r) => pointInRing(probe, r))) continue;
-    const fx = FOCUS[0] - m[0];
-    const fz = FOCUS[1] - m[1];
-    out.push({ i, a, b, len, m, nx, nz, face: (nx * fx + nz * fz) / Math.hypot(fx, fz) });
-  }
-  return out;
-}
-
-function frameOn(kit, e, y) {
-  kit.setFrame(e.m[0], y, e.m[1], e.nz, -e.nx);
-}
-
-/** Тело на зградата: ѕидови по основата + рамен или кос покрив. */
-function body(kit, s, h, part, { pitched = false, roof = 'roof', top = 'stone' } = {}) {
-  const W = new Writer();
-  const R = new Writer();
-  const isPitched = shell({ ...s, h, top: s.gmean + h }, pitched, W, R, 0);
-  kit.raw(W.pos, W.nor, part);
-  kit.raw(R.pos, R.nor, isPitched ? roof : top);
-}
-
-/** Прозорци на споредните отворени рабови (едноставно, по кат). */
-function plainWindows(kit, edges, floors, { spacing = 2.6, w = 1.0, h = 1.7, frame = 'accent', minLen = 2.4, skipMain = null } = {}) {
-  for (const e of edges) {
-    if (e === skipMain || e.len < minLen) continue;
-    const n = Math.max(1, Math.floor(e.len / spacing));
-    frameOn(kit, e, 0);
-    for (let k = 0; k < n; k++) {
-      const u = -e.len / 2 + (e.len * (k + 0.5)) / n;
-      for (const y of floors) windowAt(kit, u, y, w, h, { frame, sill: false, bars: e.len > 4 });
-    }
-  }
-}
 
 // ─────────────────────────── рецепти ───────────────────────────
 
@@ -600,77 +426,6 @@ function grne(kit, s0, _edges, gm, others) {
 // (скали) на северниот агол со камена облога горе и пониско источно крило со закосена стаклена
 // „круна“. Пред северната фасада — гранитни жардињери со зеленило.
 
-/** Отсечи прстен со полурамнина x ≤ x0 (keep = -1) или x ≥ x0 (keep = 1). */
-function clipX(ring, x0, keep) {
-  const out = [];
-  const inside = (p) => (p[0] - x0) * keep >= 0;
-  for (let i = 0; i < ring.length; i++) {
-    const a = ring[i];
-    const b = ring[(i + 1) % ring.length];
-    if (inside(a)) out.push(a);
-    if (inside(a) !== inside(b)) {
-      const t = (x0 - a[0]) / (b[0] - a[0]);
-      out.push([x0, a[1] + (b[1] - a[1]) * t]);
-    }
-  }
-  // отстрани двојни точки и точки на права (по сечењето по вертикален раб на основата)
-  let r = out.filter((p, i) => {
-    const q = out[(i + 1) % out.length];
-    return Math.hypot(p[0] - q[0], p[1] - q[1]) > 0.05;
-  });
-  return simplify(r);
-}
-
-/** Отстрани точки што се (речиси) на права меѓу соседите (sin на аголот < tol). */
-function simplify(ring, tol = 0.02) {
-  let r = ring;
-  for (let changed = true; changed && r.length > 3; ) {
-    changed = false;
-    for (let i = 0; i < r.length; i++) {
-      const a = r[(i - 1 + r.length) % r.length];
-      const p = r[i];
-      const b = r[(i + 1) % r.length];
-      const l1 = Math.hypot(p[0] - a[0], p[1] - a[1]);
-      const l2 = Math.hypot(b[0] - p[0], b[1] - p[1]);
-      const cross = (p[0] - a[0]) * (b[1] - p[1]) - (p[1] - a[1]) * (b[0] - p[0]);
-      if (l1 < 1e-6 || l2 < 1e-6 || Math.abs(cross) / (l1 * l2) < tol) {
-        r = r.filter((_, k) => k !== i);
-        changed = true;
-        break;
-      }
-    }
-  }
-  return r;
-}
-
-/** Закосен раб: од прстенот на y0 до прстенот вовлечен за inset на y0 + h, со капак горе. */
-function chamfer(kit, ring, y0, h, inset, part) {
-  const inner = grow(ring, -inset);
-  const pos = [];
-  const nor = [];
-  for (let i = 0; i < ring.length; i++) {
-    const j = (i + 1) % ring.length;
-    const a = ring[i];
-    const b = ring[j];
-    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-    if (len < 1e-3) continue;
-    const nx = (b[1] - a[1]) / len;
-    const nz = -(b[0] - a[0]) / len;
-    const l = Math.hypot(h, inset);
-    const n = [(nx * h) / l, inset / l, (nz * h) / l];
-    const A = [a[0], y0, a[1]];
-    const B = [b[0], y0, b[1]];
-    const C = [inner[j][0], y0 + h, inner[j][1]];
-    const D = [inner[i][0], y0 + h, inner[i][1]];
-    for (const p of [A, B, C, A, C, D]) {
-      pos.push(...p);
-      nor.push(...n);
-    }
-  }
-  kit.raw(pos, nor, part);
-  kit.slab([inner], y0 + h - 0.05, y0 + h, 'stone');
-}
-
 /** Стаклена фасада: стакло, хоризонтални појаси по кат, вертикални профили, „канцеларии“ ноќе. */
 function curtainWall(kit, ring, edges, gm, y0, y1, { module = 1.6, floor = 3.3 } = {}) {
   kit.slab([ring], gm + y0, gm + y1, 'glass');
@@ -785,24 +540,14 @@ const HOUSES = [
 export function magnoliaHouses(kit, ctx) {
   const pack = ctx.buildings;
   const ids = pack.arrays.osmId;
-  const want = new Map(HOUSES.map((h) => [h.osm, h]));
-  const found = [];
-  for (let b = 0; b < ids.length; b++) if (want.has(ids[b])) found.push([b, want.get(ids[b])]);
-  if (!found.length) return new Set();
-  // соседите (за заедничките ѕидови): сите основи во близина
-  const [cx, cz] = ringCentroid(buildingShape(pack, found[0][0]).rings[0]);
-  const near = [];
-  const q = pack.meta.q;
-  for (let b = 0; b < pack.meta.count; b++) {
-    const r0 = pack.arrays.ringPt[pack.arrays.polyRing[b]];
-    const x = pack.arrays.coords[r0 * 2] * q;
-    const z = pack.arrays.coords[r0 * 2 + 1] * q;
-    if (Math.abs(x - cx) < 150 && Math.abs(z - cz) < 150) near.push(b);
-  }
   const done = new Set();
-  // летната тераса: ML-основата (без OSM id) на местото на тендата
-  for (const b of near) {
-    if (ids[b]) continue;
+  // летната тераса пред „Грне“: ML-основата (без OSM id) на местото на тендата
+  for (let b = 0; b < ids.length; b++) {
+    if (ids[b] || ctx.skip.has(b)) continue;
+    const i = pack.arrays.ringPt[pack.arrays.polyRing[b]];
+    const x = pack.arrays.coords[i * 2] * pack.meta.q;
+    const z = pack.arrays.coords[i * 2 + 1] * pack.meta.q;
+    if (Math.abs(x - TERRACE[0]) > 20 || Math.abs(z - TERRACE[1]) > 20) continue;
     const s = buildingShape(pack, b);
     if (!pointInRing(TERRACE, s.rings[0])) continue;
     try {
@@ -814,18 +559,6 @@ export function magnoliaHouses(kit, ctx) {
     }
     kit.setFrame(0, 0, 0);
   }
-  for (const [b, h] of found) {
-    const s = buildingShape(pack, b);
-    const others = near.filter((o) => o !== b).map((o) => buildingShape(pack, o).rings[0]);
-    const edges = openEdges(s.rings[0], others);
-    try {
-      h.build(kit, s, edges, s.gmean, others);
-      ctx.skip.add(b);
-      done.add(b);
-    } catch (err) {
-      console.warn(`[magnolija] w${h.osm}:`, err);
-    }
-    kit.setFrame(0, 0, 0);
-  }
+  for (const b of buildHouses(kit, ctx, HOUSES, { focus: FOCUS, tag: 'magnolija' })) done.add(b);
   return done;
 }

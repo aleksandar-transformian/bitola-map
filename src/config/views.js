@@ -36,6 +36,10 @@ export const CHECK_VIEWS = [
   // штитот-фонтана и споменикот одозгора, кон Широк Сокак (како фотографијата од дрон)
   // ресторан „Грне“ од југозапад (главната фасада со балконот и летната тераса)
   { id: 'grne', target: { x: 12, z: 37 }, bearing: 205, polar: 74, distance: 30 },
+  // западно од Магнолија (кон Саат Кула): плоштадот од север, улицата 11 Октомври, Алта Банка
+  { id: 'mag-zapad', target: { x: -40, z: 52 }, bearing: 33, polar: 76, distance: 46 },
+  { id: 'oktomvri', target: { x: -50, z: 46 }, bearing: 11, polar: 76, distance: 30 },
+  { id: 'banka', target: { x: -78, z: 32 }, bearing: 343, polar: 74, distance: 38 },
   // Трговски центар Стаклена: од Магнолија (запад) и од улицата Добривое Радосављевиќ (север)
   { id: 'staklena', target: { x: 48, z: 30 }, bearing: 250, polar: 60, distance: 72 },
   { id: 'staklena-sever', target: { x: 52, z: 28 }, bearing: 15, polar: 68, distance: 62 },

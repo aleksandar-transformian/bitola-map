@@ -39,7 +39,7 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
 charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
 filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad, mag-fontana, grne,
-staklena, staklena-sever) + `lm-<id>` за секоја знаменитост.
+staklena, staklena-sever, mag-zapad, oktomvri, banka) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>&quality=auto|high|medium|low`
@@ -72,7 +72,9 @@ src/world/landmarks/     ← kit.js (примитиви → една геоме�
                            extra.js (моделите: џамија, црква, јавна зграда, коњаник, стадион, авиони, …),
                            civic.js (Дом на културата, Горна гимназија — рачно, според фотографии)
                            magnolija.js (детални згради на Магнолија/влезот на Широк Сокак по OSM id,
-                           од фотографии; „Грне“; Трговски центар Стаклена; летните тераси)
+                           од фотографии; „Грне“; Трговски центар Стаклена; летните тераси),
+                           zapad.js (куќите западно од Магнолија кон Саат Кула), facade.js
+                           (заеднички делови за фасади, buildHouses по OSM id)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/traffic.js     ← „Живот на мапата“: автомобили и пешаци (инстанцирани, CPU), фарови ноќе
 src/world/snowfall.js    ← снегулки што паѓаат (точки околу камерата); lightpoints.js ← точки на
