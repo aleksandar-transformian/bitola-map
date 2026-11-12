@@ -110,6 +110,10 @@ export default {
     plaster: '#f8f1e4',
     peach: '#f0cfb6',
     wood: '#8e4a33',
+    // грбот на Битола (Филџанот)
+    crestRed: '#c44a3a',
+    crestGold: '#e8b84c',
+    crestBlue: '#3e5c9c',
   },
   trees: {
     crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],

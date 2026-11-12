@@ -116,6 +116,10 @@ export default {
     plaster: '#ebe2d2',
     peach: '#ddb89d',
     wood: '#7b3f2a',
+    // грбот на Битола (Филџанот)
+    crestRed: '#a8463a',
+    crestGold: '#d8b062',
+    crestBlue: '#3d5585',
   },
   // играчки-возила: пригушени бои (минијатура)
   traffic: { cars: ['#9a3b2e', '#3d5a6e', '#c9a25a', '#e4ddd0', '#56604a', '#7a4a3a'], people: ['#7a3b2e', '#3d4f62', '#b88a4a', '#5a5048', '#8a6a7a'] },
