@@ -39,7 +39,8 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 Погледи за `shot`: брзите погледи од `src/config/views.js` (pregled, shirok-sokak, vlez-shirok-sokak,
 charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
 filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad, mag-fontana, grne,
-staklena, staklena-sever, mag-zapad, oktomvri, banka, osmano, osmano-agol) + `lm-<id>` за секоја знаменитост.
+staklena, staklena-sever, mag-zapad, oktomvri, banka, osmano, osmano-agol, kebab,
+njegos, jeni-park, park-ogradi) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>&quality=auto|high|medium|low`
@@ -56,7 +57,7 @@ Home = преглед, 1–5 = стил, S = снег (без → снег → �
 src/config/region.js     ← ЕДИНСТВЕНОТО место за опфатот (bbox), почетна точка, зум на релјефот
 src/config/classes.js    ← enum класи (улици, површини, згради) — дел од форматот на податоците
 src/config/zones.js      ← зони за проценка на висини (чаршија, Широк Сокак, центар)
-src/config/landmarks.js  ← знаменитости (31): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
+src/config/landmarks.js  ← знаменитости (32): OSM основа/точка/кружен тек или `at` {lat,lon} + модел,
                            group (мени „Оди до…“), view, rank, label, parts (и OSM точки),
                            flatten (израмнување на релјефот во обработката)
 src/config/views.js      ← брзи погледи
@@ -109,6 +110,9 @@ scripts/dev/             ← screenshot.mjs (слики, време, FPS), check
                            bench.mjs (бенчмарк, споредба, --check)
 .github/workflows/data-fetch.yml ← Overpass + Overture на GitHub Actions (комитува data/raw/)
 ```
+
+Живи огради (OSM `barrier=hedge`) се во `lines.bin` (`hedgeLinePt`, `hedgeCoords`, `meta.hedge`) и се
+цртаат со знаменитостите (`hedgeWalls` во `world/landmarks/index.js`, дел `green`).
 
 Тек на податоците: OSM (Overpass) + Overture згради (без OSM извор, т.е. Microsoft ML Buildings)
 + Terrarium PNG → `scripts/data/build.mjs` → `public/data/` (комитувани, ~2 MB) → прелистувачот ја

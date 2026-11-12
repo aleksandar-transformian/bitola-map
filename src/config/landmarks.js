@@ -46,6 +46,9 @@ export const LANDMARKS = [
   // фонтаната на Магнолија (кружна, w1464455372) — посебно од споменикот; точна позиција од сопственикот.
   // Позлатен штит со Сонцето од Кутлеш (фотографија од дрон од сопственикот)
   { id: 'magnolija-fontana', name: 'Фонтана', osm: 'w1464455372', at: { lat: 41.0302792, lon: 21.3346646 }, model: 'shieldFountain', rank: 2, label: false },
+  // фонтаната во паркот пред Јени џамија (w1463130096) и ископините покриени со стакло пред
+  // фасадата на џамијата (според Street View од сопственикот)
+  { id: 'jeni-fontana', name: 'Фонтана', osm: 'w1463130096', model: 'parkFountain', rank: 2, label: false, opts: { excavation: 'jeni-dzamija' } },
   { id: 'shirok-sokak', group: 'Центар', name: 'Широк Сокак', street: 'Широк Сокак', model: 'promenade', buffer: 26, rank: 0 },
   { id: 'herakleja', group: 'Историја и спомен-места', name: 'Хераклеа Линкестис', osm: 'w37956139', model: 'heraclea', parts: { theater: 'w226160304' }, rank: 0 },
 

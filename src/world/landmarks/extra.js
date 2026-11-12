@@ -197,6 +197,71 @@ function shieldFountain(kit, item, ctx) {
   }
 }
 
+// ───────────────────────── Фонтана во паркот (Јени џамија) ─────────────────────────
+// Според фотографијата: низок кружен камен базен (ѕид од квадери) со постамент и плитка чинија во
+// средината. opts.excavation = id на џамијата: пред нејзината фасада свртена кон фонтаната —
+// археолошки ископини покриени со стакло, со ниска метална ограда околу нив.
+function parkFountain(kit, item, ctx) {
+  const ring = item.polys[0][0];
+  const [ox, oz] = ringCentroid(ring);
+  const R = Math.max(2.5, ring.reduce((a, [x, z]) => a + Math.hypot(x - ox, z - oz), 0) / ring.length);
+  const [cx, cz] = item.center;
+  const y = ctx.hf.sample(cx, cz);
+  kit.setFrame(cx, y, cz);
+  kit.cylinder(0, -0.3, 0, R, 0.95, 'stone', { seg: 40 });
+  kit.add(new THREE.TorusGeometry(R - 0.18, 0.2, 5, 48), Kit.atE(0, 0.65, 0, Math.PI / 2), 'stone');
+  kit.cylinder(0, 0.62, 0, R - 0.4, 0.05, 'water', { seg: 40 });
+  kit.cylinder(0, 0.6, 0, 0.4, 1.0, 'stone', { seg: 10 });
+  kit.cylinder(0, 1.6, 0, 0.9, 0.3, 'stone', { top: 1.15, seg: 16 });
+  kit.cylinder(0, 1.9, 0, 0.18, 0.35, 'stone', { seg: 8 });
+  const mosque = item.opts?.excavation && ctx.items?.find((it) => it.id === item.opts.excavation);
+  if (!mosque) return;
+  // фасадата на џамијата најблиску до фонтаната (нормала нанадвор од нејзиното средиште)
+  const mr = mosque.polys[0][0];
+  const [mx, mz] = ringCentroid(mr);
+  let best = null;
+  for (let i = 0; i < mr.length; i++) {
+    const a = mr[i];
+    const b = mr[(i + 1) % mr.length];
+    const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (len < 6) continue;
+    const tx = (b[0] - a[0]) / len;
+    const tz = (b[1] - a[1]) / len;
+    const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    let nx = tz;
+    let nz = -tx;
+    if ((m[0] - mx) * nx + (m[1] - mz) * nz < 0) [nx, nz] = [-nx, -nz];
+    const d = (cx - m[0]) * nx + (cz - m[1]) * nz;
+    if (d > 0 && (!best || d < best.d)) best = { a, len, tx, tz, nx, nz, m, d };
+  }
+  if (!best || best.d < 8) return;
+  // ископините: 3 m од ѕидот, долж фасадата, до половината пат кон фонтаната
+  const L = Math.min(best.len * 0.8, 16);
+  const W = Math.min(4.5, best.d - R - 3.5);
+  if (W < 2) return;
+  const off = 2.6 + W / 2;
+  const ex = best.m[0] + best.nx * off;
+  const ez = best.m[1] + best.nz * off;
+  kit.setFrame(ex, ctx.hf.sample(ex, ez), ez, best.tx, best.tz);
+  kit.box(0, -0.3, 0, L + 0.3, 0.55, W + 0.3, 'stone'); // рамка
+  kit.box(0, 0.22, 0, L, 0.06, W, 'glass');
+  for (let u = -L / 2 + 2; u < L / 2 - 0.5; u += 2) kit.box(u, 0.25, 0, 0.06, 0.04, W, 'metal');
+  for (let u = -L / 2 + 1.5; u < L / 2 - 1; u += 3.1) kit.box(u, -0.1, (u * 0.37) % (W / 3), 1.2, 0.3, 0.8, 'plinth'); // ѕидишта под стаклото
+  // ниска ограда со столбчиња околу стаклото
+  const fence = (u0, v0, u1, v1) => {
+    const len = Math.hypot(u1 - u0, v1 - v0);
+    const n = Math.max(1, Math.round(len / 0.5));
+    kit.add(new THREE.BoxGeometry(len, 0.04, 0.04), Kit.atE((u0 + u1) / 2, 0.75, (v0 + v1) / 2, 0, -Math.atan2(v1 - v0, u1 - u0), 0), 'metal');
+    for (let k = 0; k <= n; k++) kit.box(u0 + ((u1 - u0) * k) / n, 0.2, v0 + ((v1 - v0) * k) / n, 0.04, 0.57, 0.04, 'metal');
+  };
+  const hu = L / 2 + 0.3;
+  const hv = W / 2 + 0.3;
+  fence(-hu, -hv, hu, -hv);
+  fence(-hu, hv, hu, hv);
+  fence(-hu, -hv, -hu, hv);
+  fence(hu, -hv, hu, hv);
+}
+
 // ───────────────────────── Зандан Куле ─────────────────────────
 // Камена кула (затвор/саат-кула од отоманскиот период), горен кат што малку излегува, четиристрешен покрив.
 function stoneTower(kit, item) {
@@ -524,4 +589,4 @@ function jets(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, shieldFountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };
+export const EXTRA_MODELS = { equestrian, fountain, shieldFountain, parkFountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };

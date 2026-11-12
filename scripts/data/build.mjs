@@ -379,10 +379,11 @@ const shirokLines = [];
   stats.roads = w.count;
 }
 
-// ─────────────── Железница и водотеци ───────────────
+// ─────────────── Железница, водотеци, живи огради ───────────────
 
 {
   const rail = new LineWriter();
+  const hedge = new LineWriter();
   const railCls = [];
   const water = new LineWriter();
   const waterCls = [];
@@ -391,6 +392,12 @@ const shirokLines = [];
   for (const way of osm.ways.values()) {
     const t = way.tags;
     if (!t) continue;
+    if (t.barrier === 'hedge') {
+      // живи огради (паркот кај Саат Кула и др.) — само линијата; висината ја дава приказот
+      const pts = wayXZ(way);
+      if (pts) for (const part of G.clipLineToRect(pts, rect)) hedge.add(G.simplifyLine(part, 0.3));
+      continue;
+    }
     let rc = null;
     if (['rail', 'light_rail', 'narrow_gauge', 'preserved'].includes(t.railway)) rc = 'rail';
     else if (['disused', 'abandoned'].includes(t.railway)) rc = 'disused';
@@ -421,10 +428,11 @@ const shirokLines = [];
   }
   const ra = rail.arrays();
   const wa = water.arrays();
+  const ha = hedge.arrays();
   await writeFile(
     `${OUT}/lines.bin`,
     encodePack({
-      meta: { q: Q, rail: rail.count, water: water.count },
+      meta: { q: Q, rail: rail.count, water: water.count, hedge: hedge.count },
       arrays: {
         railLinePt: ra.linePt,
         railCoords: ra.coords,
@@ -434,11 +442,14 @@ const shirokLines = [];
         waterCls: Uint8Array.from(waterCls),
         waterWidth: Uint16Array.from(waterWidth),
         waterFlags: Uint8Array.from(waterFlags),
+        hedgeLinePt: ha.linePt,
+        hedgeCoords: ha.coords,
       },
     }),
   );
   stats.rail = rail.count;
   stats.waterways = water.count;
+  stats.hedges = hedge.count;
 }
 
 // ─────────────── Згради ───────────────

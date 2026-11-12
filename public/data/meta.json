@@ -24,7 +24,7 @@
   "maxZ": 4519.5713262066565
  },
  "osmTimestamp": "2026-11-11T10:55:17Z",
- "generatedAt": "2026-11-12T12:08:14.144Z",
+ "generatedAt": "2026-11-12T14:22:38.422Z",
  "stats": {
   "terrain": {
    "cols": 757,
@@ -37,6 +37,7 @@
   "roads": 3134,
   "rail": 31,
   "waterways": 80,
+  "hedges": 8,
   "buildings": {
    "count": 20507,
    "heightFromOsm": 3,
@@ -55,7 +56,7 @@
    "osm": 412,
    "sampled": 26536
   },
-  "landmarks": 31,
+  "landmarks": 32,
   "pois": 87
  },
  "attribution": [

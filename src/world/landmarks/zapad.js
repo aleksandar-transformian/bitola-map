@@ -20,6 +20,9 @@ const SHOPS = [-103.4, 10.0];
 // „Стерјо Георгиев“ (w37900718), последниот дел до раскрсницата
 const STERJO = [[-144.8, -19.6], [-137.9, -23.1], [-131.4, -25.6], [-113.1, -31.4], [-111.9, -31.8]];
 
+// „Петар Петровиќ-Његош“ (w1463130141 и w36954171) околу раскрсницата со Јорго Османо
+const NJEGOS = [[-169.4, -41.9], [-161.1, -43.9], [-146.4, -46.7], [-133.3, -48.6], [-121.7, -50.4], [-102.2, -57.3], [-99.4, -60.1]];
+
 /** Рабови свртени кон улицата (линија), од најблискиот; minLen = најкраток раб. */
 function roadEdges(edges, line, minLen = 3) {
   return edges
@@ -438,6 +441,162 @@ function pinkHouse(kit, s0, _edges, gm, others) {
   }
 }
 
+// ─────────────────────────── Раскрсницата со „Петар Петровиќ-Његош“ ───────────────────────────
+
+/**
+ * Кебапчилница „Охрид“ (w1464872234): ниска приземна, малтер со испакнати полиња, прозорци со
+ * плакати, лимена надстрешница над тротоарот кон Јорго Османо со голем жолт натпис и зелен
+ * амблем, чадори (Pepsi) и маси со портокалови столчиња.
+ */
+function kebab(kit, s0, _edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = 3.5;
+  body(kit, s, H, 'peach', { top: 'metal' });
+  band(kit, ring, gm - 0.3, gm + 0.35, 0.06, 'plinth');
+  band(kit, ring, gm + H - 0.25, gm + H, 0.12, 'plinth');
+  const edges = openEdges(ring, others);
+  const front = roadEdges(edges, OSMANO, 3)[0];
+  const side = roadEdges(edges, NJEGOS, 3)[0];
+  for (const e of edges) {
+    if (e.len < 2) continue;
+    frameOn(kit, e, gm);
+    const L = e.len;
+    // испакнати полиња (пиластри) и прозорци со плакати
+    const n = Math.max(1, Math.round(L / 2.0));
+    for (let k = 0; k <= n; k++) kit.box(-L / 2 + (L * k) / n, 0.35, 0.03, 0.3, H - 0.6, 0.06, 'plinth');
+    for (let k = 0; k < n; k++) {
+      const u = -L / 2 + (L * (k + 0.5)) / n;
+      if (e === front && k === Math.floor(n / 2)) {
+        windowAt(kit, u, 0.2, 1.1, 2.4, { frame: 'wood', bars: false, sill: false, lit: 1 });
+        continue;
+      }
+      windowAt(kit, u, 0.9, Math.min(1.2, L / n - 0.6), 1.6, { frame: 'wood', bars: false, sill: false, lit: 0.9 });
+      if (e === side || rnd(u, L) < 0.5) kit.box(u, 0.95, 0.13, Math.min(1.0, L / n - 0.7), 1.4, 0.02, k % 2 ? 'ochre' : 'accent');
+    }
+    if (e !== front) continue;
+    // лимена надстрешница со натпис, амблем, чадори, маси
+    kit.add(new THREE.BoxGeometry(L + 2.4, 0.08, 2.6), Kit.atE(-0.6, H + 0.15, 1.2, 0.14, 0, 0), 'metal');
+    kit.box(-0.6, H - 0.35, 2.5, L + 2.4, 0.75, 0.08, 'ochre', 0, 0.35); // „ОХРИД кебапчилница“
+    kit.box(-0.6, H - 0.12, 2.56, L * 0.55, 0.32, 0.02, 'granite');
+    kit.box(L / 2 - 0.2, H - 0.45, 2.56, 1.4, 0.95, 0.06, 'green'); // „Скопско“
+    for (const [du, dv] of [[-L / 2 - 1.2, 3.2], [-L / 2 + 1.6, 3.6]]) {
+      kit.cylinder(du, 0, dv, 0.04, 2.3, 'metal', { seg: 5 });
+      kit.add(new THREE.ConeGeometry(1.35, 0.55, 8), Kit.at(du, 2.4, dv), 'water');
+      kit.cylinder(du + 0.6, 0, dv - 0.3, 0.38, 0.72, 'granite', { seg: 8 });
+      for (const a of [0, 2.1, 4.2]) kit.box(du + 0.6 + Math.cos(a) * 0.65, 0, dv - 0.3 + Math.sin(a) * 0.65, 0.42, 0.85, 0.42, 'roof');
+    }
+  }
+}
+
+/** Стари приземни дуќани (до кебапчилницата): крем малтер, лачни врати, венец, ќерамиди. */
+function oldShops(kit, s0, _edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = 4.4;
+  body(kit, s, H, 'plaster', { pitched: 'hip' });
+  band(kit, ring, gm - 0.3, gm + 0.4, 0.08, 'stone');
+  band(kit, ring, gm + H - 0.5, gm + H, 0.3, 'ochre');
+  const edges = openEdges(ring, others);
+  for (const e of roadEdges(edges, NJEGOS, 3)) {
+    frameOn(kit, e, gm);
+    const L = e.len;
+    const n = Math.max(1, Math.round(L / 2.6));
+    for (let k = 0; k < n; k++) {
+      const u = -L / 2 + (L * (k + 0.5)) / n;
+      plate(kit, openingShape(1.7, 3.2, 'round'), u, 0.2, 0.0, 0.06, 'ochre');
+      windowAt(kit, u, 0.3, 1.35, 2.9, { arch: 'round', frame: 'wood', v: 0.06, bars: true, sill: false, lit: 0.8 });
+    }
+    kit.box(0, 3.45, 0.12, Math.min(3.5, L - 1), 0.4, 0.05, 'accent', 0, 0.3); // натпис (менувачница)
+  }
+}
+
+/**
+ * Излитена трикатна зграда зад кебапчилницата (w1070708394): ѕидови од тула, фасадите кон
+ * улиците бело измалтерисани (со потемнети места), бели прозорци, мал балкон, два високи оџаци.
+ */
+function weathered(kit, s0, _edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = 9.8;
+  body(kit, s, H, 'roof', { pitched: 'hip', roof: 'roof' });
+  for (let y = 0.4; y < H - 0.3; y += 0.36) band(kit, ring, gm + y, gm + y + 0.03, 0.01, 'stone'); // фуги
+  const edges = openEdges(ring, others);
+  const streets = [...roadEdges(edges, OSMANO, 3), ...roadEdges(edges, STERJO, 3)];
+  for (const e of edges) {
+    if (e.len < 2.5) continue;
+    frameOn(kit, e, gm);
+    const L = e.len;
+    if (streets.includes(e)) {
+      kit.box(0, -0.3, 0.03, L, H + 0.1, 0.05, 'plaster');
+      kit.box(-L * 0.2, 0.0, 0.07, L * 0.35, 3.2, 0.02, 'ochre'); // потемнет малтер
+    }
+    const n = Math.max(1, Math.round(L / 3.2));
+    for (let k = 0; k < n; k++) {
+      const u = -L / 2 + (L * (k + 0.5)) / n;
+      for (const y of [1.0, 4.2, 7.3]) windowAt(kit, u, y, 0.95, 1.6, { frame: 'plaster', v: 0.08, sill: true, sillPart: 'plaster', lit: 0.5 });
+    }
+    if (e === streets[0]) balcony(kit, L / 4, 4.0, 1.8, 0.8, { slab: 'stone', rail: 'metal', h: 1.0 });
+  }
+  const f = obb(ring);
+  kit.setFrame(f.cx, gm + H, f.cz, f.ax, f.az);
+  for (const du of [-f.L * 0.25, f.L * 0.2]) kit.box(du, 0, f.W * 0.15, 0.7, 3.4, 0.6, 'roof');
+}
+
+/**
+ * Зграда „ROOMS“ (w1070708405): двокатна, тула од страните, бела фасада кон Његош со стар дуќан во
+ * приземјето, балкон со метална ограда на аголот и вертикален светлечки натпис „ROOMS“.
+ */
+function rooms(kit, s0, _edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = 7.6;
+  body(kit, s, H, 'roof', { pitched: 'hip' });
+  for (let y = 0.4; y < H - 0.3; y += 0.36) band(kit, ring, gm + y, gm + y + 0.03, 0.01, 'stone');
+  const edges = openEdges(ring, others);
+  const front = roadEdges(edges, NJEGOS, 3)[0];
+  for (const e of edges) {
+    if (e.len < 2.5) continue;
+    frameOn(kit, e, gm);
+    const L = e.len;
+    const isFront = e === front;
+    if (isFront) {
+      kit.box(0, -0.3, 0.03, L, H + 0.1, 0.05, 'plaster');
+      kit.box(0, 3.6, 0.08, L, 0.25, 0.16, 'ochre');
+    }
+    const n = Math.max(1, Math.round(L / 2.8));
+    for (let k = 0; k < n; k++) {
+      const u = -L / 2 + (L * (k + 0.5)) / n;
+      windowAt(kit, u, 4.5, 1.0, 1.7, { frame: 'plaster', v: 0.08, sill: true, sillPart: 'plaster', lit: 0.7 });
+      if (isFront) windowAt(kit, u, 0.3, Math.min(1.6, L / n - 0.6), 2.8, { frame: 'wood', v: 0.08, bars: true, sill: false, lit: 0.9 });
+    }
+    if (!isFront) continue;
+    balcony(kit, L / 2 - 1.1, 4.3, 1.8, 0.9, { slab: 'stone', rail: 'metal', h: 1.0 });
+    kit.box(L / 2 - 0.25, 3.0, 0.45, 0.4, 3.8, 0.14, 'ochre', 0, 0.8); // „ROOMS“
+  }
+}
+
+/** Стара двокатна куќа покрај Његош (w1463658176, w1463658177): крем малтер, кафени прозорци. */
+function oldHouse(kit, s0, _edges, gm, others) {
+  const ring = simplify(s0.rings[0]);
+  const s = { ...s0, rings: [ring] };
+  const H = s0.h > 5 ? 7.2 : 4.0;
+  body(kit, s, H, 'plaster', { pitched: 'hip' });
+  band(kit, ring, gm - 0.3, gm + 0.5, 0.08, 'stone');
+  band(kit, ring, gm + H - 0.3, gm + H, 0.35, 'plaster');
+  const edges = openEdges(ring, others);
+  for (const e of edges) {
+    if (e.len < 2.5) continue;
+    frameOn(kit, e, gm);
+    const n = Math.max(1, Math.round(e.len / 2.8));
+    for (let k = 0; k < n; k++) {
+      const u = -e.len / 2 + (e.len * (k + 0.5)) / n;
+      windowAt(kit, u, 1.1, 0.95, 1.6, { frame: 'wood', sill: true, sillPart: 'plaster', lit: 0.6 });
+      if (H > 5) windowAt(kit, u, 4.6, 0.95, 1.6, { frame: 'wood', sill: true, sillPart: 'plaster', lit: 0.6 });
+    }
+  }
+}
+
 // OSM id → рецепт
 const HOUSES = [
   { osm: 1070708388, build: altaBanka },
@@ -450,6 +609,14 @@ const HOUSES = [
   { osm: 1070708392, build: osmano8 },
   { osm: 1463976012, build: coffeeHouse },
   { osm: 1070708393, build: pinkHouse },
+  // раскрсницата со „Петар Петровиќ-Његош“
+  { osm: 1464872234, build: kebab },
+  { osm: 1464872233, build: oldShops },
+  { osm: 1070708395, build: oldShops },
+  { osm: 1070708394, build: weathered },
+  { osm: 1070708405, build: rooms },
+  { osm: 1463658177, build: oldHouse },
+  { osm: 1463658176, build: oldHouse },
 ];
 
 /** Изгради ги куќите западно од Магнолија (ги додава во ctx.skip). */

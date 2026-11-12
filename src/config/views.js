@@ -42,6 +42,12 @@ export const CHECK_VIEWS = [
   { id: 'banka', target: { x: -78, z: 32 }, bearing: 343, polar: 74, distance: 38 },
   // Јорго Османо од банката кон Саат Кула (книжарница, дуќани, бр. 8, coffee house на аголот)
   { id: 'osmano', target: { x: -100, z: 6 }, bearing: 62, polar: 70, distance: 34 },
+  // раскрсницата со „Петар Петровиќ-Његош“: кебапчилницата „Охрид“ од југоисток, улицата кон запад
+  { id: 'kebab', target: { x: -125, z: -40 }, bearing: 120, polar: 78, distance: 30 },
+  { id: 'njegos', target: { x: -138, z: -45 }, bearing: 95, polar: 74, distance: 40 },
+  // паркот: фонтаната и стаклото над ископините пред Јени џамија, живите огради
+  { id: 'jeni-park', target: { x: -12, z: -30 }, bearing: 255, polar: 66, distance: 34 },
+  { id: 'park-ogradi', target: { x: -115, z: -62 }, bearing: 30, polar: 62, distance: 45 },
   { id: 'osmano-agol', target: { x: -116, z: -22 }, bearing: 20, polar: 72, distance: 32 },
   // Трговски центар Стаклена: од Магнолија (запад) и од улицата Добривое Радосављевиќ (север)
   { id: 'staklena', target: { x: 48, z: 30 }, bearing: 250, polar: 60, distance: 72 },
