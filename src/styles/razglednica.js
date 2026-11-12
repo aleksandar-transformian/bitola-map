@@ -114,6 +114,8 @@ export default {
     gold: '#b8893e',
     granite: '#4a4744',
     glass: '#82aeb4', // Стаклена
+    rose: '#c98a7e', // Широк Сокак
+    apricot: '#eba872',
   },
   trees: {
     crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],

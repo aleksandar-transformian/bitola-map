@@ -40,7 +40,7 @@ gtao, output, postcard, tiltshift); `?bench[=quick|standard|ablation]` = бен�
 charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, top, saat, dimitrija,
 filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad, mag-fontana, grne,
 staklena, staklena-sever, mag-zapad, oktomvri, banka, osmano, osmano-agol, kebab,
-njegos, jeni-park, park-ogradi, magaza) + `lm-<id>` за секоја знаменитост.
+njegos, jeni-park, park-ogradi, magaza, sokak-istok, sokak-zapad, adams) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
 `#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>&quality=auto|high|medium|low`
@@ -74,7 +74,8 @@ src/world/landmarks/     ← kit.js (примитиви → една геоме�
                            civic.js (Дом на културата, Горна гимназија — рачно, според фотографии)
                            magnolija.js (детални згради на Магнолија/влезот на Широк Сокак по OSM id,
                            од фотографии; „Грне“; Магаза; Трговски центар Стаклена; летните тераси),
-                           zapad.js (куќите западно од Магнолија кон Саат Кула), facade.js
+                           zapad.js (куќите западно од Магнолија кон Саат Кула), sokak.js (Широк Сокак од
+                           Магнолија надолу), facade.js
                            (заеднички делови за фасади, buildHouses по OSM id)
 src/world/trees.js       ← инстанцирани дрвја (облик по стил), lamps.js ← улични светилки (ноќ)
 src/world/traffic.js     ← „Живот на мапата“: автомобили и пешаци (инстанцирани, CPU), фарови ноќе

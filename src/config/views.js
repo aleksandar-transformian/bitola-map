@@ -52,6 +52,10 @@ export const CHECK_VIEWS = [
   // Трговски центар Стаклена: од Магнолија (запад) и од улицата Добривое Радосављевиќ (север)
   { id: 'staklena', target: { x: 48, z: 30 }, bearing: 250, polar: 60, distance: 72 },
   { id: 'staklena-sever', target: { x: 52, z: 28 }, bearing: 15, polar: 68, distance: 62 },
+  // Широк Сокак од Магнолија надолу: источна страна (бр. 43, НЛБ), западна (Adorabela, Velvet), Adam's
+  { id: 'sokak-istok', target: { x: 20, z: 93 }, bearing: 190, polar: 72, distance: 22 },
+  { id: 'sokak-zapad', target: { x: 17, z: 114 }, bearing: 135, polar: 70, distance: 24 },
+  { id: 'adams', target: { x: 29, z: 122 }, bearing: 335, polar: 70, distance: 26 },
   // Магаза и нејзиниот двор од плоштадот (југ)
   { id: 'magaza', target: { x: 31, z: 77 }, bearing: 345, polar: 72, distance: 24 },
   { id: 'mag-fontana', target: { x: -15, z: 42 }, bearing: 315, polar: 52, distance: 48 },

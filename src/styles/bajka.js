@@ -120,6 +120,8 @@ export default {
     gold: '#ad8336',
     granite: '#3f3d40',
     glass: '#557f8c', // Стаклена
+    rose: '#a8645e', // Широк Сокак
+    apricot: '#c98652',
   },
   // играчки-возила: пригушени бои (минијатура)
   traffic: { cars: ['#9a3b2e', '#3d5a6e', '#c9a25a', '#e4ddd0', '#56604a', '#7a4a3a'], people: ['#7a3b2e', '#3d4f62', '#b88a4a', '#5a5048', '#8a6a7a'] },

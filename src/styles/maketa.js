@@ -111,6 +111,8 @@ export default {
     gold: '#c9a96a',
     granite: '#a89a86',
     glass: '#b9c6c2', // Стаклена
+    rose: '#dcc2b4', // Широк Сокак
+    apricot: '#e8cfae',
   },
   traffic: { cars: ['#f6f5f1', '#e6cc9f', '#ecebe6', '#d8be8f'], people: ['#f4f3ef', '#e2c697', '#d6d3cb'] },
   trees: {

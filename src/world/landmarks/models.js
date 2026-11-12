@@ -7,6 +7,7 @@ import { buildingShape, shell, wantsPitch, Writer } from '../buildings.js';
 import { BUILDING_ID } from '../../config/classes.js';
 import { magnoliaHouses } from './magnolija.js';
 import { westHouses } from './zapad.js';
+import { sokakHouses } from './sokak.js';
 
 const TAU = Math.PI * 2;
 
@@ -370,6 +371,7 @@ function promenade(kit, item, ctx) {
   // детални модели (според фотографии)
   magnoliaHouses(kit, ctx);
   westHouses(kit, ctx);
+  sokakHouses(kit, ctx);
   kit.setFrame(0, 0, 0);
   for (let b = 0; b < n; b++) {
     if (ctx.skip.has(b)) continue; // веќе ја црта друга знаменитост
