@@ -19,13 +19,17 @@ const LIFE_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11.5 
 
 const PHOTO_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.5 9.9 4h4.2l1.3 1.5H19a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5a2 2 0 0 1 2-2zM12 16.3a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-1.8a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z"/></svg>';
 
+// квалитет: три столбчиња (ниско / средно / високо); во „авто“ со буквата А
+const QUALITY_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect class="q1" x="4" y="14" width="4" height="6" rx="1"/><rect class="q2" x="10" y="10" width="4" height="10" rx="1"/><rect class="q3" x="16" y="5" width="4" height="15" rx="1"/><text class="qa" x="7.5" y="9.5" text-anchor="middle" font-size="8.5" font-weight="700" font-family="system-ui, sans-serif">А</text></svg>';
+
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 /**
  * @param {HTMLElement} root
  * @param {{ views: object[], landmarks: object[], times: object[], weathers: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onWeather: (id:string)=>void, onLife?: (on:boolean)=>void }} o
  */
-export function createMenu(root, { views, landmarks, times, weathers, onGo, onTime, onWeather, onLife, onSnapshot }) {
+export function createMenu(root, { views, landmarks, times, weathers, qualities = [], onGo, onTime, onWeather, onLife, onSnapshot, onQuality }) {
   const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места'];
   const viewIds = new Set(views.map((v) => v.id));
   const groups = new Map(GROUP_ORDER.map((g) => [g, []]));
@@ -58,6 +62,7 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
     </nav>
     <button type="button" class="help-btn life-btn" aria-pressed="true" title="Живот на мапата: сообраќај и пешаци" aria-label="Живот на мапата: сообраќај и пешаци">${LIFE_ICON}</button>
     <button type="button" class="help-btn photo-btn" title="Зачувај слика (PNG)" aria-label="Зачувај слика">${PHOTO_ICON}</button>
+    <button type="button" class="help-btn quality-btn" data-q="auto" title="Квалитет на приказот" aria-label="Квалитет на приказот">${QUALITY_ICON}</button>
     <button type="button" class="help-btn" aria-expanded="false" aria-controls="help" title="Како се движи низ мапата">?</button>
   `;
   root.appendChild(el);
@@ -84,6 +89,8 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
       <dd>Копчето со фотоапарат го зачувува погледот како PNG (со натписите и атрибуцијата).</dd>
       <dt>Живот на мапата</dt>
       <dd>Копчето со автомобил ги вклучува/исклучува сообраќајот и пешаците.</dd>
+      <dt>Квалитет</dt>
+      <dd>Копчето со столбчиња: <b>авто</b> (се прилагодува на уредот за мазно движење) → високо → средно → ниско.</dd>
     </dl>
     <p>Со „Оди до…“ камерата лета до знаменитоста. Изборот на стил, време и снег се памти и може да се сподели со линкот.</p>
     <button type="button" class="help-close">Во ред</button>
@@ -124,7 +131,12 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
       photoBtn.classList.remove('busy');
     }
   });
-  const btn = el.querySelector('.help-btn:not(.life-btn):not(.photo-btn)');
+  const qualityBtn = el.querySelector('.quality-btn');
+  qualityBtn.addEventListener('click', () => {
+    const i = qualities.findIndex((q) => q.id === qualityBtn.dataset.q);
+    if (qualities.length) onQuality?.(qualities[(i + 1) % qualities.length].id);
+  });
+  const btn = el.querySelector('.help-btn[aria-controls="help"]');
   const toggleHelp = (show = help.hidden) => {
     help.hidden = !show;
     btn.setAttribute('aria-expanded', String(show));
@@ -148,6 +160,14 @@ export function createMenu(root, { views, landmarks, times, weathers, onGo, onTi
     },
     setWeather(id) {
       for (const b of weatherNav.querySelectorAll('button')) b.setAttribute('aria-checked', String(b.dataset.id === id));
+    },
+    /** @param {string} id режим  @param {string} [detail] на пр. тековното ниво во „авто“ */
+    setQuality(id, detail = '') {
+      const q = qualities.find((x) => x.id === id);
+      qualityBtn.dataset.q = id;
+      const label = `Квалитет: ${(q?.name || id).toLowerCase()}${detail ? ` (${detail})` : ''}`;
+      qualityBtn.title = `${label} — клик за следното`;
+      qualityBtn.setAttribute('aria-label', label);
     },
     showHelp: toggleHelp,
   };

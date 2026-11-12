@@ -750,3 +750,25 @@ html[data-time='night'][data-style]:not([data-style='crtan']) {
     top: max(184px, calc(env(safe-area-inset-top) + 180px));
   }
 }
+
+/* копче „Квалитет“: столбчиња според режимот */
+.quality-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.quality-btn .qa {
+  display: none;
+}
+.quality-btn[data-q='auto'] .qa {
+  display: block;
+}
+.quality-btn[data-q='auto'] .q1,
+.quality-btn[data-q='auto'] .q2 {
+  opacity: 0.45;
+}
+.quality-btn[data-q='medium'] .q3,
+.quality-btn[data-q='low'] .q3,
+.quality-btn[data-q='low'] .q2 {
+  opacity: 0.25;
+}

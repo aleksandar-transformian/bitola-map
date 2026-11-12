@@ -17,6 +17,7 @@ import { colorLandmarks } from '../world/landmarks/index.js';
 import { colorTrees, setTreeShape } from '../world/trees.js';
 import { withGrow, withWindows, withGlow, withStreetGlow, withSnow } from './shared/materials.js';
 import { resolveLighting } from '../app/time.js';
+import { HEAVY_PASSES } from '../app/quality.js';
 
 const DEG = Math.PI / 180;
 const TONE = { neutral: THREE.NeutralToneMapping, aces: THREE.ACESFilmicToneMapping, none: THREE.NoToneMapping };
@@ -34,6 +35,14 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
   let bloom = null;
   let growStart = -1;
   let lit = null;
+  // ниво на квалитет (app/quality.js): сенки и тешки пост-ефекти (AO, боке, сјај)
+  const quality = { shadows: true, heavy: true };
+  function applyQuality() {
+    if (!current) return;
+    // некои стилови (цртан филм) се без сенки — поевтино и поедноставно
+    lights.sun.castShadow = profile.shadows > 0 && current.light.shadows !== false && quality.shadows;
+    for (const p of pipeline.stylePasses) if (p !== bloom && HEAVY_PASSES.has(p.perfName)) p.enabled = quality.heavy;
+  }
   const ctx = {
     scene,
     camera,
@@ -107,9 +116,6 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     current = style;
     applyLighting();
     pipeline.renderer.toneMapping = TONE[style.light.toneMapping] ?? THREE.NeutralToneMapping;
-    // некои стилови (цртан филм) се без сенки — поевтино и поедноставно
-    lights.sun.castShadow = profile.shadows > 0 && style.light.shadows !== false;
-
     post = style.post?.(ctx) || { before: [], after: [] };
     // Ноќен сјај околу светлата (десктоп, сите стилови): во линеарен HDR пред OutputPass,
     // вклучен само ноќе — дење не чини ништо.
@@ -122,6 +128,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
       post.before = [...post.before, bloom];
     }
     pipeline.setPasses(post.before, post.after);
+    applyQuality();
 
     document.documentElement.dataset.style = style.id;
     if (animate) fadeOut();
@@ -184,6 +191,12 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
     relight() {
       if (current) applyLighting();
     },
+    /** Ниво на квалитет: { shadows, heavy } (останатото го применува pipeline). */
+    setQuality(q) {
+      quality.shadows = q.shadows;
+      quality.heavy = q.heavy;
+      applyQuality();
+    },
     get current() {
       return current;
     },
@@ -202,7 +215,7 @@ export function createStyleManager({ world, scene, camera, controls, pipeline, p
       env.streetGain.value = 0.5 + 0.5 * k * k * (3 - 2 * k);
       if (bloom) {
         const n = env.night.value;
-        bloom.enabled = n > 0.05;
+        bloom.enabled = n > 0.05 && quality.heavy;
         bloom.strength = 0.45 * n * (current.night?.bloom ?? 1);
       }
       current?.update?.(ctx, post);

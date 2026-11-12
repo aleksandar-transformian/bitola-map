@@ -52,6 +52,8 @@ export function createOverlay() {
         else lines.push(`GPU ${f(perf.gpu.p50)} ms (p95 ${f(perf.gpu.p95)}): ${parts(perf.gpuPasses)}`);
       }
       const px = size ? ` · ${Math.round(size.width * size.dpr)}×${Math.round(size.height * size.dpr)} (DPR ${size.dpr})` : '';
+      const q = stats.quality;
+      if (q) lines.push(`квалитет: ${q.mode} · ниво ${q.levels - q.level}/${q.levels} · DPR ${q.dpr} · MSAA ${q.msaa || 'нема'} · сенки ${q.shadows ? 'да' : 'не'} · тешки ефекти ${q.heavy ? 'да' : 'не'}`);
       lines.push(`податоци ${stats.dataMs} ms · прв кадар ${stats.firstFrameMs} ms · ${stats.profile}${px}`);
       dbg.textContent = lines.join('\n');
     },

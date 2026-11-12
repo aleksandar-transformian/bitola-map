@@ -18,6 +18,8 @@ import { createSnapshot } from './app/snapshot.js';
 import { createLabels, collectLabels } from './ui/labels.js';
 import { detectProfile } from './profile.js';
 import { createPerf } from './perf/perf.js';
+import { createGpuTimer } from './perf/gpu-timer.js';
+import { createQuality, buildLadder, QUALITIES, validQuality } from './app/quality.js';
 import './ui/fonts.js';
 import './ui/ui.css';
 
@@ -88,7 +90,9 @@ async function start() {
   pipeline.init(scene, camera);
   // мерење (само со ?debug или ?bench): CPU по фаза, GPU по пас
   const perf = createPerf(pipeline.renderer, { enabled: BENCH || QS.has('debug') });
-  pipeline.instrument(perf.gpu);
+  // GPU тајмерот го користи и автоматскиот квалитет (за да знае дали има резерва за ниво погоре)
+  const gpuTimer = perf.gpu || createGpuTimer(pipeline.renderer.getContext());
+  pipeline.instrument(gpuTimer);
 
   const styles = createStyleManager({
     world,
@@ -105,6 +109,27 @@ async function start() {
   });
   stats.styleMs = styles.apply(firstStyle, { animate: false });
   stats.buildMs = Math.round(performance.now() - t1);
+
+  // ── Квалитет: авто (се прилагодува на уредот) или рачно ──
+  // При ?bench и во автоматизиран прелистувач (screenshot-ови, тестови): фиксно највисоко —
+  // споредливи мерења и исти слики — освен ако не е побарано поинаку со #quality=.
+  const pinned = BENCH || navigator.webdriver;
+  const baseDpr = pipeline.size.dpr;
+  let syncQuality = null; // го поставува интерфејсот подолу
+  const quality = createQuality({
+    ladder: buildLadder(baseDpr, profile.msaa),
+    mode: pinned ? hashPref('quality', validQuality) || 'high' : readPref('quality', validQuality) || 'auto',
+    megapixels: (container.clientWidth * container.clientHeight * baseDpr * baseDpr) / 1e6,
+    apply(l, i) {
+      if (pipeline.size.dpr !== l.dpr) pipeline.setPixelRatio(l.dpr);
+      if (pipeline.msaa !== l.msaa) pipeline.setMsaa(l.msaa);
+      styles.setQuality(l);
+      stats.quality = { mode: quality.mode, level: i, levels: quality.ladder.length, ...l };
+      syncQuality?.();
+    },
+  });
+  if (perf.enabled) perf.subscribe({ gpu: (_tag, _laps, total) => quality.gpuSample(total) });
+  quality.setStyle(firstStyle.id);
 
   // ── Интерфејс ──
   const labels = createLabels(
@@ -125,11 +150,14 @@ async function start() {
     landmarks: data.landmarks,
     times: TIMES,
     weathers: WEATHERS,
+    qualities: QUALITIES,
+    onQuality: (id) => setQuality(id),
     onGo: (id) => goTo(id),
     onTime: (id) => setTime(id),
     onWeather: (id) => setWeather(id),
     onLife: (on) => setLife(on),
-    onSnapshot: () => snapshot.save(),
+    // сликата секогаш во највисок квалитет, без оглед на тековното ниво
+    onSnapshot: () => quality.withBest(() => snapshot.save()),
   });
   const snapshot = createSnapshot({
     pipeline,
@@ -161,6 +189,11 @@ async function start() {
   }
   setLife(life, false);
   syncTime();
+  syncQuality = () => {
+    stats.quality.mode = quality.mode;
+    menu.setQuality(quality.mode, quality.mode === 'auto' ? `ниво ${quality.ladder.length - quality.level} од ${quality.ladder.length}` : '');
+  };
+  syncQuality();
   menu.setWeather(weather.mode);
   world.snowfall.userData.set(weather.falling);
   const dock = document.createElement('div');
@@ -183,6 +216,7 @@ async function start() {
     if (!s || s.id === styles.current?.id) return;
     stats.lastSwitchMs = styles.apply(s, { animate });
     picker.setActive(s.id);
+    quality.setStyle(s.id);
     syncTime();
     if (remember) rememberStyle(s.id);
     // фонтовите на натписите зависат од стилот
@@ -200,6 +234,12 @@ async function start() {
   function syncTime() {
     menu.setTime(time.mode);
     document.documentElement.dataset.time = time.mode;
+  }
+  function setQuality(id, remember = true) {
+    if (!validQuality(id) || id === quality.mode) return;
+    quality.setMode(id);
+    syncQuality();
+    if (remember) writePref('quality', id);
   }
   function setWeather(id) {
     if (!validWeather(id) || id === weather.mode) return;
@@ -225,6 +265,8 @@ async function start() {
     if (t) setTime(t);
     const w = hashPref('weather', validWeather);
     if (w) setWeather(w);
+    const q = hashPref('quality', validQuality);
+    if (q) setQuality(q);
     const v = hashPref('view', validView);
     if (v) goTo(v);
   });
@@ -287,6 +329,8 @@ async function start() {
     perf.mark('render');
     labels.update(camera, container.clientWidth, container.clientHeight, d);
     perf.end('labels');
+    if (!perf.enabled) gpuTimer?.poll((_tag, _laps, total) => quality.gpuSample(total));
+    if (!first) quality.frame(dt * 1000, now);
     frames++;
     if (first) {
       first = false;
@@ -330,6 +374,8 @@ async function start() {
     setStyle,
     setTime,
     setWeather,
+    setQuality,
+    quality,
     get style() {
       return styles.current?.id;
     },

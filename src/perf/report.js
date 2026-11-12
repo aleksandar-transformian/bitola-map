@@ -49,12 +49,13 @@ export function formatReport(r) {
   L.push(`Битола — мерење на изведбата (${r.suite}) · ${r.date.slice(0, 16).replace('T', ' ')} · ${r.commit || 'без commit'}`);
   L.push(`GPU: ${e.gpu}${e.software ? '  (софтверски — времињата НЕ се репрезентативни)' : ''}`);
   L.push(`профил ${r.profile} · ${e.canvas.cssW}×${e.canvas.cssH} @ DPR ${e.canvas.dpr} = ${e.canvas.pxW}×${e.canvas.pxH} (${e.canvas.megapixels} MP) · MSAA ${e.msaa}× · GPU тајмер: ${r.gpuTimer ? 'да' : 'не'}`);
+  if (r.quality) L.push(`квалитет: ${r.quality.mode}${r.quality.mode === 'auto' ? ' — колоната „кв.“ е постигнатото ниво (' + r.quality.ladder.length + ' = највисоко)' : ''}`);
   L.push(`вчитување: податоци ${r.load.dataMs} ms · градење ${r.load.buildMs} ms · прв кадар ${r.load.firstFrameMs} ms · програми ${r.memory.programs} · геометрии ${r.memory.geometries} · текстури ${r.memory.textures}${r.memory.jsHeapMB ? ` · JS heap ${r.memory.jsHeapMB} MB` : ''}`);
   L.push('');
-  L.push(`${pad('сценарио', 34)}${lpad('fps', 6)}${lpad('кадар p50', 11)}${lpad('p95', 7)}${lpad('сецк.%', 8)}${lpad('CPU p95', 9)}${lpad('GPU p50', 9)}${lpad('p95', 7)}${lpad('повици', 8)}${lpad('триаг.', 8)}  најскапо (GPU ms)`);
+  L.push(`${pad('сценарио', 34)}${lpad('fps', 6)}${lpad('кадар p50', 11)}${lpad('p95', 7)}${lpad('сецк.%', 8)}${lpad('CPU p95', 9)}${lpad('GPU p50', 9)}${lpad('p95', 7)}${lpad('повици', 8)}${lpad('триаг.', 8)}${lpad('кв.', 5)}  најскапо (GPU ms)`);
   for (const s of r.scenarios) {
     L.push(
-      `${pad(s.id, 34)}${lpad(f1(s.fps), 6)}${lpad(f1(s.interval.p50), 11)}${lpad(f1(s.interval.p95), 7)}${lpad(f1(s.jankPct), 8)}${lpad(f1(s.cpu.total.p95), 9)}${lpad(f1(s.gpu?.total.p50), 9)}${lpad(f1(s.gpu?.total.p95), 7)}${lpad(s.calls, 8)}${lpad(mtri(s.triangles), 8)}  ${topPasses(s.gpu)}`,
+      `${pad(s.id, 34)}${lpad(f1(s.fps), 6)}${lpad(f1(s.interval.p50), 11)}${lpad(f1(s.interval.p95), 7)}${lpad(f1(s.jankPct), 8)}${lpad(f1(s.cpu.total.p95), 9)}${lpad(f1(s.gpu?.total.p50), 9)}${lpad(f1(s.gpu?.total.p95), 7)}${lpad(s.calls, 8)}${lpad(mtri(s.triangles), 8)}${lpad(r.quality && s.quality != null ? r.quality.ladder.length - s.quality : '', 5)}  ${topPasses(s.gpu)}`,
     );
   }
   if (r.ablation?.length) {
@@ -89,7 +90,7 @@ export function formatReport(r) {
 export function compareReports(base, next, { tolerance = 0.1 } = {}) {
   const lines = [];
   const regressions = [];
-  const sameGpu = !base.env.software && !next.env.software && base.env.gpu === next.env.gpu && base.env.canvas.dpr === next.env.canvas.dpr;
+  const sameGpu = !base.env.software && !next.env.software && base.env.gpu === next.env.gpu && base.env.canvas.dpr === next.env.canvas.dpr && (base.quality?.mode || 'high') === (next.quality?.mode || 'high');
   const byId = new Map(base.scenarios.map((s) => [s.id, s]));
   lines.push(`споредба: ${base.commit || base.date} → ${next.commit || next.date}${sameGpu ? ' (ист GPU — и времиња)' : ' (само структура)'}`);
   for (const s of next.scenarios) {

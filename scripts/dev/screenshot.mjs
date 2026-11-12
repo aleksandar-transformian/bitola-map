@@ -4,7 +4,7 @@
 //
 //   node scripts/dev/screenshot.mjs [--url http://127.0.0.1:5173/] [--out screenshots/tmp]
 //        [--mobile] [--views home,center] [--scale 1] [--style razglednica|maketa|crtan|bajka] [--time day|sunset|night]
-//        [--weather clear|snow|snowfall] [--clean]
+//        [--weather clear|snow|snowfall] [--quality auto|high|medium|low] [--clean]
 //        погледи: home, center, close, west, top + брзите погледи (pregled, shirok-sokak, charshija, …)
 //                 + lm-<id> за секоја знаменитост (config/landmarks.js)
 //
@@ -70,6 +70,7 @@ const hash = new URLSearchParams();
 if (opt('style')) hash.set('style', opt('style'));
 if (opt('time')) hash.set('time', opt('time'));
 if (opt('weather')) hash.set('weather', opt('weather'));
+if (opt('quality')) hash.set('quality', opt('quality'));
 u.hash = hash.toString();
 await page.goto(u.toString());
 await page.waitForFunction(() => window.__bitola?.ready, null, { timeout: 120000 });
@@ -85,7 +86,7 @@ for (const v of views) {
     }, VIEWS[v]);
   }
   await page.waitForTimeout(2500);
-  const file = `${out}/${mobile ? 'mobile-' : ''}${opt('style') ? opt('style') + '-' : ''}${opt('time') ? opt('time') + '-' : ''}${opt('weather') ? opt('weather') + '-' : ''}${v}.png`;
+  const file = `${out}/${mobile ? 'mobile-' : ''}${opt('style') ? opt('style') + '-' : ''}${opt('time') ? opt('time') + '-' : ''}${opt('weather') ? opt('weather') + '-' : ''}${opt('quality') ? 'q' + opt('quality') + '-' : ''}${v}.png`;
   await page.screenshot({ path: file, timeout: 180000 });
   console.log(`screenshot: ${file}`);
 }

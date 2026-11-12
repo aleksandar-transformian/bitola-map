@@ -41,7 +41,7 @@ charshija, gradski-park, herakleja) + `CHECK_VIEWS` (home, center, close, west, 
 filip, dom, dom-front, gimnazija, gimnazija-agol, mag-red, mag-plostad) + `lm-<id>` за секоја знаменитост.
 
 URL: `?debug` (FPS, повици, триаголници, време), `?profile=mobile|desktop`,
-`#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>`
+`#style=razglednica|maketa|crtan|lowpoly|bajka&time=day|sunset|night&weather=clear|snow|snowfall&view=<id>&quality=auto|high|medium|low`
 (`#style=nokna` → Разгледница ноќе — „Ноќна Битола“ е споена во ноќта на сите стилови).
 Тастатура: стрелки = поместување, Q/E = ротација, +/− = зум, PageUp/PageDown = наклон,
 Home = преглед, 1–5 = стил, S = снег (без → снег → снежи), ? = упатство.
@@ -94,6 +94,8 @@ src/app/camera.js        ← камера, MapControls, погледи, лет �
 src/app/time.js          ← ден/зајдисонце/ноќ: тежини, премин, resolveLighting(style, тежини)
 src/app/weather.js       ← временски услови: без снег / снег / снежи (env.snow 0–1, премин)
 src/app/prefs.js         ← поставки во URL hash + localStorage
+src/app/quality.js       ← квалитет на приказот: скала од нивоа (DPR, MSAA, тешки ефекти, сенки) и „авто“ —
+                           се спушта/качува според измереното време на кадар; нивото се памти по стил
 src/app/snapshot.js      ← „Зачувај слика“: кадар 2×, натписи + наслов + атрибуција во PNG
 src/data/loader.js       ← вчитување на public/data/*
 src/ui/                  ← интерфејс: наслов, атрибуција, мени горе десно (menu.js: „Оди до…“, време,
@@ -152,6 +154,10 @@ models.js`) се градат од примитиви во рамка од OBB �
   триаголници наспроти основата). Оптимизациите се докажуваат со `?bench` пред/по на референтниот
   уред; новиот пас добива `perfName` за да се гледа во мерењето.
 - `localStorage` секогаш во try/catch.
+- Квалитет: стандардно „авто“ (`src/app/quality.js`). Тежок пост-ефект (AO, боке, сјај) се додава во
+  `HEAVY_PASSES` по `perfName` за да се гаси на пониските нивоа; пасовите што го даваат изгледот на
+  стилот остануваат. Во автоматизиран прелистувач (`navigator.webdriver`) и при `?bench` квалитетот е
+  фиксно „високо“ (исти слики и споредливи мерења), освен со `#quality=`.
 
 ## Git тек
 
