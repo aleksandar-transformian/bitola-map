@@ -116,6 +116,12 @@ export default {
     sand: '#ffe2a6',
     rubble: '#d9b68a',
     slate: '#3d5a80',
+    // штитот-фонтана и постаментот на Филип II (Магнолија)
+    gold: '#d99a2b',
+    granite: '#4a4a55',
+    glass: '#58b0c8', // Стаклена
+    rose: '#e0786e', // Широк Сокак
+    apricot: '#ff9f55',
   },
   traffic: { cars: ['#ef3b2d', '#ffd23f', '#2f8fe0', '#2bb673', '#ff8a1f', '#ffffff', '#8e44ad'], people: ['#ef3b2d', '#2f8fe0', '#ffd23f', '#2bb673', '#ff6fb1', '#ff8a1f'] },
   trees: {

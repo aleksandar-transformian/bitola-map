@@ -6,6 +6,8 @@ import { obb, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geo
 import { buildingShape, shell, wantsPitch, Writer } from '../buildings.js';
 import { BUILDING_ID } from '../../config/classes.js';
 import { magnoliaHouses } from './magnolija.js';
+import { westHouses } from './zapad.js';
+import { sokakHouses } from './sokak.js';
 
 const TAU = Math.PI * 2;
 
@@ -365,8 +367,11 @@ function promenade(kit, item, ctx) {
   const n = pack.meta.count;
   const lines = item.lines;
   const facades = ['facade1', 'facade2', 'facade3', 'facade4', 'facade5'];
-  // зградите на Магнолија (влезот на улицата) имаат свои детални модели
+  // зградите на Магнолија (влезот на улицата) и западно од неа (кон Саат Кула) имаат свои
+  // детални модели (според фотографии)
   magnoliaHouses(kit, ctx);
+  westHouses(kit, ctx);
+  sokakHouses(kit, ctx);
   kit.setFrame(0, 0, 0);
   for (let b = 0; b < n; b++) {
     if (ctx.skip.has(b)) continue; // веќе ја црта друга знаменитост
