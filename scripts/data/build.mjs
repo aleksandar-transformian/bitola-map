@@ -674,9 +674,14 @@ function roofShape(t) {
     if (way.tags?.highway !== 'pedestrian' || way.tags?.area !== 'yes') continue;
     for (const poly of polygonsOf(way)) noTreeRings.push(poly);
   }
-  // ниту околу рачно поставените чешми на знаменитостите (opts.fountain = { lat, lon })
-  const noTreeDiscs = LANDMARKS.filter((L) => L.opts?.fountain?.lat).map((L) => proj.toXZ(L.opts.fountain.lat, L.opts.fountain.lon));
-  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings)) || noTreeDiscs.some(([x, z]) => Math.hypot(p[0] - x, p[1] - z) < 11);
+  // ниту околу рачно поставените чешми на знаменитостите (opts.fountain = { lat, lon }, 11 m)
+  const noTreeDiscs = LANDMARKS.filter((L) => L.opts?.fountain?.lat).map((L) => [...proj.toXZ(L.opts.fountain.lat, L.opts.fountain.lon), 11]);
+  // и околу знаменитостите-точки со clearTrees (радиус во m)
+  for (const L of LANDMARKS) {
+    const n = L.node && L.clearTrees && osm.nodes.get(+L.node.slice(1));
+    if (n) noTreeDiscs.push([...proj.toXZ(n.lat, n.lon), L.clearTrees]);
+  }
+  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings)) || noTreeDiscs.some(([x, z, r]) => Math.hypot(p[0] - x, p[1] - z) < r);
   const MAX = 40000;
   const sorted = [...areas].filter((a) => DENSITY[a.cls]).sort((a, b) => {
     const da = Math.hypot(...G.centroid(a.rings[0]));

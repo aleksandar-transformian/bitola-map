@@ -99,6 +99,10 @@ export const LANDMARKS = [
   { id: 'francuski-grobishta', group: 'Историја и спомен-места', name: 'Француски воени гробишта', osm: 'w1050777115', model: 'warCemetery', parts: { memorial: 'w1217195019' }, rank: 1 },
   { id: 'srpski-grobishta', group: 'Историја и спомен-места', name: 'Српски воени гробишта', osm: 'w1050747139', model: 'warCemetery', opts: { chapel: true }, rank: 1 },
 
+  // ── Споменикот на народниот херој Стеван Наумов-Стив (OSM точка), во паркот кај Офицерскиот дом ──
+  // clearTrees: без дрвја од паркот во круг (m) околу точката (поплочен простор)
+  { id: 'stiv-naumov', group: 'Историја и спомен-места', name: 'Споменик на Стеван Наумов-Стив', node: 'n2316156278', model: 'stivMonument', rank: 1, clearTrees: 8 },
+
   // ── Битолскиот филџан: скулптура на кружниот тек „11. Бригада“ (западен влез) ──
   // точна позиција од сопственикот (Google Maps: 41.0329632, 21.3160347)
   { id: 'fildzan', group: 'Историја и спомен-места', name: 'Битолскиот филџан', roundabout: 'w196560544', at: { lat: 41.0329632, lon: 21.3160347 }, model: 'fildzan', rank: 1 },
