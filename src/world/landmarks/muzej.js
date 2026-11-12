@@ -273,7 +273,11 @@ function building(kit, item, ctx, toWorld, g0) {
 
 // ───────────────────────── градина ─────────────────────────
 
-/** Камен ѕид со железна ограда по отсечка (во рамката), со отвор [g0, g1] по должината. */
+/**
+ * Камен ѕид со железна ограда по отсечка (во рамката), со отвор [g0, g1] по должината.
+ * Се дели на делови од ~3 m; секој дел е наведнат од висината на теренот на почетокот до
+ * онаа на крајот, па ѕидот, капакот и решетката се непрекинати (без скалила меѓу деловите).
+ */
 function fence(kit, gy, a, b, wallH, gap) {
   const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
   const tu = (b[0] - a[0]) / len;
@@ -284,20 +288,31 @@ function fence(kit, gy, a, b, wallH, gap) {
     const n = Math.max(1, Math.round((p1 - p0) / 3));
     for (let k = 0; k < n; k++) pieces.push([p0 + ((p1 - p0) * k) / n, p0 + ((p1 - p0) * (k + 1)) / n]);
   }
+  const yAt = (d) => gy(a[0] + tu * d, a[1] + tv * d);
   for (const [s0, s1] of pieces) {
     const L = s1 - s0;
     if (L < 0.3) continue;
     const m = (s0 + s1) / 2;
     const u = a[0] + tu * m;
     const v = a[1] + tv * m;
-    const y = gy(u, v);
-    const at = (dy) => Kit.at(u, y + dy, v, rot);
-    kit.add(new THREE.BoxGeometry(L, wallH + 0.6, 0.55).translate(0, (wallH + 0.6) / 2, 0), at(-0.6), 'stone');
-    kit.add(new THREE.BoxGeometry(L + 0.1, 0.14, 0.65), at(wallH), 'stone');
-    kit.add(new THREE.BoxGeometry(L, 0.05, 0.05), at(wallH + 0.25), 'metal');
-    kit.add(new THREE.BoxGeometry(L, 0.05, 0.05), at(wallH + 1.45), 'metal');
-    for (let d = -L / 2 + 0.1; d < L / 2; d += 0.2) kit.add(new THREE.BoxGeometry(0.035, 1.55, 0.035).translate(d, 0.78, 0), at(wallH), 'metal');
-    kit.add(new THREE.BoxGeometry(0.08, 1.75, 0.08).translate(-L / 2, 0.88, 0), at(wallH), 'metal');
+    const ya = yAt(s0);
+    const yb = yAt(s1);
+    const y = (ya + yb) / 2;
+    const k = (yb - ya) / L; // наклон по должината
+    // геометријата се „наведнува“: секое теме добива k·x по висина
+    const shear = (g) => {
+      const p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) p.setY(i, p.getY(i) + k * p.getX(i));
+      g.computeVertexNormals();
+      return g;
+    };
+    const add = (g, dy, part) => kit.add(shear(g.translate(0, dy, 0)), Kit.at(u, y, v, rot), part);
+    add(new THREE.BoxGeometry(L, wallH + 1.2, 0.55).translate(0, (wallH + 1.2) / 2, 0), -1.2, 'stone');
+    add(new THREE.BoxGeometry(L + 0.02, 0.14, 0.65), wallH, 'stone');
+    add(new THREE.BoxGeometry(L, 0.05, 0.05), wallH + 0.25, 'metal');
+    add(new THREE.BoxGeometry(L, 0.05, 0.05), wallH + 1.45, 'metal');
+    for (let d = -L / 2 + 0.1; d < L / 2; d += 0.2) add(new THREE.BoxGeometry(0.035, 1.55, 0.035).translate(d, 0.78, 0), wallH, 'metal');
+    add(new THREE.BoxGeometry(0.08, 1.75, 0.08).translate(-L / 2, 0.88, 0), wallH, 'metal');
   }
 }
 
