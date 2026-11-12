@@ -674,7 +674,9 @@ function roofShape(t) {
     if (way.tags?.highway !== 'pedestrian' || way.tags?.area !== 'yes') continue;
     for (const poly of polygonsOf(way)) noTreeRings.push(poly);
   }
-  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings));
+  // ниту околу рачно поставените чешми на знаменитостите (opts.fountain = { lat, lon })
+  const noTreeDiscs = LANDMARKS.filter((L) => L.opts?.fountain?.lat).map((L) => proj.toXZ(L.opts.fountain.lat, L.opts.fountain.lon));
+  const excluded = (p) => noTreeRings.some((rings) => G.pointInPolygon(p, rings)) || noTreeDiscs.some(([x, z]) => Math.hypot(p[0] - x, p[1] - z) < 11);
   const MAX = 40000;
   const sorted = [...areas].filter((a) => DENSITY[a.cls]).sort((a, b) => {
     const da = Math.hypot(...G.centroid(a.rings[0]));
@@ -787,6 +789,11 @@ function roofShape(t) {
       item.buffer = L.buffer;
       const all = item.lines.flat();
       item.center = [all.reduce((a, p) => a + p[0], 0) / all.length, all.reduce((a, p) => a + p[1], 0) / all.length].map((v) => +v.toFixed(2));
+    }
+    if (L.opts?.fountain?.lat) {
+      // рачна чешма (WGS84) → локални метри
+      const [x, z] = proj.toXZ(L.opts.fountain.lat, L.opts.fountain.lon);
+      item.opts = { ...item.opts, fountain: [+x.toFixed(2), +z.toFixed(2)] };
     }
     if (L.at) {
       // рачна позиција (WGS84) — има предност пред OSM (на пр. точна локација од сопственикот)

@@ -204,7 +204,7 @@ function towerSides(kit) {
 }
 
 // ───────────────────────── модел ─────────────────────────
-export function officersHome(kit, item) {
+export function officersHome(kit, item, ctx) {
   const [cx, cz] = item.center;
   kit.setFrame(cx, item.ground.mean, cz, 1, 0);
   block(kit, -HC, HC, -DC, DC, H_C);
@@ -230,5 +230,49 @@ export function officersHome(kit, item) {
     kit.hip((k * (HW + HE)) / 2, H_T, 0, HE - HW + 0.6, 1.2, 2 * DE + 0.6, 'roof'); // краен ризалит
     kit.box(k * 9.5, H_T, -4, 0.9, 2.4, 0.9, 'wall'); // оџак
     kit.box(k * 9.5, H_T + 2.4, -4, 1.1, 0.2, 1.1, 'accent');
+  }
+
+  // камената чешма во паркот (item.opts.fountain = [x, z] во локални метри, од обработката)
+  const F = item.opts?.fountain;
+  if (Array.isArray(F)) {
+    const [fx, fz] = F;
+    kit.setFrame(fx, ctx.hf.sample(fx, fz), fz, 1, 0);
+    fountain(kit);
+  }
+}
+
+/**
+ * Чешма-кјоше од бел камен (според Street View): стапало, јадро со плоча и венец, по два
+ * столба на аглите, архитрав со венец и скалест врв; на предната (северна) и задната страна
+ * корито со чучур. Околу неа поплочен круг со клупи.
+ */
+function fountain(kit) {
+  kit.cylinder(0, -0.3, 0, 5.2, 0.36, 'paving', { seg: 28 });
+  kit.box(0, 0, 0, 3.6, 0.3, 3.0, 'stone');
+  kit.box(0, 0.3, 0, 2.3, 2.5, 1.9, 'accent');
+  for (const x of [-1, 1]) {
+    for (const z of [-1, 1]) {
+      kit.box(x * 1.45, 0.3, z * 1.15, 0.5, 0.3, 0.5, 'stone');
+      kit.cylinder(x * 1.45, 0.6, z * 1.15, 0.17, 2.0, 'accent', { top: 0.15, seg: 10 });
+      kit.box(x * 1.45, 2.6, z * 1.15, 0.42, 0.2, 0.42, 'stone');
+    }
+  }
+  kit.box(0, 2.8, 0, 3.4, 0.5, 2.8, 'accent'); // архитрав
+  kit.box(0, 3.3, 0, 3.7, 0.16, 3.1, 'stone'); // венец
+  kit.box(0, 3.46, 0, 2.8, 0.4, 2.2, 'accent'); // скалест врв
+  kit.box(0, 3.86, 0, 2.0, 0.3, 1.5, 'accent');
+  for (const s of [-1, 1]) {
+    const z = s * 0.96;
+    // венец (кружен релјеф), плоча, чучур и корито
+    kit.add(new THREE.TorusGeometry(0.45, 0.09, 6, 18), Kit.at(0, 2.0, z + s * 0.04), 'stone');
+    kit.box(0, 0.9, z, 1.2, 0.7, 0.08, 'stone');
+    kit.box(0, 1.15, z + s * 0.15, 0.08, 0.08, 0.3, 'metal');
+    kit.box(0, 0.3, z + s * 0.45, 1.6, 0.55, 0.8, 'stone');
+    kit.box(0, 0.8, z + s * 0.45, 1.35, 0.06, 0.55, 'water');
+  }
+  // клупи на кругот (исток и запад)
+  for (const x of [-4.2, 4.2]) {
+    kit.box(x, 0.06, 0, 0.5, 0.45, 1.8, 'wood');
+    kit.box(x + Math.sign(x) * 0.22, 0.5, 0, 0.08, 0.45, 1.8, 'wood');
   }
 }

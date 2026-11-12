@@ -32,7 +32,13 @@ export const LANDMARKS = [
     id: 'bezisten', group: 'Центар', name: 'Безистен', osm: 'w1143767501', model: 'bezisten', rank: 0,
     parts: { terrace1: 'w1463130077', terrace2: 'w1463130078', terrace3: 'w1463130079', pavilion1: 'w1462644090', pavilion2: 'w1462644091' },
   },
-  { id: 'oficerski-dom', group: 'Центар', name: 'Офицерски дом', osm: 'w1102567439', model: 'officersHome', rank: 0 },
+  // Офицерски дом: рачен модел (world/landmarks/oficerski.js); fountain = камената чешма во паркот
+  // (ја нема во OSM; од сателит — на оската на ул. „Раде Илиев“). Обработката ја претвора во
+  // локални метри и не става дрвја од паркот во круг од 11 m околу неа.
+  {
+    id: 'oficerski-dom', group: 'Центар', name: 'Офицерски дом', osm: 'w1102567439', model: 'officersHome', rank: 0,
+    opts: { fountain: { lat: 41.024591, lon: 21.337692 } },
+  },
   // Св. Димитрија: рачен модел (world/landmarks/dimitrija.js) — самостојна камбанарија, базен, ограда со порта
   {
     id: 'sv-dimitrija', group: 'Цркви и џамии', name: 'Св. Димитрија', osm: 'w38582552', model: 'dimitrija', rank: 0,
