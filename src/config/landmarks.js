@@ -25,7 +25,13 @@ export const LANDMARKS = [
     opts: { dome: 7.2, hall: 16, minaret: 34, porticoDomes: 3 },
   },
   { id: 'ajdar-kadi', group: 'Цркви и џамии', name: 'Ајдар-кади џамија', osm: 'w192121734', model: 'mosque', rank: 0, opts: { dome: 6.2, hall: 14, minaret: 28, porticoDomes: 3 } },
-  { id: 'bezisten', group: 'Центар', name: 'Безистен', osm: 'w1143767501', model: 'bezisten', rank: 0 },
+  // Безистен: рачен модел (world/landmarks/bezisten.js); терасите на угостителските објекти
+  // долепени до јужната фасада (OSM building) се цртаат ниско — тента и стаклена ограда;
+  // двата павилјона (влезови во подземниот премин, сега дуќани) од двете страни на „Столарска“
+  {
+    id: 'bezisten', group: 'Центар', name: 'Безистен', osm: 'w1143767501', model: 'bezisten', rank: 0,
+    parts: { terrace1: 'w1463130077', terrace2: 'w1463130078', terrace3: 'w1463130079', pavilion1: 'w1462644090', pavilion2: 'w1462644091' },
+  },
   { id: 'oficerski-dom', group: 'Центар', name: 'Офицерски дом', osm: 'w1102567439', model: 'officersHome', rank: 0 },
   // Св. Димитрија: рачен модел (world/landmarks/dimitrija.js) — самостојна камбанарија, базен, ограда со порта
   {

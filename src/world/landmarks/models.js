@@ -150,31 +150,6 @@ function mosque(kit, item) {
   kit.box(mu, H * 0.72 + 0.6, mv + 1.66, 0.4, 0.5, 0.05, 'light'); // светилка на шерефето
 }
 
-// ───────────────────────── Безистен ─────────────────────────
-function bezisten(kit, item) {
-  const ring = item.polys[0][0];
-  const y0 = item.ground.min - 0.5;
-  const top = item.ground.mean + 7;
-  kit.slab([ring], y0, top, 'wall');
-  kit.slab([ring], top, top + 0.5, 'roof');
-  kit.windows(ring, [{ y: item.ground.mean + 3.8, h: 1.4 }], { spacing: 5, width: 0.9 });
-  // низа куполи по оската
-  const f = obb(ring);
-  kit.setFrame(f.cx, top + 0.5, f.cz, f.ax, f.az);
-  const rows = f.W > 18 ? [-f.W / 4, f.W / 4] : [0];
-  for (let u = -f.L / 2 + 4; u <= f.L / 2 - 4; u += 7.5) {
-    for (const v of rows) {
-      const wx = f.cx + u * f.ax - v * f.az;
-      const wz = f.cz + u * f.az + v * f.ax;
-      if (!pointInRing([wx, wz], ring)) continue;
-      kit.cylinder(u, 0, v, 2.5, 0.8, 'stone', { seg: 12 });
-      kit.dome(u, 0.8, v, 2.5, 'dome', { seg: 16 });
-    }
-  }
-  // порти на краевите
-  for (const s of [-1, 1]) kit.box((s * f.L) / 2, -7.5, 0, 0.4, 6.5, 3.2, 'stone');
-}
-
 // ───────────────────────── Јавни згради ─────────────────────────
 // opts: height, floors, part ('wall'|'wall2'), roof ('hip'|'flat'|'tiles'), attic, flag, band.
 // item.inside = основата е двор/парцела → моделот е врз најголемата зграда во неа.
@@ -505,4 +480,4 @@ function heraclea(kit, item, ctx) {
   }
 }
 
-export const MODELS = { clockTower, mosque, bezisten, officersHome, publicBuilding, church, square, promenade, heraclea };
+export const MODELS = { clockTower, mosque, officersHome, publicBuilding, church, square, promenade, heraclea };
