@@ -24,7 +24,7 @@
   "maxZ": 4519.5713262066565
  },
  "osmTimestamp": "2026-11-11T10:55:17Z",
- "generatedAt": "2026-11-12T12:36:02.097Z",
+ "generatedAt": "2026-11-12T13:00:08.308Z",
  "stats": {
   "terrain": {
    "cols": 757,
@@ -55,7 +55,7 @@
    "osm": 412,
    "sampled": 26536
   },
-  "landmarks": 31,
+  "landmarks": 32,
   "pois": 87
  },
  "attribution": [

@@ -63,6 +63,8 @@ export const LANDMARKS = [
 
   // ── цркви и манастири ──
   { id: 'presveto-srce', group: 'Цркви и џамии', name: 'Пресвето Срце Исусово', osm: 'w1070850326', model: 'church', rank: 1, opts: { tower: 'front', spire: true, dome: false, wallH: 11 } },
+  // Митрополијата (Преспанско-пелагониска епархија): рачен модел (world/landmarks/mitropolija.js)
+  { id: 'mitropolija', group: 'Јавни згради', name: 'Митрополија', osm: 'w302354632', model: 'mitropolija', rank: 1 },
   // Пресвета Богородица: рачен модел (world/landmarks/bogorodica.js) — камбанарија и чешма од OSM
   {
     id: 'presveta-bogorodica', group: 'Цркви и џамии', name: 'Пресвета Богородица', osm: 'w210252893', model: 'bogorodica', rank: 1,
