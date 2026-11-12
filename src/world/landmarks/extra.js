@@ -1,11 +1,20 @@
 // Дополнителни знаменитости: споменик на Филип II, Зандан Куле, станица, стадион, тврдина,
-// воени гробишта (германски, француски, српски), манастири и Филџанот на кружниот тек.
+// воени гробишта (германски, француски, српски), манастири; Филџанот е во fildzan.js.
 // Сите се стилизирани модели од примитиви, во рамка од основата во OSM.
 
 import * as THREE from 'three';
 import { Kit } from './kit.js';
 import { obb, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geom2d.js';
 import { churchOn, largestInside, lamp } from './models.js';
+import { fildzan } from './fildzan.js';
+import { dimitrija } from './dimitrija.js';
+import { bezisten } from './bezisten.js';
+import { bogorodica } from './bogorodica.js';
+import { mitropolija } from './mitropolija.js';
+import { stivMonument } from './stiv.js';
+import { sportsHall } from './sportska-sala.js';
+import { openArena } from './arena.js';
+import { museum } from './muzej.js';
 
 const TAU = Math.PI * 2;
 
@@ -83,16 +92,16 @@ function equestrian(kit, item, ctx) {
   kit.frame.scale(new THREE.Vector3(S, S, S));
   // постамент од темен гранит на кружни скали (како на Магнолија): скали, тело, корниз
   const P = o.pedestal;
-  for (const [r, y0, h] of [[6.2, -0.5, 0.9], [5.4, 0.4, 0.4], [4.6, 0.8, 0.4]]) kit.cylinder(0, y0, 0, r, h, 'granite', { seg: 40 });
+  for (const [r, y0, h] of [[6.2, -0.5, 0.9], [5.4, 0.4, 0.4], [4.6, 0.8, 0.4]]) kit.cylinder(0, y0, 0, r, h, 'basalt', { seg: 40 });
   // рефлектори во работ на скалите (светат ноќе)
   for (let i = 0; i < 4; i++) {
     const a = Math.PI / 4 + (i * Math.PI) / 2;
     kit.box(Math.cos(a) * 5.0, 0.8, Math.sin(a) * 5.0, 0.4, 0.3, 0.4, 'light');
   }
-  kit.box(0, 1.2, 0, 4.4, 0.7, 4.4, 'granite');
-  kit.box(0, 1.9, 0, 3.6, P - 3.1, 3.6, 'granite');
-  kit.box(0, P - 1.2, 0, 4.2, 0.6, 4.2, 'granite');
-  kit.box(0, P - 0.6, 0, 3.9, 0.6, 3.9, 'granite');
+  kit.box(0, 1.2, 0, 4.4, 0.7, 4.4, 'basalt');
+  kit.box(0, 1.9, 0, 3.6, P - 3.1, 3.6, 'basalt');
+  kit.box(0, P - 1.2, 0, 4.2, 0.6, 4.2, 'basalt');
+  kit.box(0, P - 0.6, 0, 3.9, 0.6, 3.9, 'basalt');
   // статуата е во природна големина × ~1.6 — посебна рамка на врвот на постаментот
   kit.setFrame(cx, y + P * S, cz, ax, az);
   kit.frame.scale(new THREE.Vector3(1.6 * S, 1.6 * S, 1.6 * S));
@@ -466,41 +475,6 @@ function monastery(kit, item, ctx) {
   lamp(kit, 0, 0, 3.5);
 }
 
-// ───────────────────────── Филџанот на кружниот тек ─────────────────────────
-// Порцелански филџан (шолја за турско кафе) на чинијка, со шара — фонтана на тревниот остров.
-function fildzan(kit, item, ctx) {
-  const [cx, cz] = item.center;
-  const R = Math.max(3, (item.radius || 8) - 3.5);
-  kit.setFrame(cx, ctx.hf.sample(cx, cz), cz);
-  kit.cylinder(0, -0.4, 0, R + 0.4, 0.75, 'stone', { seg: 36 });
-  kit.cylinder(0, 0.3, 0, R, 0.12, 'green', { seg: 36 });
-  // чинијка (фонтана) и шолја
-  const s = Math.min(2.6, R / 6); // големината на скулптурата според островот
-  kit.cylinder(0, 0.4, 0, 3.6 * s, 0.4, 'accent', { top: 4.1 * s, seg: 32 });
-  kit.cylinder(0, 0.8, 0, 3.75 * s, 0.05, 'water', { seg: 32 });
-  kit.add(new THREE.TorusGeometry(4.0 * s, 0.14, 6, 40), Kit.atE(0, 0.86, 0, Math.PI / 2), 'accent');
-  const prof = [
-    [0.01, 0],
-    [1.15, 0],
-    [1.3, 0.25],
-    [1.55, 1.2],
-    [1.95, 2.3],
-    [2.15, 3.0],
-    [2.1, 3.05],
-    [1.9, 2.4],
-    [0.01, 2.2],
-  ].map(([x, y]) => new THREE.Vector2(x * s, y * s));
-  kit.add(new THREE.LatheGeometry(prof, 32), Kit.atE(0, 0.85, 0), 'accent');
-  // шара (лента) и рачка
-  kit.add(new THREE.CylinderGeometry(1.86 * s, 1.62 * s, 0.45 * s, 32, 1, true), Kit.atE(0, 0.85 + 1.35 * s, 0), 'mosaic1');
-  kit.add(new THREE.TorusGeometry(0.62 * s, 0.13 * s, 8, 16, Math.PI * 1.25), Kit.atE(2.0 * s, 0.85 + 1.8 * s, 0, 0, 0, -Math.PI * 0.62), 'accent');
-  kit.cylinder(0, 0.85 + 2.25 * s, 0, 1.95 * s, 0.06, 'water', { seg: 32 }); // „кафе“ — вода во шолјата
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * TAU;
-    kit.box(Math.cos(a) * (R - 0.6), 0.35, Math.sin(a) * (R - 0.6), 0.3, 0.2, 0.3, 'light', -a);
-  }
-}
-
 // ───────────────────────── Кај авионите ─────────────────────────
 // Изложени млазни ловци со стреловидни крила (стилизирани по F-86), секој на рамно тревно
 // плато со кружна патека. Позициите се од OSM (parts), насоката и големината на кругот — opts.planes.
@@ -589,4 +563,4 @@ function jets(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, shieldFountain, parkFountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };
+export const EXTRA_MODELS = { equestrian, fountain, shieldFountain, parkFountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, dimitrija, bezisten, bogorodica, mitropolija, stivMonument, sportsHall, openArena, museum, jets };

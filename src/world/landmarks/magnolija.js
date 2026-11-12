@@ -14,7 +14,7 @@ import { obb, pointInRing } from '../geom2d.js';
 import {
   plate, rnd, windowAt, balcony, wallLamp, band, grow, openingShape, openEdges, frameOn, body,
   plainWindows, clipX, simplify, chamfer, buildHouses,
-} from './facade.js';
+} from './house-kit.js';
 
 // Споменикот на Филип II (локални метри) — кон него гледаат главните фасади.
 const FOCUS = [-10.1, 45.5];
@@ -699,7 +699,7 @@ function staklena(kit, s, _edges, gm, others) {
   if (longN) {
     frameOn(kit, longN, gm);
     for (let u = -longN.len / 2 + 1.5; u < longN.len / 2 - 1; u += 3.2) {
-      kit.box(u, -0.3, 2.6, 2.8, 1.0, 1.4, 'granite');
+      kit.box(u, -0.3, 2.6, 2.8, 1.0, 1.4, 'basalt');
       kit.sphere(u - 0.6, 1.0, 2.6, 0.7, 'green', { seg: 7, sy: 0.6 });
       kit.sphere(u + 0.6, 1.1, 2.6, 0.6, 'green', { seg: 7, sy: 0.7 });
     }

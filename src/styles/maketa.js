@@ -113,9 +113,14 @@ export default {
     sand: '#efe2c6',
     rubble: '#dcc6a2',
     slate: '#c3ab84',
+    // грбот на Битола (Филџанот)
+    crestRed: '#c98c72',
+    crestGold: '#e6cf92',
+    crestBlue: '#93a4bb',
+    granite: '#dcc0b4', // постаменти (споменик на Стив)
     // штитот-фонтана и постаментот на Филип II (Магнолија)
     gold: '#c9a96a',
-    granite: '#a89a86',
+    basalt: '#a89a86',
     glass: '#b9c6c2', // Стаклена
     rose: '#dcc2b4', // Широк Сокак
     apricot: '#e8cfae',

@@ -25,9 +25,25 @@ export const LANDMARKS = [
     opts: { dome: 7.2, hall: 16, minaret: 34, porticoDomes: 3 },
   },
   { id: 'ajdar-kadi', group: 'Цркви и џамии', name: 'Ајдар-кади џамија', osm: 'w192121734', model: 'mosque', rank: 0, opts: { dome: 6.2, hall: 14, minaret: 28, porticoDomes: 3 } },
-  { id: 'bezisten', group: 'Центар', name: 'Безистен', osm: 'w1143767501', model: 'bezisten', rank: 0 },
-  { id: 'oficerski-dom', group: 'Центар', name: 'Офицерски дом', osm: 'w1102567439', model: 'officersHome', rank: 0 },
-  { id: 'sv-dimitrija', group: 'Цркви и џамии', name: 'Св. Димитрија', osm: 'w38582552', model: 'church', rank: 0 },
+  // Безистен: рачен модел (world/landmarks/bezisten.js); терасите на угостителските објекти
+  // долепени до јужната фасада (OSM building) се цртаат ниско — тента и стаклена ограда;
+  // двата павилјона (влезови во подземниот премин, сега дуќани) од двете страни на „Столарска“
+  {
+    id: 'bezisten', group: 'Центар', name: 'Безистен', osm: 'w1143767501', model: 'bezisten', rank: 0,
+    parts: { terrace1: 'w1463130077', terrace2: 'w1463130078', terrace3: 'w1463130079', pavilion1: 'w1462644090', pavilion2: 'w1462644091' },
+  },
+  // Офицерски дом: рачен модел (world/landmarks/oficerski.js); fountain = камената чешма во паркот
+  // (ја нема во OSM; од сателит — на оската на ул. „Раде Илиев“). Обработката ја претвора во
+  // локални метри и не става дрвја од паркот во круг од 11 m околу неа.
+  {
+    id: 'oficerski-dom', group: 'Центар', name: 'Офицерски дом', osm: 'w1102567439', model: 'officersHome', rank: 0,
+    opts: { fountain: { lat: 41.024591, lon: 21.337692 } },
+  },
+  // Св. Димитрија: рачен модел (world/landmarks/dimitrija.js) — самостојна камбанарија, базен, ограда со порта
+  {
+    id: 'sv-dimitrija', group: 'Цркви и џамии', name: 'Св. Димитрија', osm: 'w38582552', model: 'dimitrija', rank: 0,
+    parts: { tower: 'w961554014', pool: 'n8894631986', fence: 'w961554013' },
+  },
   { id: 'magnolija', group: 'Центар', name: 'Плоштад Магнолија', osm: 'r20052087', model: 'square', rank: 0 },
   // коњаничка статуа на висок постамент (n4411126494 „Статуа Филип II“); точна позиција од
   // сопственикот (Google Maps). Коњаникот е свртен кон Магнолија и влезот на Широк Сокак —
@@ -58,7 +74,13 @@ export const LANDMARKS = [
 
   // ── цркви и манастири ──
   { id: 'presveto-srce', group: 'Цркви и џамии', name: 'Пресвето Срце Исусово', osm: 'w1070850326', model: 'church', rank: 1, opts: { tower: 'front', spire: true, dome: false, wallH: 11 } },
-  { id: 'presveta-bogorodica', group: 'Цркви и џамии', name: 'Пресвета Богородица', osm: 'w210252893', model: 'church', rank: 1, opts: { towerH: 24 } },
+  // Митрополијата (Преспанско-пелагониска епархија): рачен модел (world/landmarks/mitropolija.js)
+  { id: 'mitropolija', group: 'Јавни згради', name: 'Митрополија', osm: 'w302354632', model: 'mitropolija', rank: 1 },
+  // Пресвета Богородица: рачен модел (world/landmarks/bogorodica.js) — камбанарија и чешма од OSM
+  {
+    id: 'presveta-bogorodica', group: 'Цркви и џамии', name: 'Пресвета Богородица', osm: 'w210252893', model: 'bogorodica', rank: 1,
+    parts: { tower: 'w961565085', fountain: 'n8894698515' },
+  },
   { id: 'sv-nedela', group: 'Цркви и џамии', name: 'Св. Недела', osm: 'w210253741', model: 'church', rank: 1, opts: { towerH: 20, wallH: 8 } },
   { id: 'star-manastir', group: 'Цркви и џамии', name: 'Стар Битолски Манастир', osm: 'w1134050922', model: 'monastery', rank: 1 },
   { id: 'nov-manastir', group: 'Цркви и џамии', name: 'Нов Битолски Манастир', osm: 'w1331445406', model: 'monastery', rank: 1 },
@@ -71,9 +93,15 @@ export const LANDMARKS = [
   // „Горна гимназија“ — СОУ „Јосип Броз Тито“: главната зграда во дворот на училиштето
   // главната зграда е до главната улица (точка од сопственикот); најголемата во дворот е спортската сала
   { id: 'gorna-gimnazija', group: 'Јавни згради', name: 'Горна гимназија', osm: 'w991753317', inside: true, at: { lat: 41.0321394, lon: 21.3284611 }, model: 'gymnasium', rank: 1, opts: { front: [0, 1] } }, // фасадата кон Драгор (на југ од зградата)
-  { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'publicBuilding', rank: 1, opts: { height: 10, roof: 'tiles', part: 'wall2', floors: 2 } },
+  // Музејот на Битола: рачен модел (world/landmarks/muzej.js); bust = бистата на Даме Груев во градината
+  { id: 'muzej', group: 'Јавни згради', name: 'Музеј на Битола', osm: 'r17362023', model: 'museum', rank: 1, parts: { bust: 'n12329728344' } },
   { id: 'zandan-kule', group: 'Историја и спомен-места', name: 'Зандан Куле', osm: 'w992188624', model: 'stoneTower', rank: 1 },
   { id: 'stanica', group: 'Јавни згради', name: 'Железничка станица', osm: 'w333585687', model: 'station', rank: 1 },
+  // Спортската сала „Боро Чурлевски“ („Младост“): рачен модел (world/landmarks/sportska-sala.js)
+  { id: 'sportska-sala', group: 'Јавни згради', name: 'Спортска сала „Боро Чурлевски“', osm: 'w38006427', model: 'sportsHall', rank: 1 },
+  // „Ракометното игралиште“: отворен простор со трибини, повремено за концерти (world/landmarks/arena.js);
+  // во OSM е building=public — обичната зграда се заменува со моделот; kiosks = бутките на западната страна
+  { id: 'rakometno', group: 'Јавни згради', name: 'Ракометно игралиште', osm: 'w38165657', model: 'openArena', rank: 1, parts: { kiosks: 'w1470238682' } },
   { id: 'stadion', group: 'Јавни згради', name: 'Стадион „Тумбе Кафе“', osm: 'w38006058', model: 'stadium', rank: 1 },
   { id: 'tvrdina', group: 'Историја и спомен-места', name: 'Битолска тврдина', osm: 'w1127758201', model: 'fortress', rank: 1 },
 
@@ -81,6 +109,10 @@ export const LANDMARKS = [
   { id: 'totenborg', group: 'Историја и спомен-места', name: 'Германски воени гробишта (Тотенборг)', osm: 'w210250978', model: 'totenburg', rank: 1 },
   { id: 'francuski-grobishta', group: 'Историја и спомен-места', name: 'Француски воени гробишта', osm: 'w1050777115', model: 'warCemetery', parts: { memorial: 'w1217195019' }, rank: 1 },
   { id: 'srpski-grobishta', group: 'Историја и спомен-места', name: 'Српски воени гробишта', osm: 'w1050747139', model: 'warCemetery', opts: { chapel: true }, rank: 1 },
+
+  // ── Споменикот на народниот херој Стеван Наумов-Стив (OSM точка), во паркот кај Офицерскиот дом ──
+  // clearTrees: без дрвја од паркот во круг (m) околу точката (поплочен простор)
+  { id: 'stiv-naumov', group: 'Историја и спомен-места', name: 'Споменик на Стеван Наумов-Стив', node: 'n2316156278', model: 'stivMonument', rank: 1, clearTrees: 8 },
 
   // ── Битолскиот филџан: скулптура на кружниот тек „11. Бригада“ (западен влез) ──
   // точна позиција од сопственикот (Google Maps: 41.0329632, 21.3160347)

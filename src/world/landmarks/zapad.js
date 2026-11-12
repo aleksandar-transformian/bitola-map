@@ -2,12 +2,12 @@
 // модели според фотографии од сопственикот (Street View). Не се знаменитости: немаат натпис,
 // само ги заменуваат обичните кутии.
 //
-// Рамка на раб: u = по работ, v = нанадвор од ѕидот, y = над подлогата (види facade.js).
+// Рамка на раб: u = по работ, v = нанадвор од ѕидот, y = над подлогата (види house-kit.js).
 
 import * as THREE from 'three';
 import { Kit } from './kit.js';
 import { distToPolyline, obb } from '../geom2d.js';
-import { rnd, windowAt, balcony, wallLamp, band, grow, frameOn, body, simplify, openEdges, openingShape, plate, buildHouses } from './facade.js';
+import { rnd, windowAt, balcony, wallLamp, band, grow, frameOn, body, simplify, openEdges, openingShape, plate, buildHouses } from './house-kit.js';
 
 // улицата пред Алта Банка и пицеријата (OSM w1463976011) — кон неа гледаат главните фасади
 const STREET = [-66, 24];
@@ -218,9 +218,9 @@ function mickey(kit, s0, _edges, gm, others) {
   const H = 7.0;
   const F = 3.6; // кат
   body(kit, s, H, 'window', { pitched: 'hip', roof: 'dome' });
-  band(kit, ring, gm - 0.3, gm + 0.45, 0.06, 'granite');
-  band(kit, ring, gm + F - 0.25, gm + F + 0.15, 0.12, 'granite');
-  band(kit, ring, gm + H - 0.35, gm + H, 0.85, 'granite'); // стреа
+  band(kit, ring, gm - 0.3, gm + 0.45, 0.06, 'basalt');
+  band(kit, ring, gm + F - 0.25, gm + F + 0.15, 0.12, 'basalt');
+  band(kit, ring, gm + H - 0.35, gm + H, 0.85, 'basalt'); // стреа
   const edges = openEdges(ring, others);
   for (const e of edges) {
     if (e.len < 1.5) continue;
@@ -229,25 +229,25 @@ function mickey(kit, s0, _edges, gm, others) {
     const n = Math.max(1, Math.round(L / 1.9));
     for (let k = 0; k <= n; k++) {
       const u = -L / 2 + (L * k) / n;
-      kit.box(u, 0, 0.06, 0.22, H - 0.3, 0.16, 'granite');
+      kit.box(u, 0, 0.06, 0.22, H - 0.3, 0.16, 'basalt');
     }
     for (let k = 0; k < n; k++) {
       const u = -L / 2 + (L * (k + 0.5)) / n;
       const w = L / n - 0.3;
-      kit.box(u, 0.45, 0.08, w, 0.06, 0.05, 'granite');
-      kit.box(u, 2.35, 0.08, w, 0.06, 0.05, 'granite');
-      kit.box(u, F + 1.0, 0.08, w, 0.06, 0.05, 'granite');
-      kit.box(u, F + 2.4, 0.08, w, 0.06, 0.05, 'granite');
-      kit.box(u, 0.45, 0.07, 0.05, F - 0.7, 0.04, 'granite');
+      kit.box(u, 0.45, 0.08, w, 0.06, 0.05, 'basalt');
+      kit.box(u, 2.35, 0.08, w, 0.06, 0.05, 'basalt');
+      kit.box(u, F + 1.0, 0.08, w, 0.06, 0.05, 'basalt');
+      kit.box(u, F + 2.4, 0.08, w, 0.06, 0.05, 'basalt');
+      kit.box(u, 0.45, 0.07, 0.05, F - 0.7, 0.04, 'basalt');
       // жардињера на катот со црвени цвеќиња
-      kit.box(u, F + 0.15, 0.32, w, 0.32, 0.36, 'granite');
+      kit.box(u, F + 0.15, 0.32, w, 0.32, 0.36, 'basalt');
       for (let t = -w / 2 + 0.2; t < w / 2 - 0.1; t += 0.35) {
         kit.sphere(u + t, F + 0.6, 0.34, 0.16, rnd(u + t, e.m[0]) < 0.55 ? 'roof' : 'green', { seg: 5, sy: 0.9 });
       }
     }
     // ограда на катот
-    kit.box(0, F + 1.05, 0.5, L, 0.05, 0.05, 'granite');
-    for (let t = -L / 2; t <= L / 2; t += 0.3) kit.box(t, F + 0.15, 0.5, 0.03, 0.9, 0.03, 'granite');
+    kit.box(0, F + 1.05, 0.5, L, 0.05, 0.05, 'basalt');
+    for (let t = -L / 2; t <= L / 2; t += 0.3) kit.box(t, F + 0.15, 0.5, 0.03, 0.9, 0.03, 'basalt');
   }
 }
 
@@ -315,14 +315,14 @@ function lowShops(kit, s0, _edges, gm, others) {
   for (let k = 0; k < n; k++) {
     const u = -L / 2 + (L * (k + 0.5)) / n;
     const w = L / n - 0.5;
-    kit.box(u, 0.25, 0.0, w + 0.3, 2.95, 0.06, 'granite');
-    windowAt(kit, u, 0.3, w, 2.75, { frame: 'granite', v: 0.06, bars: true, sill: false, lit: 0.9 });
+    kit.box(u, 0.25, 0.0, w + 0.3, 2.95, 0.06, 'basalt');
+    windowAt(kit, u, 0.3, w, 2.75, { frame: 'basalt', v: 0.06, bars: true, sill: false, lit: 0.9 });
     if (rnd(u, L) < 0.35) kit.box(u, 1.5, 0.14, w, 1.55, 0.03, 'metal'); // спуштена ролетна
     kit.box(u, 3.1, 0.2, Math.min(1.6, w), 0.45, 0.06, signs[k % signs.length], 0, 0.3);
   }
   // стреа (настрешница) над тротоарот
   kit.add(new THREE.BoxGeometry(L, 0.12, 1.8), Kit.atE(0, 3.55, 0.9, 0.12, 0, 0), 'roof');
-  kit.box(0, 3.3, 1.75, L, 0.2, 0.06, 'granite');
+  kit.box(0, 3.3, 1.75, L, 0.2, 0.06, 'basalt');
 }
 
 /**
@@ -409,7 +409,7 @@ function coffeeHouse(kit, s0, _edges, gm, others) {
       kit.box(u, 0.1, -0.56, L / n - 0.4, 2.9, 0.05, 'wood');
       windowAt(kit, u, 0.2, L / n - 0.7, 2.6, { frame: 'wood', v: -0.5, bars: true, sill: false, lit: 0.95 });
     }
-    if (street && e === streets[0]) kit.box(-L / 4, G - 0.05, 0.08, Math.min(3.2, L / 2), 0.55, 0.12, 'granite', 0, 0.3); // натпис
+    if (street && e === streets[0]) kit.box(-L / 4, G - 0.05, 0.08, Math.min(3.2, L / 2), 0.55, 0.12, 'basalt', 0, 0.3); // натпис
   }
 }
 
@@ -478,12 +478,12 @@ function kebab(kit, s0, _edges, gm, others) {
     // лимена надстрешница со натпис, амблем, чадори, маси
     kit.add(new THREE.BoxGeometry(L + 2.4, 0.08, 2.6), Kit.atE(-0.6, H + 0.15, 1.2, 0.14, 0, 0), 'metal');
     kit.box(-0.6, H - 0.35, 2.5, L + 2.4, 0.75, 0.08, 'ochre', 0, 0.35); // „ОХРИД кебапчилница“
-    kit.box(-0.6, H - 0.12, 2.56, L * 0.55, 0.32, 0.02, 'granite');
+    kit.box(-0.6, H - 0.12, 2.56, L * 0.55, 0.32, 0.02, 'basalt');
     kit.box(L / 2 - 0.2, H - 0.45, 2.56, 1.4, 0.95, 0.06, 'green'); // „Скопско“
     for (const [du, dv] of [[-L / 2 - 1.2, 3.2], [-L / 2 + 1.6, 3.6]]) {
       kit.cylinder(du, 0, dv, 0.04, 2.3, 'metal', { seg: 5 });
       kit.add(new THREE.ConeGeometry(1.35, 0.55, 8), Kit.at(du, 2.4, dv), 'water');
-      kit.cylinder(du + 0.6, 0, dv - 0.3, 0.38, 0.72, 'granite', { seg: 8 });
+      kit.cylinder(du + 0.6, 0, dv - 0.3, 0.38, 0.72, 'basalt', { seg: 8 });
       for (const a of [0, 2.1, 4.2]) kit.box(du + 0.6 + Math.cos(a) * 0.65, 0, dv - 0.3 + Math.sin(a) * 0.65, 0.42, 0.85, 0.42, 'roof');
     }
   }

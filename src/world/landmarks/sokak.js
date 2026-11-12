@@ -1,13 +1,13 @@
 // Широк Сокак од Магнолија надолу — детални фасади според Street View од сопственикот.
 // Не се знаменитости: само ги заменуваат обичните фасади на улицата (ги додаваат во ctx.skip).
 //
-// Рамка на раб (facade.js): u = по работ, v = нанадвор од ѕидот, y = над подлогата. +u е десно
+// Рамка на раб (house-kit.js): u = по работ, v = нанадвор од ѕидот, y = над подлогата. +u е десно
 // од гледачот што стои пред фасадата, па „лево → десно на фотографијата“ е t = 0 → 1: u = U(L, t).
 
 import * as THREE from 'three';
 import { Kit } from './kit.js';
 import { distToPolyline } from '../geom2d.js';
-import { windowAt, balcony, wallLamp, band, frameOn, body, simplify, openEdges, openingShape, plate, buildHouses } from './facade.js';
+import { windowAt, balcony, wallLamp, band, frameOn, body, simplify, openEdges, openingShape, plate, buildHouses } from './house-kit.js';
 
 // Широк Сокак (OSM w1414592489, северниот крај), уличките „Кирил и Методиј“ (w37727881) и „27. Март“
 const SOKAK = [[6.6, 70.7], [24.5, 112], [36.9, 137.5]];
@@ -223,7 +223,7 @@ function velvet(kit, s0, _e, gm, others) {
     kit.box(at(t), 0.3, 0.02, 2.3, 3.3, 0.06, 'wood');
     windowAt(kit, at(t), 0.45, 2.0, 3.0, { frame: 'wood', v: 0.06, bars: true, sill: false, lit: 0.95 });
   }
-  kit.box(at(0.94), 1.8, 0.1, 1.1, 0.9, 0.05, 'granite', 0, 0.2); // табла „Velvet“
+  kit.box(at(0.94), 1.8, 0.1, 1.1, 0.9, 0.05, 'basalt', 0, 0.2); // табла „Velvet“
   // прв кат: балкон на голема конзола над лоѓијата, прозорци со леани огради
   kit.box(lu, G - 0.5, 0.45, 1.5, 0.9, 0.8, 'accent');
   balcony(kit, lu, G + 0.6, 2.6, 1.0, { slab: 'accent', rail: 'metal', h: 1.0, step: 0.12 });
@@ -416,7 +416,7 @@ function adams(kit, s0, _e, gm, others) {
       if (e === street) {
         const m = Math.max(1, Math.round(L / 3.2));
         for (let k = 0; k < m; k++) windowAt(kit, U(L, (k + 0.5) / m), 0.35, Math.min(2.2, L / m - 0.8), 2.9, { frame: 'plaster', v: 0.06, bars: true, sill: false, lit: 0.95 });
-        kit.add(new THREE.BoxGeometry(L * 0.55, 0.05, 1.4), Kit.atE(U(L, 0.7), 3.6, 0.7, 0.3, 0, 0), 'granite');
+        kit.add(new THREE.BoxGeometry(L * 0.55, 0.05, 1.4), Kit.atE(U(L, 0.7), 3.6, 0.7, 0.3, 0, 0), 'basalt');
         ironBalcony(kit, U(L, 0.45), G + 0.95, 2.6, 0.85);
       } else {
         ironBalcony(kit, U(L, 0.85), F2 + 0.55, 1.6, 0.75);
