@@ -2,7 +2,7 @@
 // item доаѓа од public/data/landmarks.json (основа од OSM, подлога), ctx = { hf, buildings, skip }.
 // Моделите се стилизирани — препознатлив силует, пропорции од основата, без архитектонски детали.
 
-import { obb, longestEdge, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geom2d.js';
+import { obb, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geom2d.js';
 import { buildingShape, shell, wantsPitch, Writer } from '../buildings.js';
 import { BUILDING_ID } from '../../config/classes.js';
 import { magnoliaHouses } from './magnolija.js';
@@ -425,84 +425,4 @@ export function walk(line, step, fn) {
   }
 }
 
-// ───────────────────────── Хераклеа Линкестис ─────────────────────────
-function heraclea(kit, item, ctx) {
-  const site = item.polys[0][0];
-  // модерните покриви/настрешници во оградата (ML детекции) ги кријат урнатините — без нив
-  const pack = ctx.buildings;
-  const q = pack.meta.q;
-  for (let b = 0; b < pack.meta.count; b++) {
-    const r0 = pack.arrays.ringPt[pack.arrays.polyRing[b]];
-    const x = pack.arrays.coords[r0 * 2] * q;
-    const z = pack.arrays.coords[r0 * 2 + 1] * q;
-    if (Math.abs(x - item.center[0]) < 300 && Math.abs(z - item.center[1]) < 300 && pointInRing([x, z], site)) ctx.skip.add(b);
-  }
-  const T = item.parts?.theater;
-  // театар: сцената е по најдолгиот раб, гледалиштето е полукруг на спротивната страна
-  if (T) {
-    const tr = T.polys[0][0];
-    const [a, b, len] = longestEdge(tr);
-    const mx = (a[0] + b[0]) / 2;
-    const mz = (a[1] + b[1]) / 2;
-    const tx = (b[0] - a[0]) / len;
-    const tz = (b[1] - a[1]) / len;
-    let nx = -tz;
-    let nz = tx;
-    const [cx, cz] = T.center;
-    if ((cx - mx) * nx + (cz - mz) * nz < 0) {
-      nx = -nx;
-      nz = -nz;
-    }
-    const y = ctx.hf.sample(mx, mz) - 0.4;
-    kit.setFrame(mx, y, mz, nx, nz); // u = кон гледалиштето
-    const R = Math.min(len / 2, 30);
-    const rows = 11;
-    for (let r = 0; r < rows; r++) {
-      const r0 = 7 + ((R - 7) * r) / rows;
-      const r1 = 7 + ((R - 7) * (r + 1)) / rows;
-      const segs = 22;
-      for (let k = 0; k < segs; k++) {
-        const a0 = -Math.PI / 2 + (k / segs) * Math.PI;
-        const a1 = -Math.PI / 2 + ((k + 1) / segs) * Math.PI;
-        const am = (a0 + a1) / 2;
-        const rm = (r0 + r1) / 2;
-        const w = rm * (a1 - a0) * 1.04;
-        if ((k + r) % 9 === 4 && r > 5) continue; // урнати делови
-        kit.box(Math.cos(am) * rm, 0, Math.sin(am) * rm, r1 - r0, 0.45 * (r + 1), w, 'stone', -am);
-      }
-    }
-    // орхестра и сцена
-    kit.cylinder(0, 0, 0, 6.6, 0.15, 'paving', { seg: 24 });
-    kit.box(-3.2, 0, 0, 4.5, 1.1, len * 0.7, 'stone');
-    for (let i = -4; i <= 4; i++) kit.cylinder(-5, 1.1, (i * len * 0.7) / 9, 0.35, i % 2 ? 3.2 : 4.6, 'stone', { seg: 10 });
-  }
-  // колонада и урнатини околу „Голема базилика“ (центарот на локалитетот)
-  const f = obb(site);
-  const [scx, scz] = ringCentroid(site);
-  const gy = ctx.hf.sample(scx, scz) - 0.3;
-  kit.setFrame(scx + f.ax * f.L * 0.12, gy, scz + f.az * f.L * 0.12, f.ax, f.az);
-  for (let i = 0; i < 12; i++) {
-    for (const v of [-6, 6]) {
-      const h = (i * 7 + (v > 0 ? 3 : 0)) % 5 === 0 ? 1.4 : 5.2;
-      kit.cylinder(-22 + i * 4, 0, v, 0.42, h, 'stone', { seg: 10 });
-      if (h > 5 && i % 3 === 1) kit.box(-20 + i * 4, h, v, 4.2, 0.7, 1, 'stone');
-    }
-  }
-  // ѕидишта на просторииште (ниски, на места урнати)
-  const rooms = [[-18, 14, 12, 9], [-4, 14, 10, 9], [8, 14, 9, 9], [-16, -16, 14, 10], [2, -16, 12, 10]];
-  rooms.forEach(([u, v, w, d], i) => {
-    const h = 0.8 + (i % 3) * 0.5;
-    kit.box(u, 0, v - d / 2, w, h, 0.6, 'stone');
-    kit.box(u - w / 2, 0, v, 0.6, h * 0.7, d, 'stone');
-    if (i % 2) kit.box(u + w / 2, 0, v, 0.6, h, d, 'stone');
-    if (i !== 2) kit.box(u, 0, v + d / 2, w * 0.6, h * 0.6, 0.6, 'stone');
-  });
-  // подни мозаици
-  for (let i = 0; i < 6; i++) {
-    for (let j = 0; j < 4; j++) {
-      kit.box(-1 + i * 1.6, 0.25, -1.6 + j * 1.6 - 14 + 30, 1.5, 0.06, 1.5, (i + j) % 2 ? 'mosaic1' : 'mosaic2');
-    }
-  }
-}
-
-export const MODELS = { clockTower, mosque, bezisten, officersHome, publicBuilding, church, square, promenade, heraclea };
+export const MODELS = { clockTower, mosque, bezisten, officersHome, publicBuilding, church, square, promenade };

@@ -20,7 +20,8 @@ export const PLACE_SKIP = new Set(['Битола', 'Стара чаршија', 
 export const EXTRA_PLACES = [
   { name: 'Стара чаршија', x: 60, z: -190, rank: 2, kind: 'quarter' },
   { name: 'Јени Маале', x: 820, z: -260, rank: 2, kind: 'quarter', approx: true },
-  { name: 'Буковски Ливади', x: -420, z: 2050, rank: 2, kind: 'quarter', approx: true },
+  // меѓу Панде Илковски, Апостол Здравевски и Крстин Чулаковски (Google Maps од сопственикот)
+  { name: 'Буковски Ливади', x: 975, z: 2770, rank: 2, kind: 'quarter' },
   { name: 'Тумбе Кафе', x: 300, z: 1500, rank: 2, kind: 'quarter', approx: true },
   // натпис на падините на масивот (врвот е надвор од опфатот, ~12 km западно)
   { name: 'Пелистер', x: -5900, z: 2900, rank: 1, kind: 'mountain', lift: 60 },

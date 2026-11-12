@@ -33,4 +33,12 @@ export const CHECK_VIEWS = [
   // камерата е на плоштадот источно од споменикот (не во ресторанот „Грне“)
   { id: 'mag-red', target: { x: -25, z: 73 }, bearing: 43, polar: 77, distance: 41 },
   { id: 'mag-plostad', target: { x: 10, z: 58 }, bearing: 300, polar: 68, distance: 90 },
+  // Хераклеа одблиску: од локалитетот кон театарот (аркадата на сцената) и од горе кон базиликата
+  { id: 'her-teatar', target: { x: 625, z: 2150 }, bearing: 170, polar: 70, distance: 120 },
+  { id: 'her-bazilika', target: { x: 635, z: 2195 }, bearing: 320, polar: 58, distance: 130 },
+  { id: 'her-gore', target: { x: 630, z: 2175 }, bearing: 0, polar: 1, distance: 260 },
+  // Зоолошката градина и југот (натписот на Буковски Ливади)
+  { id: 'zoo', target: { x: 560, z: 1740 }, bearing: 140, polar: 55, distance: 330 },
+  { id: 'zoo-blisku', target: { x: 600, z: 1720 }, bearing: 150, polar: 62, distance: 130 },
+  { id: 'jug', target: { x: 800, z: 2400 }, bearing: 20, polar: 50, distance: 1600 },
 ];

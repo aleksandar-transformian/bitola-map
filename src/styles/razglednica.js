@@ -110,6 +110,12 @@ export default {
     plaster: '#f8f1e4',
     peach: '#f0cfb6',
     wood: '#8e4a33',
+    // Хераклеа (world/landmarks/heraclea.js)
+    brick: '#b8664c',
+    marble: '#f4efe4',
+    sand: '#e8d6ae',
+    rubble: '#c2ab8c',
+    slate: '#6b7178',
   },
   trees: {
     crowns: ['#8fb36a', '#9cbf74', '#7ea862', '#a8c47e', '#b3b86c'],

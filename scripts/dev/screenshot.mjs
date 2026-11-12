@@ -41,7 +41,7 @@ const VIEWS = {
 // lm-<id> = поглед кон знаменитост од public/data/landmarks.json (свој `view` или растојание по големина)
 const LMS = JSON.parse(readFileSync('public/data/landmarks.json', 'utf8'));
 for (const lm of LMS) {
-  const big = { stadium: 420, warCemetery: 380, fortress: 300, monastery: 300, totenburg: 200, heraclea: 380, promenade: 420 }[lm.model] || 150;
+  const big = { stadium: 420, warCemetery: 380, fortress: 300, monastery: 300, totenburg: 200, heraclea: 380, zoo: 420, promenade: 420 }[lm.model] || 150;
   VIEWS[`lm-${lm.id}`] = { target: { x: lm.center[0], z: lm.center[1] }, bearing: 200, polar: 58, distance: big, ...(lm.view || {}) };
 }
 

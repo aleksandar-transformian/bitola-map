@@ -30,7 +30,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&l
  * @param {{ views: object[], landmarks: object[], times: object[], weathers: object[], onGo: (id:string)=>void, onTime: (id:string)=>void, onWeather: (id:string)=>void, onLife?: (on:boolean)=>void }} o
  */
 export function createMenu(root, { views, landmarks, times, weathers, qualities = [], onGo, onTime, onWeather, onLife, onSnapshot, onQuality }) {
-  const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места'];
+  const GROUP_ORDER = ['Центар', 'Цркви и џамии', 'Јавни згради', 'Историја и спомен-места', 'Паркови и рекреација'];
   const viewIds = new Set(views.map((v) => v.id));
   const groups = new Map(GROUP_ORDER.map((g) => [g, []]));
   for (const l of landmarks) {
