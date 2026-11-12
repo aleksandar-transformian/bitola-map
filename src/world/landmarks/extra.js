@@ -7,6 +7,7 @@ import { Kit } from './kit.js';
 import { obb, ringCentroid, pointInRing, distToPolyline, ringArea } from '../geom2d.js';
 import { churchOn, largestInside, lamp } from './models.js';
 import { fildzan } from './fildzan.js';
+import { dimitrija } from './dimitrija.js';
 
 const TAU = Math.PI * 2;
 
@@ -424,4 +425,4 @@ function jets(kit, item, ctx) {
   }
 }
 
-export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, jets };
+export const EXTRA_MODELS = { equestrian, fountain, stoneTower, station, stadium, fortress, totenburg, warCemetery, monastery, fildzan, dimitrija, jets };

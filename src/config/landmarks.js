@@ -27,7 +27,11 @@ export const LANDMARKS = [
   { id: 'ajdar-kadi', group: 'Цркви и џамии', name: 'Ајдар-кади џамија', osm: 'w192121734', model: 'mosque', rank: 0, opts: { dome: 6.2, hall: 14, minaret: 28, porticoDomes: 3 } },
   { id: 'bezisten', group: 'Центар', name: 'Безистен', osm: 'w1143767501', model: 'bezisten', rank: 0 },
   { id: 'oficerski-dom', group: 'Центар', name: 'Офицерски дом', osm: 'w1102567439', model: 'officersHome', rank: 0 },
-  { id: 'sv-dimitrija', group: 'Цркви и џамии', name: 'Св. Димитрија', osm: 'w38582552', model: 'church', rank: 0 },
+  // Св. Димитрија: рачен модел (world/landmarks/dimitrija.js) — самостојна камбанарија, базен, ограда со порта
+  {
+    id: 'sv-dimitrija', group: 'Цркви и џамии', name: 'Св. Димитрија', osm: 'w38582552', model: 'dimitrija', rank: 0,
+    parts: { tower: 'w961554014', pool: 'n8894631986', fence: 'w961554013' },
+  },
   { id: 'magnolija', group: 'Центар', name: 'Плоштад Магнолија', osm: 'r20052087', model: 'square', rank: 0 },
   // коњаничка статуа на висок постамент (n4411126494 „Статуа Филип II“); точна позиција од
   // сопственикот (Google Maps). Коњаникот е свртен кон Магнолија и влезот на Широк Сокак —
